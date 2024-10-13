@@ -41,7 +41,7 @@ const NoteCard = ({ note }: NoteCardProps) => {
           </p>
         </CardContent>
         <CardFooter className="justify-end">
-          <div className="flex flex-col space-y-2 md:flex-row md:space-x-2 md:space-y-0 w-full">
+          <div className="flex flex-col space-y-2 md:flex-row md:space-x-2 md:space-y-0 w-full md:w-auto">
             <Button className="w-full" variant="outline">
               Edit
             </Button>
