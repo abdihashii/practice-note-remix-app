@@ -32,7 +32,22 @@ export default function Index() {
       updatedAt: new Date(),
       favorite: false,
     },
-    // Add more notes as needed
+    {
+      id: "3",
+      title: "Third Note",
+      content: "This is the content of the third note.",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      favorite: false,
+    },
+    {
+      id: "4",
+      title: "Fourth Note",
+      content: "This is the content of the fourth note.",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      favorite: false,
+    },
   ]);
 
   return (
