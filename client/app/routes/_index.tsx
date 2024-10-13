@@ -1,14 +1,10 @@
 import type { MetaFunction } from "@remix-run/node";
 import { useState } from "react";
 
+import { Note } from "~/types";
+
 import Layout from "~/components/Layout/Layout";
 import MainContent from "~/components/MainComponent";
-
-interface Note {
-  id: string;
-  title: string;
-  content: string;
-}
 
 export const meta: MetaFunction = () => {
   return [
