@@ -1,7 +1,7 @@
 import type { MetaFunction } from "@remix-run/node";
 import { useState } from "react";
 
-import Layout from "~/components/Layout";
+import Layout from "~/components/Layout/Layout";
 import MainContent from "~/components/MainComponent";
 
 interface Note {
