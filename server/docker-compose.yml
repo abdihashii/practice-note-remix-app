@@ -1,0 +1,17 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:latest # postgres image from dockerhub
+    container_name: my-postgres-container # name of the container
+    environment:
+      POSTGRES_USER: myuser # postgres username
+      POSTGRES_PASSWORD: mypassword # postgres password
+      POSTGRES_DB: mydatabase # postgres database name
+    ports:
+      - "5432:5432" # map postgres port to host port
+    volumes:
+      - postgres_data:/var/lib/postgresql/data # map postgres data to host volume
+
+volumes:
+  postgres_data: # name of the volume
