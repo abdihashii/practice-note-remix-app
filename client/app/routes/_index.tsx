@@ -1,10 +1,11 @@
 import type { MetaFunction } from "@remix-run/node";
-import { useState } from "react";
+import { useLoaderData, json } from "@remix-run/react";
 
-import { Note } from "~/types";
+import { getNotes } from "~/lib/routes";
 
 import Layout from "~/components/Layout/Layout";
-import MainContent from "~/components/MainComponent";
+import NoteCard from "~/components/notes/NoteCard";
+import FloatingActionButton from "~/components/FloatingActionButton";
 
 export const meta: MetaFunction = () => {
   return [
@@ -13,46 +14,46 @@ export const meta: MetaFunction = () => {
   ];
 };
 
+export async function loader() {
+  const API_URL = process.env.API_URL;
+
+  if (!API_URL) {
+    console.error("API_URL is not set");
+    return { notes: [] };
+  }
+
+  const notes = await getNotes(API_URL);
+
+  if (!notes) {
+    throw new Response("No notes found", { status: 404 });
+  }
+
+  return json({ notes });
+}
+
 export default function Index() {
-  const [notes, setNotes] = useState<Note[]>([
-    // Example notes
-    {
-      id: "1",
-      title: "First Note",
-      content: "This is the content of the first note.",
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      favorite: false,
-    },
-    {
-      id: "2",
-      title: "Second Note",
-      content: "This is the content of the second note.",
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      favorite: false,
-    },
-    {
-      id: "3",
-      title: "Third Note",
-      content: "This is the content of the third note.",
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      favorite: false,
-    },
-    {
-      id: "4",
-      title: "Fourth Note",
-      content: "This is the content of the fourth note.",
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      favorite: false,
-    },
-  ]);
+  const { notes } = useLoaderData<typeof loader>();
 
   return (
     <Layout>
-      <MainContent notes={notes} />
+      <div className="relative flex-grow">
+        {notes.length > 0 ? (
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {notes.map((note) =>
+              note ? (
+                <NoteCard key={note.id} note={note} />
+              ) : (
+                <p className="text-center text-gray-600">
+                  There was an error loading this note.
+                </p>
+              )
+            )}
+          </div>
+        ) : (
+          <p className="text-center text-gray-600">No notes yet. Create one!</p>
+        )}
+        <FloatingActionButton />
+      </div>
     </Layout>
   );
 }
