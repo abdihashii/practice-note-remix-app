@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import { Note } from "~/types";
 
-import { DeleteConfirmationDialog } from "./DeleteConfirmationDialog";
+import { DeleteConfirmationDialog } from "~/components/notes/DeleteConfirmationDialog";
 
 interface NoteCardProps {
   note: Note;
