@@ -30,14 +30,13 @@ const NoteCard = ({ note }: NoteCardProps) => {
 
   return (
     <>
-      <Card>
+      <Card className="flex flex-col h-full">
         <CardHeader>
           <CardTitle>{note.title}</CardTitle>
         </CardHeader>
-        <CardContent>
-          <p className="text-gray-700 flex-grow overflow-hidden">
-            {note.content.substring(0, 100)}
-            {/* Excerpt */}
+        <CardContent className="flex-grow">
+          <p className="text-gray-700 overflow-hidden line-clamp-4">
+            {note.content}
           </p>
         </CardContent>
         <CardFooter className="justify-end">
