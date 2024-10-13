@@ -2,8 +2,8 @@ export interface Note {
   id: string; // UUID
   title: string;
   content: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
   favorite: boolean;
 }
 
