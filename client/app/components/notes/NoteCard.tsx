@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+// import { deleteNode } from "~/lib/routes";
 import { Note } from "~/types";
 
 import { DeleteConfirmationDialog } from "~/components/notes/DeleteConfirmationDialog";
@@ -11,6 +12,14 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
+import { useLoaderData, json } from "@remix-run/react";
+
+export async function loader() {
+  console.log(process.env.API_URL);
+
+  const API_URL = process.env.API_URL;
+  return json({ API_URL });
+}
 
 interface NoteCardProps {
   note: Note;
@@ -20,8 +29,14 @@ const NoteCard = ({ note }: NoteCardProps) => {
   const [openDeleteConfirmationDialog, setOpenDeleteConfirmationDialog] =
     useState(false);
 
-  const handleDelete = (id: string) => {
-    console.log("Deleting note with id:", id);
+  const { API_URL } = useLoaderData<typeof loader>();
+
+  const handleDelete = async (id: string) => {
+    // if (!API_URL) {
+    //   console.error("API_URL is not set");
+    //   return;
+    // }
+    // await deleteNode(API_URL, id);
   };
 
   const handleOpenDeleteConfirmationDialog = (id: string) => {
