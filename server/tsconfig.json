@@ -1,0 +1,46 @@
+{
+  "compilerOptions": {
+    /* Specify ECMAScript target version for compatibility. */
+    "target": "ES2022",
+
+    /* Use modern ES modules. */
+    "module": "ESNext",
+
+    /* Node module resolution strategy. */
+    "moduleResolution": "Node",
+
+    /* Enable strict type-checking for better safety. */
+    "strict": true,
+
+    /* Ensure compatibility with CommonJS modules. */
+    "esModuleInterop": true,
+
+    /* Skip type checking for library declaration files for faster builds. */
+    "skipLibCheck": true,
+
+    /* Enforce consistent file casing in imports. */
+    "forceConsistentCasingInFileNames": true,
+
+    /* Don't emit JavaScript output, as the project doesn't require it. */
+    "noEmit": true,
+
+    /* Allow importing JSON files directly. */
+    "resolveJsonModule": true,
+
+    /* Add type declarations for Node.js APIs. */
+    "types": ["node"],
+
+    /* Set base directory for resolving non-relative imports. */
+    "baseUrl": "./",
+
+    /* Define alias for cleaner imports. */
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  },
+  /* Include all TypeScript files in the src directory. */
+  "include": ["src/**/*.ts"],
+
+  /* Exclude node_modules and build outputs. */
+  "exclude": ["node_modules", "dist", "build"]
+}

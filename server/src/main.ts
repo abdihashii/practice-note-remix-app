@@ -1,40 +1,37 @@
-import { Application, Router } from "@oak/oak";
+// Third-party imports
+import { serve } from "@hono/node-server";
+import { eq } from "drizzle-orm";
+import { Hono } from "hono";
 
-const router = new Router();
+// Local imports
+import { dbConnect } from "./db";
+import { notesTable } from "./db/schema";
 
-router.get("/test", (ctx) => {
-  ctx.response.body = "Hello World";
-});
+const app = new Hono();
 
-// router.get("/notes", async (ctx) => {
-//   ctx.response.body = await getAllNotes();
-// });
+async function main() {
+  const db = await dbConnect();
 
-// router.post("/todos", async (ctx) => {
-//   const { title } = await ctx.request.body().value;
-//   ctx.response.body = await addTodo(title);
-// });
+  app.get("/", async (c) => {
+    return c.text("Hello, World!");
+  });
 
-// router.put("/todos/:id", async (ctx) => {
-//   const id = parseInt(ctx.params.id);
-//   const { completed } = await ctx.request.body().value;
-//   ctx.response.body = await updateTodo(id, completed);
-// });
+  app.get("/notes", async (c) => {
+    const notes = await db.select().from(notesTable);
+    return c.json(notes);
+  });
 
-// router.delete("/todos/:id", async (ctx) => {
-//   const id = parseInt(ctx.params.id);
-//   await deleteTodo(id);
-//   ctx.response.body = { message: "Todo deleted successfully" };
-// });
+  app.delete("/notes/:id", async (c) => {
+    const id = c.req.param("id");
+    await db.delete(notesTable).where(eq(notesTable.id, id));
+    return c.json({ message: `Note ${id} deleted` });
+  });
 
-const app = new Application();
+  serve({
+    fetch: app.fetch,
+    port: 3000,
+  });
+  console.log("Server is running on port 3000");
+}
 
-// Create the table if it doesn't exist
-// await createTable();
-
-app.use(router.routes());
-app.use(router.allowedMethods());
-
-app.listen({ port: 8000 });
-
-console.log("Server is running on http://localhost:8000");
+main();

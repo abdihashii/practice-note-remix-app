@@ -1,11 +1,22 @@
-import { drizzle } from "drizzle-orm/connect";
-import { load } from "@std/dotenv";
+import { drizzle } from "drizzle-orm/node-postgres";
+import { Client } from "pg";
+import dotenv from "dotenv";
+import { notesTable } from "./schema";
 
-await load({ export: true });
+dotenv.config();
 
-const databaseUrl = Deno.env.get("DATABASE_URL");
+const databaseUrl = process.env.DATABASE_URL;
 
-export async function connect() {
-  const db = await drizzle("node-postgres", databaseUrl!);
-  return db;
+export async function dbConnect() {
+  if (!databaseUrl) {
+    throw new Error("DATABASE_URL is not set");
+  }
+
+  const client = new Client({
+    connectionString: databaseUrl,
+  });
+
+  await client.connect();
+
+  return drizzle(client, { schema: { notesTable } });
 }

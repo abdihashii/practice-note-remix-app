@@ -1,9 +1,9 @@
 import { defineConfig } from "drizzle-kit";
-import { load } from "@std/dotenv";
+import dotenv from "dotenv";
 
-await load({ export: true });
+dotenv.config();
 
-const databaseUrl = Deno.env.get("DATABASE_URL");
+const databaseUrl = process.env.DATABASE_URL;
 
 export default defineConfig({
   out: "./drizzle",
