@@ -20,11 +20,17 @@ export default function Index() {
       id: "1",
       title: "First Note",
       content: "This is the content of the first note.",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      favorite: false,
     },
     {
       id: "2",
       title: "Second Note",
       content: "This is the content of the second note.",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      favorite: false,
     },
     // Add more notes as needed
   ]);

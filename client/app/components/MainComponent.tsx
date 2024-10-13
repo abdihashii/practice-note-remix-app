@@ -1,7 +1,7 @@
 import { Note } from "~/types";
 
-import FloatingActionButton from "./FloatingActionButton";
-import NoteCard from "./NoteCard";
+import FloatingActionButton from "~/components/FloatingActionButton";
+import NoteCard from "~/components/notes/NoteCard";
 
 interface MainContentProps {
   notes: Note[];
