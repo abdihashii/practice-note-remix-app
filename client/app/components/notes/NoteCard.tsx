@@ -3,6 +3,14 @@ import { useState } from "react";
 import { Note } from "~/types";
 
 import { DeleteConfirmationDialog } from "~/components/notes/DeleteConfirmationDialog";
+import { Button } from "~/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "~/components/ui/card";
 
 interface NoteCardProps {
   note: Note;
@@ -21,21 +29,32 @@ const NoteCard = ({ note }: NoteCardProps) => {
   };
 
   return (
-    <div className="bg-gray-100 rounded-lg p-4 h-48 flex flex-col">
-      <h2 className="text-xl font-semibold mb-2">{note.title}</h2>
-      <p className="text-gray-700 flex-grow overflow-hidden">
-        {note.content.substring(0, 100)}
-        {/* Excerpt */}
-      </p>
-      <div className="flex justify-end space-x-2 mt-4">
-        <button className="text-blue-600 hover:underline">Edit</button>
-        <button
-          className="text-red-600 hover:underline"
-          onClick={() => handleOpenDeleteConfirmationDialog(note.id)}
-        >
-          Delete
-        </button>
-      </div>
+    <>
+      <Card>
+        <CardHeader>
+          <CardTitle>{note.title}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-gray-700 flex-grow overflow-hidden">
+            {note.content.substring(0, 100)}
+            {/* Excerpt */}
+          </p>
+        </CardContent>
+        <CardFooter className="justify-end">
+          <div className="flex flex-col space-y-2 md:flex-row md:space-x-2 md:space-y-0 w-full">
+            <Button className="w-full" variant="outline">
+              Edit
+            </Button>
+            <Button
+              className="w-full"
+              variant="destructive"
+              onClick={() => handleOpenDeleteConfirmationDialog(note.id)}
+            >
+              Delete
+            </Button>
+          </div>
+        </CardFooter>
+      </Card>
 
       <DeleteConfirmationDialog
         open={openDeleteConfirmationDialog}
@@ -43,7 +62,7 @@ const NoteCard = ({ note }: NoteCardProps) => {
         onDelete={() => handleDelete(note.id)}
         noteTitle={note.title}
       />
-    </div>
+    </>
   );
 };
 
