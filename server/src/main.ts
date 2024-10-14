@@ -21,21 +21,28 @@ app.use(
 async function main() {
   const db = await dbConnect();
 
-  app.get("/", async (c) => {
-    return c.text("Hello, World!");
+  // Get all notes
+  app.get("/notes", async (c) => {
+    const notes = await db.select().from(notesTable);
+    return c.json(notes);
   });
 
+  // Create a new note
   app.post("/notes", async (c) => {
     const note = await c.req.json();
     const newNote = await db.insert(notesTable).values(note).returning();
     return c.json(newNote);
   });
 
-  app.get("/notes", async (c) => {
-    const notes = await db.select().from(notesTable);
-    return c.json(notes);
+  // Update a note
+  app.put("/notes/:id", async (c) => {
+    const id = c.req.param("id");
+    const note = await c.req.json();
+    await db.update(notesTable).set(note).where(eq(notesTable.id, id));
+    return c.json({ message: `Note ${id} updated` });
   });
 
+  // Delete a note
   app.delete("/notes/:id", async (c) => {
     const id = c.req.param("id");
     await db.delete(notesTable).where(eq(notesTable.id, id));

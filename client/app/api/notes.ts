@@ -1,4 +1,4 @@
-import { CreateNoteDto, Note } from "~/types";
+import { CreateNoteDto, Note, UpdateNoteDto } from "~/types";
 
 const API_URL = "http://localhost:3000";
 
@@ -17,6 +17,26 @@ export const createNote = async (note: CreateNoteDto): Promise<Note | null> => {
   try {
     const response = await fetch(`${API_URL}/notes`, {
       method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(note),
+    });
+    const data = await response.json();
+    return data as Note;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+};
+
+export const updateNote = async (
+  id: string,
+  note: UpdateNoteDto
+): Promise<Note | null> => {
+  try {
+    const response = await fetch(`${API_URL}/notes/${id}`, {
+      method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
