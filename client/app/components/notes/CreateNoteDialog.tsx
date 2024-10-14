@@ -1,8 +1,12 @@
+// First party libraries
 import { CreateNoteDto } from "~/types";
 
+// Third party libraries
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 
+// Third party components
+import { Loader2Icon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { Button } from "~/components/ui/button";
 import {
@@ -16,7 +20,6 @@ import {
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Textarea } from "~/components/ui/textarea";
-import { Loader2Icon } from "lucide-react";
 
 const createNoteSchema = z.object({
   title: z.string().min(1, { message: "Title is required" }),
