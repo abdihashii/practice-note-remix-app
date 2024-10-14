@@ -113,6 +113,7 @@ export default function Index() {
           open={openCreateNoteDialog}
           onClose={() => setOpenCreateNoteDialog(false)}
           onSubmit={handleCreateNote}
+          isPending={createNoteMutation.isPending}
         />
       </div>
     </Layout>
