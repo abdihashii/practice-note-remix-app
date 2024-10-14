@@ -1,6 +1,8 @@
 import { Note } from "~/types";
 
-export const getNotes = async (API_URL: string): Promise<Note[] | null> => {
+const API_URL = "http://localhost:3000";
+
+export const getNotes = async (): Promise<Note[] | null> => {
   try {
     const response = await fetch(`${API_URL}/notes`);
     const data = await response.json();
@@ -11,10 +13,7 @@ export const getNotes = async (API_URL: string): Promise<Note[] | null> => {
   }
 };
 
-export const deleteNote = async (
-  API_URL: string,
-  id: string
-): Promise<Note | null> => {
+export const deleteNote = async (id: string): Promise<Note | null> => {
   try {
     const response = await fetch(`${API_URL}/notes/${id}`, {
       method: "DELETE",
