@@ -1,16 +1,17 @@
 import type { MetaFunction } from "@remix-run/node";
 
-import { getNotes } from "~/lib/routes";
+import { createNote, getNotes } from "~/lib/routes";
+import { CreateNoteDto } from "~/types";
 
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "~/components/ui/button";
-import { Skeleton } from "~/components/ui/skeleton";
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
 } from "~/components/ui/card";
+import { Skeleton } from "~/components/ui/skeleton";
 
 import FloatingActionButton from "~/components/FloatingActionButton";
 import Layout from "~/components/Layout/Layout";
@@ -24,6 +25,8 @@ export const meta: MetaFunction = () => {
 };
 
 export default function Index() {
+  const queryClient = useQueryClient();
+
   const {
     data: notes,
     isLoading,
@@ -32,6 +35,16 @@ export default function Index() {
     queryKey: ["notes"],
     queryFn: async () => getNotes(),
   });
+  const createNoteMutation = useMutation({
+    mutationFn: createNote,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notes"] });
+    },
+  });
+
+  const handleCreateNote = async (note: CreateNoteDto) => {
+    createNoteMutation.mutate(note);
+  };
 
   return (
     <Layout>
@@ -86,7 +99,7 @@ export default function Index() {
             No notes yet. Create one!
           </p>
         )}
-        <FloatingActionButton />
+        <FloatingActionButton onClick={handleCreateNote} />
       </div>
     </Layout>
   );
