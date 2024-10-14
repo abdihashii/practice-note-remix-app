@@ -1,9 +1,12 @@
+// Remix and React
 import type { MetaFunction } from "@remix-run/node";
 import { useState } from "react";
 
+// First party libraries
 import { createNote, getNotes } from "~/lib/routes";
 import { CreateNoteDto } from "~/types";
 
+// Third party components
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "~/components/ui/button";
 import {
@@ -14,6 +17,7 @@ import {
 } from "~/components/ui/card";
 import { Skeleton } from "~/components/ui/skeleton";
 
+// First party components
 import FloatingActionButton from "~/components/FloatingActionButton";
 import Layout from "~/components/Layout/Layout";
 import { CreateNoteDialog } from "~/components/notes/CreateNoteDialog";
