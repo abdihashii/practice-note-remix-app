@@ -1,7 +1,9 @@
 import { useState } from "react";
 
-import { Note } from "~/types";
+import { format } from "date-fns";
+
 import { deleteNote } from "~/lib/routes";
+import { Note } from "~/types";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -46,6 +48,16 @@ const NoteCard = ({ note }: NoteCardProps) => {
       <Card className="flex flex-col h-full">
         <CardHeader>
           <CardTitle>{note.title}</CardTitle>
+          <p className="text-sm text-muted-foreground">
+            {format(
+              new Date(
+                note.updatedAt > note.createdAt
+                  ? note.updatedAt
+                  : note.createdAt
+              ),
+              "MMM d, yyyy 'at' h:mm a"
+            )}
+          </p>
         </CardHeader>
         <CardContent className="flex-grow">
           <p className="text-gray-700 overflow-hidden line-clamp-3 h-[4.5rem]">
@@ -54,11 +66,11 @@ const NoteCard = ({ note }: NoteCardProps) => {
         </CardContent>
         <CardFooter className="justify-end">
           <div className="flex flex-col space-y-2 md:flex-row md:space-x-2 md:space-y-0 w-full md:w-auto">
-            <Button className="w-full" variant="outline">
+            <Button className="w-full md:w-20" variant="outline">
               Edit
             </Button>
             <Button
-              className="w-full"
+              className="w-full md:w-20"
               variant="destructive"
               onClick={() => handleOpenDeleteConfirmationDialog(note.id)}
             >

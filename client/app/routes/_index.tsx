@@ -54,7 +54,8 @@ export default function Index() {
             {[...Array(6)].map((_, index) => (
               <Card key={index} className="flex flex-col h-full">
                 <CardHeader>
-                  <Skeleton className="h-6 w-3/4" />
+                  <Skeleton className="h-6 w-3/4 mb-2" />
+                  <Skeleton className="h-4 w-1/2" />
                 </CardHeader>
                 <CardContent className="flex-grow">
                   <Skeleton className="h-4 w-full mb-2" />
