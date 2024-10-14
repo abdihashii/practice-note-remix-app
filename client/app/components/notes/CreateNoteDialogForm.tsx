@@ -26,7 +26,7 @@ const createNoteSchema = z.object({
   content: z.string().min(1, { message: "Content is required" }),
 });
 
-export const CreateNoteDialog = ({
+export const CreateNoteDialogForm = ({
   open,
   onClose,
   onSubmit,

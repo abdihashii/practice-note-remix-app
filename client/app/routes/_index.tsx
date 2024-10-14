@@ -20,7 +20,7 @@ import { Skeleton } from "~/components/ui/skeleton";
 // First party components
 import FloatingActionButton from "~/components/FloatingActionButton";
 import Layout from "~/components/Layout/Layout";
-import { CreateNoteDialog } from "~/components/notes/CreateNoteDialog";
+import { CreateNoteDialogForm } from "~/components/notes/CreateNoteDialogForm";
 import NoteCard from "~/components/notes/NoteCard";
 
 export const meta: MetaFunction = () => {
@@ -113,7 +113,7 @@ export default function Index() {
         )}
         <FloatingActionButton onClick={handleFloatingActionClick} />
 
-        <CreateNoteDialog
+        <CreateNoteDialogForm
           open={openCreateNoteDialog}
           onClose={() => setOpenCreateNoteDialog(false)}
           onSubmit={handleCreateNote}
