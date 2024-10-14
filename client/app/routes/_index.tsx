@@ -18,8 +18,8 @@ import {
 import { Skeleton } from "~/components/ui/skeleton";
 
 // First party components
-import FloatingActionButton from "~/components/FloatingActionButton";
-import Layout from "~/components/Layout/Layout";
+import FloatingActionButton from "~/components/common/FloatingActionButton";
+import Layout from "~/components/common/Layout/Layout";
 import { CreateNoteDialogForm } from "~/components/notes/CreateNoteDialogForm";
 import NoteCard from "~/components/notes/NoteCard";
 
