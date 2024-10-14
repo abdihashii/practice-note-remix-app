@@ -5,6 +5,12 @@ import { getNotes } from "~/lib/routes";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "~/components/ui/button";
 import { Skeleton } from "~/components/ui/skeleton";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "~/components/ui/card";
 
 import FloatingActionButton from "~/components/FloatingActionButton";
 import Layout from "~/components/Layout/Layout";
@@ -33,13 +39,22 @@ export default function Index() {
         {isLoading ? (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {[...Array(6)].map((_, index) => (
-              <div key={index} className="space-y-3">
-                <Skeleton className="h-[125px] w-full rounded-lg" />
-                <div className="space-y-2">
-                  <Skeleton className="h-4 w-[250px]" />
-                  <Skeleton className="h-4 w-[200px]" />
-                </div>
-              </div>
+              <Card key={index} className="flex flex-col h-full">
+                <CardHeader>
+                  <Skeleton className="h-6 w-3/4" />
+                </CardHeader>
+                <CardContent className="flex-grow">
+                  <Skeleton className="h-4 w-full mb-2" />
+                  <Skeleton className="h-4 w-5/6 mb-2" />
+                  <Skeleton className="h-4 w-4/6" />
+                </CardContent>
+                <CardFooter className="justify-end">
+                  <div className="flex flex-col space-y-2 md:flex-row md:space-x-2 md:space-y-0 w-full md:w-auto">
+                    <Skeleton className="h-9 w-full md:w-20" />
+                    <Skeleton className="h-9 w-full md:w-20" />
+                  </div>
+                </CardFooter>
+              </Card>
             ))}
           </div>
         ) : isError ? (
