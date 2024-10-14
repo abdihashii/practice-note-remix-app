@@ -2,8 +2,8 @@ import { useState } from "react";
 
 import { format } from "date-fns";
 
-import { deleteNote } from "~/api/notes";
-import { Note } from "~/types";
+import { deleteNote, updateNote } from "~/api/notes";
+import { Note, UpdateNoteDto } from "~/types";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -16,6 +16,7 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
+import { EditNoteDialogForm } from "./EditNoteDialogForm";
 
 interface NoteCardProps {
   note: Note;
@@ -24,11 +25,21 @@ interface NoteCardProps {
 const NoteCard = ({ note }: NoteCardProps) => {
   const [openDeleteConfirmationDialog, setOpenDeleteConfirmationDialog] =
     useState(false);
+  const [openEditNoteDialog, setOpenEditNoteDialog] = useState(false);
 
   const queryClient = useQueryClient();
 
   const deleteMutation = useMutation({
     mutationFn: deleteNote,
+    onSuccess: () => {
+      // Invalidate and refetch
+      queryClient.invalidateQueries({ queryKey: ["notes"] });
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: (data: { id: string; note: UpdateNoteDto }) =>
+      updateNote(data.id, data.note),
     onSuccess: () => {
       // Invalidate and refetch
       queryClient.invalidateQueries({ queryKey: ["notes"] });
@@ -41,6 +52,14 @@ const NoteCard = ({ note }: NoteCardProps) => {
 
   const handleOpenDeleteConfirmationDialog = (id: string) => {
     setOpenDeleteConfirmationDialog(true);
+  };
+
+  const handleEdit = async (id: string, updatedNote: UpdateNoteDto) => {
+    updateMutation.mutate({ id, note: updatedNote });
+  };
+
+  const handleOpenEditNoteDialog = (id: string) => {
+    setOpenEditNoteDialog(true);
   };
 
   return (
@@ -66,7 +85,11 @@ const NoteCard = ({ note }: NoteCardProps) => {
         </CardContent>
         <CardFooter className="justify-end">
           <div className="flex flex-col space-y-2 md:flex-row md:space-x-2 md:space-y-0 w-full md:w-auto">
-            <Button className="w-full md:w-20" variant="outline">
+            <Button
+              className="w-full md:w-20"
+              variant="outline"
+              onClick={() => handleOpenEditNoteDialog(note.id)}
+            >
               Edit
             </Button>
             <Button
@@ -86,6 +109,14 @@ const NoteCard = ({ note }: NoteCardProps) => {
         onDelete={() => handleDelete(note.id)}
         noteTitle={note.title}
         isDeleting={deleteMutation.isPending}
+      />
+
+      <EditNoteDialogForm
+        open={openEditNoteDialog}
+        onClose={() => setOpenEditNoteDialog(false)}
+        onSubmit={(updatedNote) => handleEdit(note.id, updatedNote)}
+        isPending={updateMutation.isPending}
+        note={note}
       />
     </>
   );
