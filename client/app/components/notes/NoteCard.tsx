@@ -1,6 +1,9 @@
 import { useState } from "react";
 
 import { Note } from "~/types";
+import { deleteNote } from "~/lib/routes";
+
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { DeleteConfirmationDialog } from "~/components/notes/DeleteConfirmationDialog";
 import { Button } from "~/components/ui/button";
@@ -20,8 +23,18 @@ const NoteCard = ({ note }: NoteCardProps) => {
   const [openDeleteConfirmationDialog, setOpenDeleteConfirmationDialog] =
     useState(false);
 
+  const queryClient = useQueryClient();
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteNote,
+    onSuccess: () => {
+      // Invalidate and refetch
+      queryClient.invalidateQueries({ queryKey: ["notes"] });
+    },
+  });
+
   const handleDelete = async (id: string) => {
-    console.log("Deleting note with id:", id);
+    deleteMutation.mutate(id);
   };
 
   const handleOpenDeleteConfirmationDialog = (id: string) => {
@@ -60,6 +73,7 @@ const NoteCard = ({ note }: NoteCardProps) => {
         onClose={() => setOpenDeleteConfirmationDialog(false)}
         onDelete={() => handleDelete(note.id)}
         noteTitle={note.title}
+        isDeleting={deleteMutation.isPending}
       />
     </>
   );
