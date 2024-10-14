@@ -10,6 +10,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "~/components/ui/alert-dialog";
+import { Button } from "../ui/button";
 
 export const DeleteConfirmationDialog = ({
   open,
@@ -33,11 +34,22 @@ export const DeleteConfirmationDialog = ({
             Deleting <strong>{noteTitle}</strong> is irreversible.
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction disabled={isDeleting} onClick={onDelete}>
+        <AlertDialogFooter className="flex flex-col space-y-2 md:flex-row md:space-x-2 md:space-y-0 w-full md:w-auto">
+          <Button
+            variant="outline"
+            className="w-full md:w-20"
+            onClick={onClose}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="destructive"
+            className="w-full md:w-20"
+            disabled={isDeleting}
+            onClick={onDelete}
+          >
             {isDeleting ? <Loader2Icon className="animate-spin" /> : "Delete"}
-          </AlertDialogAction>
+          </Button>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
