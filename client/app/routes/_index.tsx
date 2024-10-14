@@ -1,4 +1,5 @@
 import type { MetaFunction } from "@remix-run/node";
+import { useState } from "react";
 
 import { createNote, getNotes } from "~/lib/routes";
 import { CreateNoteDto } from "~/types";
@@ -15,6 +16,7 @@ import { Skeleton } from "~/components/ui/skeleton";
 
 import FloatingActionButton from "~/components/FloatingActionButton";
 import Layout from "~/components/Layout/Layout";
+import { CreateNoteDialog } from "~/components/notes/CreateNoteDialog";
 import NoteCard from "~/components/notes/NoteCard";
 
 export const meta: MetaFunction = () => {
@@ -25,8 +27,9 @@ export const meta: MetaFunction = () => {
 };
 
 export default function Index() {
-  const queryClient = useQueryClient();
+  const [openCreateNoteDialog, setOpenCreateNoteDialog] = useState(false);
 
+  const queryClient = useQueryClient();
   const {
     data: notes,
     isLoading,
@@ -41,6 +44,10 @@ export default function Index() {
       queryClient.invalidateQueries({ queryKey: ["notes"] });
     },
   });
+
+  const handleFloatingActionClick = () => {
+    setOpenCreateNoteDialog(true);
+  };
 
   const handleCreateNote = async (note: CreateNoteDto) => {
     createNoteMutation.mutate(note);
@@ -100,7 +107,13 @@ export default function Index() {
             No notes yet. Create one!
           </p>
         )}
-        <FloatingActionButton onClick={handleCreateNote} />
+        <FloatingActionButton onClick={handleFloatingActionClick} />
+
+        <CreateNoteDialog
+          open={openCreateNoteDialog}
+          onClose={() => setOpenCreateNoteDialog(false)}
+          onSubmit={handleCreateNote}
+        />
       </div>
     </Layout>
   );
