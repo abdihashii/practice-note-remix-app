@@ -25,6 +25,12 @@ async function main() {
     return c.text("Hello, World!");
   });
 
+  app.post("/notes", async (c) => {
+    const note = await c.req.json();
+    const newNote = await db.insert(notesTable).values(note).returning();
+    return c.json(newNote);
+  });
+
   app.get("/notes", async (c) => {
     const notes = await db.select().from(notesTable);
     return c.json(notes);
