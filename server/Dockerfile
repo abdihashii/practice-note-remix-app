@@ -11,4 +11,4 @@ COPY . .
 
 RUN pnpm run db:generate
 
-CMD ["pnpm", "start"]
+CMD ["pnpm", "run", "dev"]
