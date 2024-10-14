@@ -1,3 +1,6 @@
+// Remix and React
+import React, { useState } from "react";
+
 // First party libraries
 import { CreateNoteDto } from "~/types";
 
@@ -6,7 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 
 // Third party components
-import { Loader2Icon } from "lucide-react";
+import { Loader2Icon, KeyboardIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { Button } from "~/components/ui/button";
 import {
@@ -37,6 +40,8 @@ export const CreateNoteDialogForm = ({
   onSubmit: (note: CreateNoteDto) => void;
   isPending: boolean;
 }) => {
+  const [showShortcutHint, setShowShortcutHint] = useState(false);
+
   const {
     register,
     handleSubmit,
@@ -57,6 +62,16 @@ export const CreateNoteDialogForm = ({
     onClose();
   };
 
+  const handleKeyDown = React.useCallback(
+    (event: React.KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
+        event.preventDefault();
+        handleSubmit(handleCreateNote)();
+      }
+    },
+    [handleSubmit, handleCreateNote]
+  );
+
   return (
     <Dialog open={open} onOpenChange={handleCloseDialog}>
       <DialogContent className="sm:max-w-[425px]">
@@ -66,7 +81,11 @@ export const CreateNoteDialogForm = ({
             Add a title and content for your new note.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit(handleCreateNote)} className="space-y-4">
+        <form
+          onSubmit={handleSubmit(handleCreateNote)}
+          className="space-y-4"
+          onKeyDown={handleKeyDown}
+        >
           <div className="space-y-2">
             <Label htmlFor="title">Title</Label>
             <Input {...register("title")} placeholder="Enter note title" />
@@ -78,11 +97,25 @@ export const CreateNoteDialogForm = ({
           </div>
           <div className="space-y-2">
             <Label htmlFor="content">Content</Label>
-            <Textarea
-              {...register("content")}
-              placeholder="Enter note content"
-              className="min-h-[100px]"
-            />
+            <div className="relative">
+              <Textarea
+                {...register("content")}
+                placeholder="Enter note content"
+                className="min-h-[100px] pr-8"
+              />
+              <div
+                className="absolute bottom-2 right-2 text-muted-foreground"
+                onMouseEnter={() => setShowShortcutHint(true)}
+                onMouseLeave={() => setShowShortcutHint(false)}
+              >
+                <KeyboardIcon size={16} />
+                {showShortcutHint && (
+                  <div className="absolute bottom-full right-0 mb-2 bg-secondary text-secondary-foreground text-xs py-2 px-4 rounded shadow w-48 text-center">
+                    CMD + Enter to submit form
+                  </div>
+                )}
+              </div>
+            </div>
             {errors.content ? (
               <p className="text-red-500 text-sm h-4">
                 {errors.content.message}
