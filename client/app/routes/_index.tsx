@@ -3,7 +3,7 @@ import type { MetaFunction } from "@remix-run/node";
 import { useState } from "react";
 
 // First party libraries
-import { createNote, getNotes } from "~/lib/routes";
+import { createNote, getNotes } from "~/api/notes";
 import { CreateNoteDto } from "~/types";
 
 // Third party components

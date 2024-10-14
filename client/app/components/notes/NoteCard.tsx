@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import { format } from "date-fns";
 
-import { deleteNote } from "~/lib/routes";
+import { deleteNote } from "~/api/notes";
 import { Note } from "~/types";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
