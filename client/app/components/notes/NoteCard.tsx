@@ -35,7 +35,7 @@ const NoteCard = ({ note }: NoteCardProps) => {
           <CardTitle>{note.title}</CardTitle>
         </CardHeader>
         <CardContent className="flex-grow">
-          <p className="text-gray-700 overflow-hidden line-clamp-4">
+          <p className="text-gray-700 overflow-hidden line-clamp-3 h-[4.5rem]">
             {note.content}
           </p>
         </CardContent>
