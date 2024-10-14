@@ -2,12 +2,21 @@
 import { serve } from "@hono/node-server";
 import { eq } from "drizzle-orm";
 import { Hono } from "hono";
+import { cors } from "hono/cors";
 
 // Local imports
 import { dbConnect } from "./db";
 import { notesTable } from "./db/schema";
 
 const app = new Hono();
+
+app.use(
+  "*",
+  cors({
+    origin: "*",
+    allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  })
+);
 
 async function main() {
   const db = await dbConnect();
