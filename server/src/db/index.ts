@@ -5,7 +5,9 @@ import { notesTable } from "./schema";
 
 dotenv.config();
 
-const databaseUrl = process.env.DATABASE_URL;
+const databaseUrl =
+  process.env.DATABASE_URL ||
+  "postgres://myuser:mypassword@postgres:5432/mydatabase";
 
 export async function dbConnect() {
   if (!databaseUrl) {

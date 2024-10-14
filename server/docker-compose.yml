@@ -13,5 +13,17 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data # map postgres data to host volume
 
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: notes-app-server
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgres://myuser:mypassword@postgres:5432/mydatabase
+    depends_on:
+      - postgres
+
 volumes:
   postgres_data: # name of the volume
