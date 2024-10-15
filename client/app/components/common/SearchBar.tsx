@@ -1,9 +1,9 @@
 // React
 // import { redirect } from "@remix-run/react";
-import { useEffect, useRef, useState, FormEvent } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 
 // Third party components
-import { AlertCircleIcon, Loader2Icon, TextSearchIcon } from "lucide-react";
+import { AlertCircleIcon, Loader2Icon, SearchIcon } from "lucide-react";
 import { Input } from "~/components/ui/input";
 
 // First party components
@@ -65,8 +65,8 @@ export function SearchBar<T>({
 
   return (
     <form className="w-full relative h-12" onSubmit={handleSubmit}>
-      <TextSearchIcon
-        className={`absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none transition-colors ${
+      <SearchIcon
+        className={`h-4 absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none transition-colors ${
           isFocused ? "text-gray-700" : "text-gray-400"
         }`}
       />
