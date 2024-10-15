@@ -38,10 +38,11 @@ export const SearchBar = ({ isModalOpen }: SearchBarProps) => {
       <Input
         type="text"
         placeholder="Search your notes"
-        className="pl-10 w-full h-full pr-10 focus:border-gray-400 focus:ring-gray-300"
+        className="pl-14 w-full h-full pr-10 focus:border-gray-400 focus:ring-gray-300"
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
         ref={inputRef}
+        autoFocus
       />
       <div
         className={`absolute right-2.5 top-1/2 transform -translate-y-1/2 pointer-events-none h-7 w-7 flex items-center justify-center border border-gray-200 rounded-md transition-colors ${
