@@ -51,10 +51,10 @@ async function main() {
 
   serve({
     fetch: app.fetch,
-    port: 3000,
+    port: 8000,
     hostname: "0.0.0.0",
   });
-  console.log("Server is running on port 3000");
+  console.log("Server is running on port 8000");
 }
 
 main();
