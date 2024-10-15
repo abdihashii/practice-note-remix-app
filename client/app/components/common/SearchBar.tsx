@@ -82,21 +82,21 @@ export function SearchBar<T>({
         ref={inputRef}
         autoFocus
       />
-      <div
-        className={`absolute right-2.5 top-1/2 transform -translate-y-1/2 pointer-events-none h-7 w-7 flex items-center justify-center border border-gray-200 rounded-md transition-colors ${
-          isFocused ? "text-gray-700" : "text-gray-400"
-        }`}
-      >
-        /
-      </div>
-      {isLoading && (
+      {isLoading ? (
         <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
           <Loader2Icon className="animate-spin h-5 w-5 text-gray-400" />
         </div>
-      )}
-      {isError && (
+      ) : isError ? (
         <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
           <AlertCircleIcon className="h-5 w-5 text-red-500" />
+        </div>
+      ) : (
+        <div
+          className={`absolute right-2.5 top-1/2 transform -translate-y-1/2 pointer-events-none h-7 w-7 flex items-center justify-center border border-gray-200 rounded-md transition-colors ${
+            isFocused ? "text-gray-700" : "text-gray-400"
+          }`}
+        >
+          /
         </div>
       )}
     </form>
