@@ -1,12 +1,32 @@
 // React
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 // Third party components
 import { TextSearchIcon } from "lucide-react";
 import { Input } from "~/components/ui/input";
 
-export const SearchBar = () => {
+interface SearchBarProps {
+  isModalOpen?: boolean; // we maybe will use this in the future
+}
+
+export const SearchBar = ({ isModalOpen }: SearchBarProps) => {
   const [isFocused, setIsFocused] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (event.key === "/" && !isModalOpen && !isFocused) {
+        event.preventDefault();
+        inputRef.current?.focus();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyPress);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyPress);
+    };
+  }, [isModalOpen, isFocused]);
 
   return (
     <div className="w-full relative h-12">
@@ -21,6 +41,7 @@ export const SearchBar = () => {
         className="pl-10 w-full h-full pr-10 focus:border-gray-400 focus:ring-gray-300"
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
+        ref={inputRef}
       />
       <div
         className={`absolute right-2.5 top-1/2 transform -translate-y-1/2 pointer-events-none h-7 w-7 flex items-center justify-center border border-gray-200 rounded-md transition-colors ${
