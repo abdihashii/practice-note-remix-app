@@ -81,6 +81,7 @@ export function SearchBar<T>({
         onBlur={() => setIsFocused(false)}
         ref={inputRef}
         autoFocus
+        autoComplete="off"
       />
       {isLoading ? (
         <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
