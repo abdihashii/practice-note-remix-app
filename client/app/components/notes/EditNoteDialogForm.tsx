@@ -110,7 +110,7 @@ export const EditNoteDialogForm = ({
                 className="min-h-[100px] pr-8"
               />
               <div
-                className="absolute bottom-2 right-2 text-muted-foreground"
+                className="absolute bottom-2 right-6 text-muted-foreground"
                 onMouseEnter={() => setShowShortcutHint(true)}
                 onMouseLeave={() => setShowShortcutHint(false)}
               >
