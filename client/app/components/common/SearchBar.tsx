@@ -1,21 +1,45 @@
 // React
-import { useState, useEffect, useRef } from "react";
+// import { redirect } from "@remix-run/react";
+import { useEffect, useRef, useState, FormEvent } from "react";
 
 // Third party components
-import { TextSearchIcon } from "lucide-react";
+import { AlertCircleIcon, Loader2Icon, TextSearchIcon } from "lucide-react";
 import { Input } from "~/components/ui/input";
 
-interface SearchBarProps {
-  isModalOpen?: boolean; // we maybe will use this in the future
+// First party components
+import { useSearch } from "~/hooks/useSearch";
+
+interface SearchBarProps<T> {
+  queryKey: string;
+  searchFn: (query: string) => Promise<T[]>;
+  placeholder?: string;
+  onResultsChange?: (results: T[]) => void;
 }
 
-export const SearchBar = ({ isModalOpen }: SearchBarProps) => {
+export function SearchBar<T>({
+  queryKey,
+  searchFn,
+  placeholder = "Search...",
+  onResultsChange,
+}: SearchBarProps<T>) {
   const [isFocused, setIsFocused] = useState(false);
+
   const inputRef = useRef<HTMLInputElement>(null);
+  const {
+    searchQuery,
+    setSearchQuery,
+    submitSearch,
+    data,
+    isLoading,
+    isError,
+  } = useSearch({
+    queryKey,
+    searchFn,
+  });
 
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
-      if (event.key === "/" && !isModalOpen && !isFocused) {
+      if (event.key === "/" && !isFocused) {
         event.preventDefault();
         inputRef.current?.focus();
       }
@@ -26,10 +50,21 @@ export const SearchBar = ({ isModalOpen }: SearchBarProps) => {
     return () => {
       document.removeEventListener("keydown", handleKeyPress);
     };
-  }, [isModalOpen, isFocused]);
+  }, [isFocused]);
+
+  useEffect(() => {
+    if (data && onResultsChange) {
+      onResultsChange(data);
+    }
+  }, [data, onResultsChange]);
+
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    submitSearch();
+  };
 
   return (
-    <div className="w-full relative h-12">
+    <form className="w-full relative h-12" onSubmit={handleSubmit}>
       <TextSearchIcon
         className={`absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none transition-colors ${
           isFocused ? "text-gray-700" : "text-gray-400"
@@ -37,8 +72,11 @@ export const SearchBar = ({ isModalOpen }: SearchBarProps) => {
       />
       <Input
         type="text"
-        placeholder="Search your notes"
+        name="search-query"
+        placeholder={placeholder}
         className="pl-12 w-full h-full pr-10 focus:border-gray-400 focus:ring-gray-300"
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
         ref={inputRef}
@@ -51,6 +89,16 @@ export const SearchBar = ({ isModalOpen }: SearchBarProps) => {
       >
         /
       </div>
-    </div>
+      {isLoading && (
+        <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+          <Loader2Icon className="animate-spin h-5 w-5 text-gray-400" />
+        </div>
+      )}
+      {isError && (
+        <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+          <AlertCircleIcon className="h-5 w-5 text-red-500" />
+        </div>
+      )}
+    </form>
   );
-};
+}
