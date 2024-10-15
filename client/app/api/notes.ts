@@ -1,6 +1,6 @@
 import { CreateNoteDto, Note, UpdateNoteDto } from "~/types";
 
-const API_URL = "http://localhost:3000";
+const API_URL = "http://localhost:8000";
 
 export const getNotes = async (): Promise<Note[] | null> => {
   try {
