@@ -4,21 +4,16 @@ import { useState } from "react";
 interface UseSearchProps<T> {
   queryKey: string;
   searchFn: (query: string) => Promise<T>;
-  enabled?: boolean;
 }
 
-export function useSearch<T>({
-  queryKey,
-  searchFn,
-  enabled = true,
-}: UseSearchProps<T>) {
+export function useSearch<T>({ queryKey, searchFn }: UseSearchProps<T>) {
   const [searchQuery, setSearchQuery] = useState("");
   const [submittedSearchQuery, setSubmittedSearchQuery] = useState("");
 
   const { data, isLoading, isError } = useQuery({
     queryKey: [queryKey, submittedSearchQuery],
     queryFn: () => searchFn(submittedSearchQuery),
-    enabled: enabled,
+    enabled: !!submittedSearchQuery, // Only run the query if there's a submitted search query
   });
 
   const handleSearch = (query: string) => {
@@ -26,7 +21,11 @@ export function useSearch<T>({
   };
 
   const submitSearch = () => {
-    setSubmittedSearchQuery(searchQuery);
+    if (searchQuery.trim()) {
+      setSubmittedSearchQuery(searchQuery);
+    } else {
+      setSubmittedSearchQuery(""); // Clear the submitted query if the search is empty
+    }
   };
 
   return {

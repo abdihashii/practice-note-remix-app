@@ -1,5 +1,4 @@
 // React
-// import { redirect } from "@remix-run/react";
 import { FormEvent, useEffect, useRef, useState } from "react";
 
 // Third party components
@@ -13,7 +12,7 @@ interface SearchBarProps<T> {
   queryKey: string;
   searchFn: (query: string) => Promise<T[]>;
   placeholder?: string;
-  onResultsChange?: (results: T[]) => void;
+  onResultsChange?: (results: T[] | undefined) => void;
 }
 
 export function SearchBar<T>({
@@ -53,7 +52,7 @@ export function SearchBar<T>({
   }, [isFocused]);
 
   useEffect(() => {
-    if (data && onResultsChange) {
+    if (onResultsChange) {
       onResultsChange(data);
     }
   }, [data, onResultsChange]);

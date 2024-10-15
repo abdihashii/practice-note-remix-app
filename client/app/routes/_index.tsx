@@ -61,9 +61,9 @@ export default function Index() {
     createNoteMutation.mutate(note);
   };
 
-  const handleSearchResultsChange = (results: Note[]) => {
-    setSearchResults(results);
-    setIsSearchActive(true);
+  const handleSearchResultsChange = (results: Note[] | undefined) => {
+    setSearchResults(results || []);
+    setIsSearchActive(!!results);
   };
 
   const renderNoteGrid = (notesToRender: Note[], isLoading: boolean) => (
