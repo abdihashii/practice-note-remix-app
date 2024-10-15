@@ -19,7 +19,8 @@ import { Skeleton } from "~/components/ui/skeleton";
 
 // First party components
 import FloatingActionButton from "~/components/common/FloatingActionButton";
-import Layout from "~/components/common/Layout/Layout";
+import Header from "~/components/common/Header";
+import { SearchBar } from "~/components/common/SearchBar";
 import { CreateNoteDialogForm } from "~/components/notes/CreateNoteDialogForm";
 import NoteCard from "~/components/notes/NoteCard";
 
@@ -59,6 +60,8 @@ export default function Index() {
 
   return (
     <Layout>
+      <SearchBar />
+
       <div className="relative flex-grow">
         {isLoading ? (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -123,3 +126,16 @@ export default function Index() {
     </Layout>
   );
 }
+
+const Layout = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <div className="min-h-screen flex flex-col">
+      <Header />
+      <main className="flex-grow flex flex-col">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full py-6 flex flex-col gap-4">
+          {children}
+        </div>
+      </main>
+    </div>
+  );
+};
