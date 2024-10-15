@@ -1,6 +1,6 @@
 // Third-party imports
 import { serve } from "@hono/node-server";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 
@@ -47,6 +47,47 @@ async function main() {
     const id = c.req.param("id");
     await db.delete(notesTable).where(eq(notesTable.id, id));
     return c.json({ message: `Note ${id} deleted` });
+  });
+
+  // Search notes table
+  app.get("/search", async (c) => {
+    try {
+      const searchQuery = c.req.query("q");
+      const normalizedSearchQuery = searchQuery
+        ? searchQuery.trim().toLowerCase()
+        : "";
+
+      let searchResults;
+
+      if (normalizedSearchQuery === "") {
+        // Return all notes if the search query is empty
+        searchResults = await db.select().from(notesTable);
+      } else {
+        // Perform search with the given query
+        searchResults = await db
+          .select()
+          .from(notesTable)
+          .where(sql`LOWER(title) LIKE ${`%${normalizedSearchQuery}%`}`);
+      }
+
+      if (searchResults.length === 0) {
+        return c.json({
+          error: `No results found for ${searchQuery}`,
+          searchResults: [],
+        });
+      }
+
+      return c.json({
+        error: null,
+        searchResults,
+      });
+    } catch (error) {
+      console.error("Error in search endpoint:", error);
+      return c.json(
+        { error: "An unexpected error occurred. Please try again later." },
+        500
+      );
+    }
   });
 
   serve({
