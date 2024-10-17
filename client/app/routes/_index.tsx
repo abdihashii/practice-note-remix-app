@@ -21,7 +21,6 @@ import { Skeleton } from "~/components/ui/skeleton";
 // First party components
 import FloatingActionButton from "~/components/common/FloatingActionButton";
 import Header from "~/components/common/Header";
-import { SearchBar } from "~/components/common/SearchBar";
 import { CreateNoteDialogForm } from "~/components/notes/CreateNoteDialogForm";
 import NoteCard from "~/components/notes/NoteCard";
 
@@ -94,13 +93,6 @@ export default function Index() {
 
   return (
     <Layout>
-      <SearchBar<Note>
-        queryKey="notes-search"
-        searchFn={searchNotes}
-        placeholder="Search your notes"
-        onResultsChange={handleSearchResultsChange}
-      />
-
       <div className="relative flex-grow mt-6">
         {isSearchActive ? (
           searchResults.length > 0 ? (
