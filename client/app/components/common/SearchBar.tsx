@@ -2,6 +2,8 @@
 import { FormEvent, useEffect, useRef } from "react";
 
 // Third party components
+import { XIcon } from "lucide-react";
+import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 
 const SearchBar = ({
@@ -40,7 +42,7 @@ const SearchBar = ({
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex w-full items-center gap-2 h-12"
+      className="flex w-full items-center gap-2 h-12 relative"
     >
       <Input
         ref={inputRef}
@@ -51,6 +53,17 @@ const SearchBar = ({
         className="h-full"
         autoComplete="off"
       />
+
+      {/* Clear search button */}
+      <Button
+        type="button"
+        variant="outline"
+        size="icon"
+        onClick={() => setSearchQuery("")} // Clear the search query
+        className="absolute right-2.5 top-2.5 h-7 w-7 text-muted-foreground"
+      >
+        <XIcon className="h-4 w-4" />
+      </Button>
     </form>
   );
 };

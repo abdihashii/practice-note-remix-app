@@ -3,7 +3,7 @@
 - [x] CRUD
 - [x] Excerpt
 - [ ] Favorites
-- [ ] Search
+- [x] Search
 - [ ] Fuzzy search
 - [ ] Auth
 - [ ] Secured user data
