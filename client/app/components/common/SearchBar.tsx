@@ -1,6 +1,3 @@
-// Remix and React
-import { useState } from "react";
-
 // Third party components
 import { Input } from "~/components/ui/input";
 
