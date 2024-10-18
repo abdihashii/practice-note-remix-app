@@ -50,6 +50,8 @@ export default function Index() {
     queryKey: ["notes", q],
     queryFn: () => (q ? searchNotes(q) : getNotes()),
     refetchOnWindowFocus: false,
+    staleTime: 1000 * 60, // stale time means that the data is considered fresh for 1 minute
+    gcTime: 1000 * 60 * 60 * 24 * 3, // garbage collect after 3 days
   });
 
   const createNoteMutation = useMutation({
