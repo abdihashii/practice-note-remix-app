@@ -44,13 +44,11 @@ const SearchBar = ({
     >
       <Input
         ref={inputRef}
-        type="search"
         name="q"
         placeholder="Type / to search notes"
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
         className="h-full"
-        autoFocus
         autoComplete="off"
       />
     </form>
