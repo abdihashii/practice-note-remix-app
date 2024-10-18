@@ -50,7 +50,7 @@ export default function Index() {
     queryKey: ["notes", q],
     queryFn: () => (q ? searchNotes(q) : getNotes()),
     refetchOnWindowFocus: false,
-    staleTime: 1000 * 60, // stale time means that the data is considered fresh for 1 minute
+    staleTime: 1000 * 60 * 60 * 3, // stale time means that the data is considered fresh for 3 hours
     gcTime: 1000 * 60 * 60 * 24 * 3, // garbage collect after 3 days
   });
 
