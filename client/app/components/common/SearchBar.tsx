@@ -1,3 +1,6 @@
+// React
+import { FormEvent } from "react";
+
 // Third party components
 import { Input } from "~/components/ui/input";
 
@@ -10,7 +13,7 @@ const SearchBar = ({
   setSearchQuery: (searchQuery: string) => void;
   onSearch: (searchQuery: string) => void;
 }) => {
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     onSearch(searchQuery);
   };
