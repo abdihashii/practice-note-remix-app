@@ -104,10 +104,11 @@ export default function Index() {
 
   return (
     <Layout>
-      <div className="relative flex-grow mt-6">
-        <div className="mb-6">
+      <div className="relative flex-grow space-y-4">
+        <div>
           <SearchBar />
         </div>
+
         {isNotesLoading ? (
           renderNoteGrid([], true)
         ) : isNotesError ? (
