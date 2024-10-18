@@ -1,13 +1,13 @@
+// React
 import { useState } from "react";
 
+// Third party libraries
 import { format } from "date-fns";
 
-import { deleteNote, updateNote } from "~/api/notes";
-import { Note, UpdateNoteDto } from "~/types";
+// First party libraries
+import { Note } from "~/types";
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-
-import { DeleteConfirmationDialog } from "~/components/notes/DeleteConfirmationDialog";
+// Third party components
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -16,6 +16,10 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
+
+// First party components
+import { DeleteConfirmationDialog } from "~/components/notes/DeleteConfirmationDialog";
+import { useNote } from "~/hooks/useNote";
 import { EditNoteDialogForm } from "./EditNoteDialogForm";
 
 interface NoteCardProps {
@@ -27,40 +31,8 @@ const NoteCard = ({ note }: NoteCardProps) => {
     useState(false);
   const [openEditNoteDialog, setOpenEditNoteDialog] = useState(false);
 
-  const queryClient = useQueryClient();
-
-  const deleteMutation = useMutation({
-    mutationFn: deleteNote,
-    onSuccess: () => {
-      // Invalidate and refetch
-      queryClient.invalidateQueries({ queryKey: ["notes"] });
-    },
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: (data: { id: string; note: UpdateNoteDto }) =>
-      updateNote(data.id, data.note),
-    onSuccess: () => {
-      // Invalidate and refetch
-      queryClient.invalidateQueries({ queryKey: ["notes"] });
-    },
-  });
-
-  const handleDelete = async (id: string) => {
-    deleteMutation.mutate(id);
-  };
-
-  const handleOpenDeleteConfirmationDialog = (id: string) => {
-    setOpenDeleteConfirmationDialog(true);
-  };
-
-  const handleEdit = async (id: string, updatedNote: UpdateNoteDto) => {
-    updateMutation.mutate({ id, note: updatedNote });
-  };
-
-  const handleOpenEditNoteDialog = (id: string) => {
-    setOpenEditNoteDialog(true);
-  };
+  const { deleteMutation, handleDelete, updateMutation, handleEdit } =
+    useNote();
 
   return (
     <>
@@ -88,14 +60,14 @@ const NoteCard = ({ note }: NoteCardProps) => {
             <Button
               className="w-full md:w-20"
               variant="outline"
-              onClick={() => handleOpenEditNoteDialog(note.id)}
+              onClick={() => setOpenEditNoteDialog(true)}
             >
               Edit
             </Button>
             <Button
               className="w-full md:w-20"
               variant="destructive"
-              onClick={() => handleOpenDeleteConfirmationDialog(note.id)}
+              onClick={() => setOpenDeleteConfirmationDialog(true)}
             >
               Delete
             </Button>
