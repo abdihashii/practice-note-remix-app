@@ -4,6 +4,7 @@
 - [x] Excerpt
 - [ ] Favorites
 - [x] Search
+- [ ] Use postgres full text search with indexes
 - [ ] Fuzzy search
 - [ ] Auth
 - [ ] Secured user data
