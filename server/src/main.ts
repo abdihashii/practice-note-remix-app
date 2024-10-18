@@ -1,14 +1,17 @@
 // Third-party imports
 import { serve } from "@hono/node-server";
-import { eq, sql } from "drizzle-orm";
-import { Hono } from "hono";
+import { Context, Hono } from "hono";
 import { cors } from "hono/cors";
+import { MiddlewareHandler } from "hono/types";
 
 // Local imports
-import { dbConnect } from "./db";
-import { notesTable } from "./db/schema";
+import { dbConnect } from "@/db";
+import { noteRoutes } from "@/routes/noteRoutes";
+import { searchRoutes } from "@/routes/searchRoutes";
+import { CustomEnv } from "@/types";
 
-const app = new Hono();
+// Create a new Hono app with the custom environment
+const app = new Hono<CustomEnv>();
 
 app.use(
   "*",
@@ -21,74 +24,18 @@ app.use(
 async function main() {
   const db = await dbConnect();
 
-  // Get all notes
-  app.get("/notes", async (c) => {
-    const notes = await db.select().from(notesTable);
-    return c.json(notes);
-  });
+  // Middleware to pass the database connection to the routes
+  const dbMiddleware: MiddlewareHandler<CustomEnv> = async (c, next) => {
+    c.set("db", db);
+    await next();
+  };
+  app.use(dbMiddleware);
 
-  // Create a new note
-  app.post("/notes", async (c) => {
-    const note = await c.req.json();
-    const newNote = await db.insert(notesTable).values(note).returning();
-    return c.json(newNote);
-  });
+  // Mount note routes
+  app.route("/notes", noteRoutes);
 
-  // Update a note
-  app.put("/notes/:id", async (c) => {
-    const id = c.req.param("id");
-    const note = await c.req.json();
-    await db.update(notesTable).set(note).where(eq(notesTable.id, id));
-    return c.json({ message: `Note ${id} updated` });
-  });
-
-  // Delete a note
-  app.delete("/notes/:id", async (c) => {
-    const id = c.req.param("id");
-    await db.delete(notesTable).where(eq(notesTable.id, id));
-    return c.json({ message: `Note ${id} deleted` });
-  });
-
-  // Search notes table
-  app.get("/search", async (c) => {
-    try {
-      const searchQuery = c.req.query("q");
-      const normalizedSearchQuery = searchQuery
-        ? searchQuery.trim().toLowerCase()
-        : "";
-
-      let searchResults;
-
-      if (normalizedSearchQuery === "") {
-        // Return all notes if the search query is empty
-        searchResults = await db.select().from(notesTable);
-      } else {
-        // Perform search with the given query
-        searchResults = await db
-          .select()
-          .from(notesTable)
-          .where(sql`LOWER(title) LIKE ${`%${normalizedSearchQuery}%`}`);
-      }
-
-      if (searchResults.length === 0) {
-        return c.json({
-          error: `No results found for ${searchQuery}`,
-          searchResults: [],
-        });
-      }
-
-      return c.json({
-        error: null,
-        searchResults,
-      });
-    } catch (error) {
-      console.error("Error in search endpoint:", error);
-      return c.json(
-        { error: "An unexpected error occurred. Please try again later." },
-        500
-      );
-    }
-  });
+  // Mount search routes
+  app.route("/search", searchRoutes);
 
   serve({
     fetch: app.fetch,
