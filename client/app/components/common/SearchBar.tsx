@@ -1,23 +1,25 @@
 // Remix and React
-import { Form, useSubmit } from "@remix-run/react";
 import { useState } from "react";
 
 // Third party components
 import { Input } from "~/components/ui/input";
 
-const SearchBar = () => {
-  const [searchQuery, setSearchQuery] = useState("");
-
-  const submit = useSubmit();
-
+const SearchBar = ({
+  searchQuery,
+  setSearchQuery,
+  onSearch,
+}: {
+  searchQuery: string;
+  setSearchQuery: (searchQuery: string) => void;
+  onSearch: (searchQuery: string) => void;
+}) => {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    submit(event.currentTarget);
+    onSearch(searchQuery);
   };
 
   return (
-    <Form
-      method="get"
+    <form
       onSubmit={handleSubmit}
       className="flex w-full items-center gap-2 h-12"
     >
@@ -28,8 +30,10 @@ const SearchBar = () => {
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
         className="h-full"
+        autoFocus
+        autoComplete="off"
       />
-    </Form>
+    </form>
   );
 };
 

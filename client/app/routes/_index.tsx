@@ -1,7 +1,7 @@
 // Remix and React
-import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
-import { useLoaderData, useSearchParams } from "@remix-run/react";
-import { useState } from "react";
+import type { MetaFunction } from "@remix-run/node";
+import { useSearchParams } from "@remix-run/react";
+import { ReactNode, useEffect, useState } from "react";
 
 // First party libraries
 import { createNote, getNotes } from "~/api/notes";
@@ -33,32 +33,23 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const url = new URL(request.url);
-  const q = url.searchParams.get("q");
-  if (q) {
-    const searchResults = await searchNotes(q);
-    return { initialSearchResults: searchResults };
-  }
-  return { initialSearchResults: null };
-};
-
 export default function Index() {
-  const { initialSearchResults } = useLoaderData<typeof loader>();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const q = searchParams.get("q") || "";
 
   const [openCreateNoteDialog, setOpenCreateNoteDialog] = useState(false);
+  const [searchQuery, setSearchQuery] = useState(q);
 
   const queryClient = useQueryClient();
+
   const {
     data: notes,
     isLoading: isNotesLoading,
     isError: isNotesError,
   } = useQuery({
     queryKey: ["notes", q],
-    queryFn: async () => (q ? searchNotes(q) : getNotes()),
-    initialData: initialSearchResults,
+    queryFn: () => (q ? searchNotes(q) : getNotes()),
+    refetchOnWindowFocus: false,
   });
 
   const createNoteMutation = useMutation({
@@ -102,11 +93,19 @@ export default function Index() {
     </div>
   );
 
+  const handleSearch = (query: string) => {
+    setSearchParams({ q: query });
+  };
+
   return (
     <Layout>
       <div className="relative flex-grow space-y-4">
         <div>
-          <SearchBar />
+          <SearchBar
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            onSearch={handleSearch}
+          />
         </div>
 
         {isNotesLoading ? (
@@ -146,7 +145,7 @@ export default function Index() {
   );
 }
 
-const Layout = ({ children }: { children: React.ReactNode }) => {
+const Layout = ({ children }: { children: ReactNode }) => {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
