@@ -1,5 +1,6 @@
 // Remix and React
-import type { MetaFunction } from "@remix-run/node";
+import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
+import { useLoaderData, useSearchParams } from "@remix-run/react";
 import { useState } from "react";
 
 // First party libraries
@@ -21,6 +22,7 @@ import { Skeleton } from "~/components/ui/skeleton";
 // First party components
 import FloatingActionButton from "~/components/common/FloatingActionButton";
 import Header from "~/components/common/Header";
+import SearchBar from "~/components/common/SearchBar";
 import { CreateNoteDialogForm } from "~/components/notes/CreateNoteDialogForm";
 import NoteCard from "~/components/notes/NoteCard";
 
@@ -31,10 +33,22 @@ export const meta: MetaFunction = () => {
   ];
 };
 
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const url = new URL(request.url);
+  const q = url.searchParams.get("q");
+  if (q) {
+    const searchResults = await searchNotes(q);
+    return { initialSearchResults: searchResults };
+  }
+  return { initialSearchResults: null };
+};
+
 export default function Index() {
+  const { initialSearchResults } = useLoaderData<typeof loader>();
+  const [searchParams] = useSearchParams();
+  const q = searchParams.get("q") || "";
+
   const [openCreateNoteDialog, setOpenCreateNoteDialog] = useState(false);
-  const [searchResults, setSearchResults] = useState<Note[]>([]);
-  const [isSearchActive, setIsSearchActive] = useState(false);
 
   const queryClient = useQueryClient();
   const {
@@ -42,9 +56,11 @@ export default function Index() {
     isLoading: isNotesLoading,
     isError: isNotesError,
   } = useQuery({
-    queryKey: ["notes"],
-    queryFn: async () => getNotes(),
+    queryKey: ["notes", q],
+    queryFn: async () => (q ? searchNotes(q) : getNotes()),
+    initialData: initialSearchResults,
   });
+
   const createNoteMutation = useMutation({
     mutationFn: createNote,
     onSuccess: () => {
@@ -58,11 +74,6 @@ export default function Index() {
 
   const handleCreateNote = async (note: CreateNoteDto) => {
     createNoteMutation.mutate(note);
-  };
-
-  const handleSearchResultsChange = (results: Note[] | undefined) => {
-    setSearchResults(results || []);
-    setIsSearchActive(!!results);
   };
 
   const renderNoteGrid = (notesToRender: Note[], isLoading: boolean) => (
@@ -94,15 +105,10 @@ export default function Index() {
   return (
     <Layout>
       <div className="relative flex-grow mt-6">
-        {isSearchActive ? (
-          searchResults.length > 0 ? (
-            renderNoteGrid(searchResults, false)
-          ) : (
-            <p className="text-center text-gray-600 dark:text-gray-400 py-10">
-              No results found. Try a different search term.
-            </p>
-          )
-        ) : isNotesLoading ? (
+        <div className="mb-6">
+          <SearchBar />
+        </div>
+        {isNotesLoading ? (
           renderNoteGrid([], true)
         ) : isNotesError ? (
           <div className="text-center py-10">
@@ -120,7 +126,9 @@ export default function Index() {
           renderNoteGrid(notes, false)
         ) : (
           <p className="text-center text-gray-600 dark:text-gray-400 py-10">
-            No notes yet. Create one!
+            {q
+              ? "No results found. Try a different search term."
+              : "No notes yet. Create one!"}
           </p>
         )}
 
