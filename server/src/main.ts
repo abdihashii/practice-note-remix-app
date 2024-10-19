@@ -1,6 +1,6 @@
 // Third-party imports
 import { serve } from "@hono/node-server";
-import { Context, Hono } from "hono";
+import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { MiddlewareHandler } from "hono/types";
 
