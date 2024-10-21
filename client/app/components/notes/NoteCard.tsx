@@ -18,8 +18,10 @@ import {
 } from "~/components/ui/card";
 
 // First party components
+import { StarIcon } from "lucide-react";
 import { DeleteConfirmationDialog } from "~/components/notes/DeleteConfirmationDialog";
 import { useNote } from "~/hooks/useNote";
+import { StarFilledIcon } from "../common/icons/StarFilledIcon";
 import { EditNoteDialogForm } from "./EditNoteDialogForm";
 
 interface NoteCardProps {
@@ -37,18 +39,27 @@ const NoteCard = ({ note }: NoteCardProps) => {
   return (
     <>
       <Card className="flex flex-col h-full">
-        <CardHeader>
-          <CardTitle>{note.title}</CardTitle>
-          <p className="text-sm text-muted-foreground">
-            {format(
-              new Date(
-                note.updatedAt > note.createdAt
-                  ? note.updatedAt
-                  : note.createdAt
-              ),
-              "MMM d, yyyy 'at' h:mm a"
+        <CardHeader className="flex flex-row justify-between items-center space-y-0 space-x-0">
+          <div className="flex flex-col gap-1">
+            <CardTitle>{note.title}</CardTitle>
+            <p className="text-sm text-muted-foreground">
+              {format(
+                new Date(
+                  note.updatedAt > note.createdAt
+                    ? note.updatedAt
+                    : note.createdAt
+                ),
+                "MMM d, yyyy 'at' h:mm a"
+              )}
+            </p>
+          </div>
+          <Button variant="ghost" size="icon">
+            {note.favorite ? (
+              <StarFilledIcon className="w-4 h-4" />
+            ) : (
+              <StarIcon className="w-4 h-4" />
             )}
-          </p>
+          </Button>
         </CardHeader>
         <CardContent className="flex-grow">
           <p className="text-gray-700 overflow-hidden line-clamp-3 h-[4.5rem]">
