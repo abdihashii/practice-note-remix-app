@@ -15,6 +15,16 @@ noteRoutes.get("/", async (c) => {
   return c.json(notes);
 });
 
+// Get a note by id
+noteRoutes.get("/:id", async (c) => {
+  const db = c.get("db");
+  const id = c.req.param("id");
+  const note = await db.query.notesTable.findFirst({
+    where: eq(notesTable.id, id),
+  });
+  return c.json(note);
+});
+
 // Create a new note
 noteRoutes.post("/", async (c) => {
   const db = c.get("db");

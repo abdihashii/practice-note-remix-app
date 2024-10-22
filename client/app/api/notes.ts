@@ -13,6 +13,17 @@ export const getNotes = async (): Promise<Note[] | null> => {
   }
 };
 
+export const getNoteById = async (id: string): Promise<Note | null> => {
+  try {
+    const response = await fetch(`${API_URL}/notes/${id}`);
+    const data = await response.json();
+    return data as Note;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+};
+
 export const createNote = async (note: CreateNoteDto): Promise<Note | null> => {
   try {
     const response = await fetch(`${API_URL}/notes`, {
