@@ -1,14 +1,14 @@
-import { useState } from "react";
+import { Theme, useTheme } from "remix-themes";
 
 import { MoonIcon, SunIcon } from "lucide-react";
 
 import { Button } from "~/components/ui/button";
 
 const Header = () => {
-  const [theme, setTheme] = useState("light");
+  const [theme, setTheme] = useTheme();
 
   const toggleTheme = () => {
-    setTheme(theme === "light" ? "dark" : "light");
+    setTheme(theme === Theme.LIGHT ? Theme.DARK : Theme.LIGHT);
   };
 
   return (
