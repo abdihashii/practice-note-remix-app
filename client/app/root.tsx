@@ -80,10 +80,6 @@ export function App() {
   );
 }
 
-// export function App() {
-//   return <Outlet />;
-// }
-
 export default function AppWithProviders() {
   const data = useLoaderData<typeof loader>();
 
