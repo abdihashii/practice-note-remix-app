@@ -6,6 +6,7 @@ import { MoonIcon, SunIcon } from "lucide-react";
 
 // First party components
 import { Button } from "~/components/ui/button";
+import { Link } from "@remix-run/react";
 
 const Header = () => {
   const [theme, setTheme] = useTheme();
@@ -18,9 +19,12 @@ const Header = () => {
     <header className="sticky top-0 z-10 bg-background shadow">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-14 sm:h-16 md:h-20">
-          <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-foreground truncate">
+          <Link
+            to="/notes"
+            className="text-lg sm:text-xl md:text-2xl font-bold text-foreground truncate"
+          >
             My Notes
-          </h1>
+          </Link>
 
           <div className="flex items-center space-x-2 sm:space-x-4">
             <Button
