@@ -1,3 +1,4 @@
+import type { LinksFunction, LoaderFunctionArgs } from "@remix-run/node";
 import {
   Links,
   Meta,
@@ -5,8 +6,8 @@ import {
   Scripts,
   ScrollRestoration,
   useLoaderData,
+  useLocation,
 } from "@remix-run/react";
-import type { LinksFunction, LoaderFunctionArgs } from "@remix-run/node";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
@@ -18,6 +19,9 @@ import {
   useTheme,
 } from "remix-themes";
 import { themeSessionResolver } from "./sessions.server";
+
+// Components
+import ProtectedLayout from "~/components/common/layout/ProtectedLayout";
 
 // Styles
 import "./tailwind.css";
@@ -54,6 +58,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export function App() {
   const data = useLoaderData<typeof loader>();
   const [theme] = useTheme();
+  const location = useLocation();
+
+  const isProtectedRoute = !location.pathname.startsWith("/");
 
   return (
     <html lang="en" className={clsx(theme)}>
@@ -66,7 +73,13 @@ export function App() {
       </head>
       <body>
         <QueryClientProvider client={queryClient}>
-          <Outlet />
+          {isProtectedRoute ? (
+            <ProtectedLayout>
+              <Outlet />
+            </ProtectedLayout>
+          ) : (
+            <Outlet />
+          )}
           <ScrollRestoration />
           <Scripts />
 
