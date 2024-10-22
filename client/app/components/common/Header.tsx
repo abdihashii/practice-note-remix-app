@@ -1,7 +1,10 @@
+// Third party libraries
 import { Theme, useTheme } from "remix-themes";
 
+// Third party components
 import { MoonIcon, SunIcon } from "lucide-react";
 
+// First party components
 import { Button } from "~/components/ui/button";
 
 const Header = () => {
