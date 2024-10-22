@@ -8,6 +8,8 @@
 - [ ] Fuzzy search
 - [ ] Auth
 - [ ] Secured user data
+- [ ] Page instead of modal for viewing/editing notes
+- [ ] Rich text editor
 - [ ] Manual tags
 - [ ] Collections
 - [ ] Dark theme
