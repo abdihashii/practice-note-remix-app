@@ -1,9 +1,11 @@
+name: practice-notes-backend
+
 version: "3.8"
 
 services:
   postgres:
     image: postgres:latest # postgres image from dockerhub
-    container_name: my-postgres-container # name of the container
+    container_name: postgres # name of the container
     environment:
       POSTGRES_USER: myuser # postgres username
       POSTGRES_PASSWORD: mypassword # postgres password
