@@ -24,6 +24,7 @@ console.log("Initializing server...");
 const db = await dbConnect();
 console.log("Database connected successfully");
 
+// Middleware to pass the database connection to the routes
 const dbMiddleware: MiddlewareHandler<CustomEnv> = async (c, next) => {
   try {
     c.set("db", db);
