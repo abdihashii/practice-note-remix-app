@@ -1,46 +1,38 @@
 {
   "compilerOptions": {
-    /* Specify ECMAScript target version for compatibility. */
-    "target": "ES2022",
-
-    /* Use modern ES modules. */
+    // Enable latest features
+    "lib": ["ESNext", "DOM"],
+    "target": "ESNext",
     "module": "ESNext",
+    "moduleDetection": "force",
+    "allowJs": false,
 
-    /* Node module resolution strategy. */
-    "moduleResolution": "Node",
-
-    /* Enable strict type-checking for better safety. */
-    "strict": true,
-
-    /* Ensure compatibility with CommonJS modules. */
-    "esModuleInterop": true,
-
-    /* Skip type checking for library declaration files for faster builds. */
-    "skipLibCheck": true,
-
-    /* Enforce consistent file casing in imports. */
-    "forceConsistentCasingInFileNames": true,
-
-    /* Don't emit JavaScript output, as the project doesn't require it. */
+    // Bundler mode
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
     "noEmit": true,
 
-    /* Allow importing JSON files directly. */
-    "resolveJsonModule": true,
+    // Best practices
+    "strict": true, // For better type safety
+    "skipLibCheck": true, // Skip type checking for external libraries for faster build times
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true,
 
-    /* Add type declarations for Node.js APIs. */
-    "types": ["node"],
+    // Some stricter flags (disabled by default)
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noPropertyAccessFromIndexSignature": false,
 
-    /* Set base directory for resolving non-relative imports. */
+    // Type declarations
+    "types": ["./types.d.ts"],
+
+    // Set base directory for resolving non-relative imports.
     "baseUrl": "./",
 
-    /* Define alias for cleaner imports. */
+    // Define alias for cleaner imports
     "paths": {
       "@/*": ["src/*"]
     }
-  },
-  /* Include all TypeScript files in the src directory. */
-  "include": ["src/**/*.ts"],
-
-  /* Exclude node_modules and build outputs. */
-  "exclude": ["node_modules", "dist", "build"]
+  }
 }
