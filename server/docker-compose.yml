@@ -4,7 +4,7 @@ name: notes-app
 services:
   # Postgres database
   postgres:
-    image: postgres:15-alpine
+    image: postgres:latest
     container_name: notes-app-postgres-db
     restart: unless-stopped
     environment:
