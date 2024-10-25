@@ -4,11 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "pnpm run db:migrate && pnpm run db:push && tsx src/main.ts",
-    "dev": "pnpm run db:migrate && pnpm run db:push && nodemon --watch src -e ts,json --exec 'tsx' src/main.ts",
+    "start": "bun run db:migrate && bun run db:push && bun run src/main.ts",
+    "dev": "bun run db:migrate && bun run db:push && bun --watch src/main.ts",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "tsx src/db/migrate.ts",
+    "db:migrate": "bun run src/db/migrate.ts",
     "db:push": "drizzle-kit push"
   },
   "keywords": [],
