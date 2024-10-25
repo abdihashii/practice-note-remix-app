@@ -3,6 +3,7 @@ name: practice-notes-backend
 version: "3.8"
 
 services:
+  # Postgres database
   postgres:
     image: postgres:latest # postgres image from dockerhub
     container_name: postgres # name of the container
@@ -15,6 +16,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data # map postgres data to host volume
 
+  # Backend web server
   app:
     build:
       context: .
