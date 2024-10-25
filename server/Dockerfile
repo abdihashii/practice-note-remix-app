@@ -1,14 +1,13 @@
-FROM node:20-alpine
+FROM oven/bun:latest
 
 WORKDIR /app
 
-COPY package.json pnpm-lock.yaml ./
+COPY package.json bun.lockb ./
 
-RUN npm install -g pnpm
-RUN pnpm install
+RUN bun install
 
 COPY . .
 
-RUN pnpm run db:generate
+RUN bun run db:generate
 
-CMD ["pnpm", "run", "dev"]
+CMD ["bun", "run", "dev"]

@@ -29,8 +29,8 @@ services:
     volumes:
       - ./src:/app/src
       - ./package.json:/app/package.json
-      - ./pnpm-lock.yaml:/app/pnpm-lock.yaml
-    command: pnpm run dev
+      - ./bun.lockb:/app/bun.lockb
+    command: bun run dev
 
 volumes:
   postgres_data: # name of the volume
