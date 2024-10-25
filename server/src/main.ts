@@ -2,13 +2,13 @@
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import { MiddlewareHandler } from "hono/types";
+import type { MiddlewareHandler } from "hono/types";
 
 // Local imports
 import { dbConnect } from "@/db";
 import { noteRoutes } from "@/routes/noteRoutes";
 import { searchRoutes } from "@/routes/searchRoutes";
-import { CustomEnv } from "@/types";
+import type { CustomEnv } from "@/types";
 
 // Create a new Hono app with the custom environment
 const app = new Hono<CustomEnv>();

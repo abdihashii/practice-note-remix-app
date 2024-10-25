@@ -4,7 +4,7 @@ import { Hono } from "hono";
 
 // Local imports
 import { notesTable } from "@/db/schema";
-import { CustomEnv } from "@/types";
+import type { CustomEnv } from "@/types";
 
 export const noteRoutes = new Hono<CustomEnv>();
 
