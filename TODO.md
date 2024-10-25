@@ -37,6 +37,8 @@
 ## Engineering
 
 - [ ] Monorepo setup
+- [x] Docker setup for server
+- [ ] Docker setup for client
 - [ ] Deployment
 - [ ] Unit testing for the server code
 - [ ] Integration testing for the server code
