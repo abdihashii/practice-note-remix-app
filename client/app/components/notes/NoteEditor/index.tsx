@@ -36,7 +36,7 @@ const NoteEditor = ({ initialContent = "", onChange }: NoteEditorProps) => {
   const Divider = () => <div className="w-px h-6 bg-border" />;
 
   return (
-    <div className="flex flex-col w-full border rounded-lg">
+    <div className="flex flex-col w-full border rounded-lg bg-background">
       <div className="flex items-center gap-1 p-2 border-b overflow-x-auto">
         {/* Text Style Group */}
         <MenuButton
@@ -172,12 +172,12 @@ const NoteEditor = ({ initialContent = "", onChange }: NoteEditorProps) => {
 
       <EditorContent
         editor={editor}
-        className="prose prose-sm max-w-none px-4 py-2 overflow-y-auto focus:outline-none"
+        className="prose dark:prose-invert prose-sm max-w-none px-4 py-2 overflow-y-auto focus:outline-none"
         style={{ height: `${editorHeight}px` }}
       />
 
       <div
-        className="h-2 bg-gray-200 cursor-ns-resize"
+        className="h-2 bg-muted cursor-ns-resize hover:bg-muted/80"
         onMouseDown={handleResize}
       />
     </div>
