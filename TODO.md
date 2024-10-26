@@ -2,18 +2,18 @@
 
 - [x] CRUD
 - [x] Excerpt
-- [ ] Favorites
-- [x] Search
-- [ ] Use postgres full text search with indexes
-- [ ] Fuzzy search
-- [ ] Auth
-- [ ] Secured user data
 - [x] Page instead of modal for viewing notes
 - [ ] Page instead of modal for creating/editing notes
 - [ ] Rich text editor
+- [ ] Favorites
+- [ ] Auth
+- [ ] Secured user data
+- [x] Search
+- [ ] Use postgres full text search with indexes
+- [ ] Fuzzy search
 - [ ] Manual tags
 - [ ] Collections
-- [ ] Dark theme
+- [x] Dark theme
 
 ## Nice to haves
 
