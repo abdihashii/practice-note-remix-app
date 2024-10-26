@@ -26,6 +26,11 @@ export default function useNoteEditor({
         heading: {
           levels: [1, 2, 3],
         },
+        codeBlock: {
+          HTMLAttributes: {
+            class: "rounded-md bg-muted",
+          },
+        },
       }),
       Placeholder.configure({
         placeholder: "Start writing your note...",
@@ -34,6 +39,11 @@ export default function useNoteEditor({
     content: initialContent,
     onUpdate: ({ editor }) => {
       onChange?.(editor.getText());
+    },
+    editorProps: {
+      attributes: {
+        class: "prose-sm focus:outline-none max-w-full",
+      },
     },
   });
 
@@ -45,16 +55,22 @@ export default function useNoteEditor({
     isActive = false,
     onClick,
     children,
+    disabled = false,
+    title,
   }: {
     isActive?: boolean;
     onClick: () => void;
     children: React.ReactNode;
+    disabled?: boolean;
+    title?: string;
   }) => (
     <Button
       variant="ghost"
       size="sm"
       className={`p-2 ${isActive ? "bg-accent" : ""}`}
       onClick={onClick}
+      disabled={disabled}
+      title={title}
     >
       {children}
     </Button>
@@ -78,10 +94,5 @@ export default function useNoteEditor({
     document.addEventListener("mouseup", onMouseUp);
   };
 
-  return {
-    editor,
-    editorHeight,
-    MenuButton,
-    handleResize,
-  };
+  return { editor, editorHeight, MenuButton, handleResize };
 }
