@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 
 // First party libraries
-import { LANGUAGES } from "./utils";
+import { LANGUAGES } from "../utils";
 
 // Tiptap
 import { NodeViewContent, NodeViewProps, NodeViewWrapper } from "@tiptap/react";

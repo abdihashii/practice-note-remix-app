@@ -14,7 +14,7 @@ import StarterKit from "@tiptap/starter-kit";
 import { common, createLowlight } from "lowlight";
 
 // First party components
-import CodeBlock from "./CodeBlock";
+import CodeBlock from "../components/CodeBlock";
 
 const lowlight = createLowlight(common);
 
