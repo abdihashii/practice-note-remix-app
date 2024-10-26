@@ -2,9 +2,9 @@
 import { useState } from "react";
 
 // Tiptap
-import { useEditor } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
+import { Extension, useEditor } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
 
 // Third party components
 import { Button } from "~/components/ui/button";
@@ -14,9 +14,11 @@ const EDITOR_MIN_HEIGHT = 500;
 export default function useNoteEditor({
   initialContent,
   onChange,
+  customExtensions = [],
 }: {
   initialContent: string;
   onChange?: (markdown: string) => void;
+  customExtensions?: Extension[];
 }) {
   const [editorHeight, setEditorHeight] = useState(EDITOR_MIN_HEIGHT);
 
@@ -26,15 +28,12 @@ export default function useNoteEditor({
         heading: {
           levels: [1, 2, 3],
         },
-        codeBlock: {
-          HTMLAttributes: {
-            class: "rounded-md bg-muted",
-          },
-        },
+        codeBlock: false,
       }),
       Placeholder.configure({
         placeholder: "Start writing your note...",
       }),
+      ...customExtensions,
     ],
     content: initialContent,
     onUpdate: ({ editor }) => {

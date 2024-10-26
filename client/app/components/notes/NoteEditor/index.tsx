@@ -1,4 +1,10 @@
+// Tiptap
+import { Extension } from "@tiptap/core";
+import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import { EditorContent } from "@tiptap/react";
+import { common, createLowlight } from "lowlight";
+
+// Third party components
 import {
   BoldIcon,
   BracesIcon,
@@ -15,9 +21,14 @@ import {
   StrikethroughIcon,
   UndoIcon,
 } from "lucide-react";
+
+// First party components
 import useNoteEditor from "./useNoteEditor";
 
-import "./styles.css";
+import "./styles.scss";
+
+// Create lowlight instance with ALL common languages
+const lowlight = createLowlight(common);
 
 interface NoteEditorProps {
   initialContent?: string;
@@ -25,7 +36,19 @@ interface NoteEditorProps {
 }
 
 const NoteEditor = ({ initialContent = "", onChange }: NoteEditorProps) => {
-  const result = useNoteEditor({ initialContent, onChange });
+  const result = useNoteEditor({
+    initialContent,
+    onChange,
+    customExtensions: [
+      CodeBlockLowlight.configure({
+        lowlight,
+        defaultLanguage: "javascript",
+        HTMLAttributes: {
+          class: "not-prose relative rounded-md bg-muted",
+        },
+      }) as Extension,
+    ],
+  });
 
   if (!result) {
     return null;
