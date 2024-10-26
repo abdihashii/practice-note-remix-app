@@ -8,7 +8,8 @@
 - [ ] Fuzzy search
 - [ ] Auth
 - [ ] Secured user data
-- [ ] Page instead of modal for viewing/editing notes
+- [x] Page instead of modal for viewing notes
+- [ ] Page instead of modal for creating/editing notes
 - [ ] Rich text editor
 - [ ] Manual tags
 - [ ] Collections
