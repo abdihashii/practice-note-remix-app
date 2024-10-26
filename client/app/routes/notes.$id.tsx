@@ -25,7 +25,11 @@ export default function NotePage() {
   return (
     <ProtectedLayout>
       {note ? (
-        <div>Note page for {note.title}</div>
+        <div className="flex flex-col gap-4">
+          <h1 className="text-4xl font-bold">{note.title}</h1>
+          <p className="text-sm text-muted-foreground">{note.createdAt}</p>
+          <p className="text-lg">{note.content}</p>
+        </div>
       ) : (
         <div>
           <p>Note not found</p>
