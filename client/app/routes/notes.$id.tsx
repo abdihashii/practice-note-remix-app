@@ -1,6 +1,6 @@
 // Remix and React
 import { json, LoaderFunctionArgs, redirect } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { Link, useLoaderData } from "@remix-run/react";
 
 // First party libraries
 import { getNoteById } from "~/api/notes";
@@ -22,11 +22,16 @@ export async function loader({ params }: LoaderFunctionArgs) {
 export default function NotePage() {
   const { note } = useLoaderData<typeof loader>();
 
-  console.log(note);
-
   return (
     <ProtectedLayout>
-      <div>Note page for {note?.title}</div>
+      {note ? (
+        <div>Note page for {note.title}</div>
+      ) : (
+        <div>
+          <p>Note not found</p>
+          <Link to="/notes">Go back to the notes page</Link>
+        </div>
+      )}
     </ProtectedLayout>
   );
 }
