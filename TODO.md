@@ -25,7 +25,6 @@
 - [ ] Share notes
 - [ ] Collaboration
 - [ ] Version history
-- [ ] Tagging
 
 ## AI
 
