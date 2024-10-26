@@ -1,6 +1,9 @@
 // React
 import React, { useState } from "react";
 
+// First party libraries
+import { LANGUAGES } from "./utils";
+
 // Tiptap
 import { NodeViewContent, NodeViewProps, NodeViewWrapper } from "@tiptap/react";
 
@@ -16,21 +19,6 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 
-const LANGUAGES = [
-  { value: "javascript", label: "JavaScript" },
-  { value: "typescript", label: "TypeScript" },
-  { value: "html", label: "HTML" },
-  { value: "css", label: "CSS" },
-  { value: "json", label: "JSON" },
-  { value: "python", label: "Python" },
-  { value: "rust", label: "Rust" },
-  { value: "go", label: "Go" },
-  { value: "bash", label: "Bash" },
-  { value: "markdown", label: "Markdown" },
-  { value: "sql", label: "SQL" },
-  { value: "yaml", label: "YAML" },
-];
-
 const CodeBlockComponent = ({ node, updateAttributes }: NodeViewProps) => {
   const [language, setLanguage] = useState(node.attrs.language || "javascript");
 
@@ -43,7 +31,7 @@ const CodeBlockComponent = ({ node, updateAttributes }: NodeViewProps) => {
     <NodeViewWrapper className="relative not-prose">
       <div className="absolute right-4 top-2 z-10">
         <Select value={language} onValueChange={handleLanguageChange}>
-          <SelectTrigger className="h-7 w-32 bg-background text-xs">
+          <SelectTrigger className="h-7 w-40 bg-background text-xs">
             <SelectValue placeholder="Select language" />
           </SelectTrigger>
           <SelectContent>

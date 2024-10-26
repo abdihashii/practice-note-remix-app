@@ -1,6 +1,9 @@
 // React
 import { useState } from "react";
 
+// First party libraries
+import { LANGUAGE_ALIASES } from "./utils";
+
 // Tiptap
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import Placeholder from "@tiptap/extension-placeholder";
@@ -58,7 +61,6 @@ export default function useNoteEditor({
         addKeyboardShortcuts() {
           return {
             "Mod-Alt-c": () => this.editor.commands.toggleCodeBlock(),
-            // Handle backtick + language pattern
             Backspace: () => {
               const { selection, doc } = this.editor.state;
               const pos = selection.$head.pos;
@@ -67,7 +69,11 @@ export default function useNoteEditor({
               // Check for ```{language} pattern
               const match = before.match(/```(\w+)\s*$/);
               if (match) {
-                const language = match[1];
+                let language = match[1].toLowerCase();
+
+                // Check if it's an alias and map it to the full language name
+                language = LANGUAGE_ALIASES[language] || language;
+
                 // Replace the ```language with a code block
                 this.editor
                   .chain()
