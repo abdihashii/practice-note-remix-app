@@ -73,18 +73,18 @@ export default function Index() {
     <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
       {isLoading
         ? Array.from({ length: 6 }).map((_, index) => (
-            <Card key={index} className="flex flex-col h-full">
+            <Card key={index} className="flex h-full flex-col">
               <CardHeader>
-                <Skeleton className="h-6 w-3/4 mb-2" />
+                <Skeleton className="mb-2 h-6 w-3/4" />
                 <Skeleton className="h-4 w-1/2" />
               </CardHeader>
               <CardContent className="flex-grow">
-                <Skeleton className="h-4 w-full mb-2" />
-                <Skeleton className="h-4 w-5/6 mb-2" />
+                <Skeleton className="mb-2 h-4 w-full" />
+                <Skeleton className="mb-2 h-4 w-5/6" />
                 <Skeleton className="h-4 w-4/6" />
               </CardContent>
               <CardFooter className="justify-end">
-                <div className="flex flex-col space-y-2 md:flex-row md:space-x-2 md:space-y-0 w-full md:w-auto">
+                <div className="flex w-full flex-col space-y-2 md:w-auto md:flex-row md:space-x-2 md:space-y-0">
                   <Skeleton className="h-9 w-full md:w-20" />
                   <Skeleton className="h-9 w-full md:w-20" />
                 </div>
@@ -117,11 +117,11 @@ export default function Index() {
         {isNotesLoading ? (
           renderNoteGrid([], true)
         ) : isNotesError ? (
-          <div className="text-center py-10">
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
+          <div className="py-10 text-center">
+            <h2 className="mb-2 text-2xl font-semibold text-gray-900 dark:text-gray-100">
               Oops! Something went wrong
             </h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">
+            <p className="mb-4 text-gray-600 dark:text-gray-400">
               We're having trouble loading your notes. Please try again later.
             </p>
             <Button onClick={() => navigate(".", { replace: true })}>
@@ -131,7 +131,7 @@ export default function Index() {
         ) : notes && notes.length > 0 ? (
           renderNoteGrid(notes, false)
         ) : (
-          <p className="text-center text-gray-600 dark:text-gray-400 py-10">
+          <p className="py-10 text-center text-gray-600 dark:text-gray-400">
             {q
               ? "No results found. Try a different search term."
               : "No notes yet. Create one!"}

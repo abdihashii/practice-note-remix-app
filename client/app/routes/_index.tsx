@@ -20,17 +20,17 @@ export default function Index() {
 
 const Layout = ({ children }: { children: ReactNode }) => {
   return (
-    <main className="w-full h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">
+    <main className="flex h-screen w-full items-center justify-center px-4 sm:px-6 lg:px-8">
       <div className="text-center">
-        <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6">
+        <h1 className="mb-6 text-4xl font-bold sm:text-5xl md:text-6xl">
           Welcome to Notes App
         </h1>
-        <p className="text-lg sm:text-xl md:text-2xl mb-8 text-muted-foreground">
+        <p className="mb-8 text-lg text-muted-foreground sm:text-xl md:text-2xl">
           Your personal space for organizing thoughts and ideas
         </p>
         <Link
           to="/notes"
-          className="inline-block text-lg sm:text-xl font-semibold px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+          className="inline-block rounded-lg bg-primary px-6 py-3 text-lg font-semibold text-primary-foreground transition-colors hover:bg-primary/90 sm:text-xl"
         >
           Get Started
         </Link>

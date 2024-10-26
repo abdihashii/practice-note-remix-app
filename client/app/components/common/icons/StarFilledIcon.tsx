@@ -8,7 +8,7 @@ export const StarFilledIcon = ({
   return (
     <StarIcon
       {...props}
-      className={cn("text-yellow-500 fill-yellow-500", className)}
+      className={cn("fill-yellow-500 text-yellow-500", className)}
     />
   );
 };

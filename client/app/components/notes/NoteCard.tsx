@@ -38,8 +38,8 @@ const NoteCard = ({ note }: NoteCardProps) => {
 
   return (
     <>
-      <Card className="flex flex-col h-full">
-        <CardHeader className="flex flex-row justify-between items-center space-y-0 space-x-0">
+      <Card className="flex h-full flex-col">
+        <CardHeader className="flex flex-row items-center justify-between space-x-0 space-y-0">
           <div className="flex flex-col gap-1">
             <CardTitle>{note.title}</CardTitle>
             <p className="text-sm text-muted-foreground">
@@ -47,27 +47,27 @@ const NoteCard = ({ note }: NoteCardProps) => {
                 new Date(
                   note.updatedAt > note.createdAt
                     ? note.updatedAt
-                    : note.createdAt
+                    : note.createdAt,
                 ),
-                "MMM d, yyyy 'at' h:mm a"
+                "MMM d, yyyy 'at' h:mm a",
               )}
             </p>
           </div>
           <Button variant="ghost" size="icon">
             {note.favorite ? (
-              <StarFilledIcon className="w-4 h-4" />
+              <StarFilledIcon className="h-4 w-4" />
             ) : (
-              <StarIcon className="w-4 h-4" />
+              <StarIcon className="h-4 w-4" />
             )}
           </Button>
         </CardHeader>
         <CardContent className="flex-grow">
-          <p className="text-gray-700 overflow-hidden line-clamp-3 h-[4.5rem]">
+          <p className="line-clamp-3 h-[4.5rem] overflow-hidden text-gray-700">
             {note.content}
           </p>
         </CardContent>
         <CardFooter className="justify-end">
-          <div className="flex flex-col space-y-2 md:flex-row md:space-x-2 md:space-y-0 w-full md:w-auto">
+          <div className="flex w-full flex-col space-y-2 md:w-auto md:flex-row md:space-x-2 md:space-y-0">
             <Button
               className="w-full md:w-20"
               variant="outline"

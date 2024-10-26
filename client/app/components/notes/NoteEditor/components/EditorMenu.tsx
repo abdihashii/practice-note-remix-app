@@ -47,7 +47,7 @@ const MenuButton = ({
   </Button>
 );
 
-const Divider = () => <div className="w-px h-6 bg-border" />;
+const Divider = () => <div className="h-6 w-px bg-border" />;
 
 interface EditorMenuProps {
   editor: Editor;
@@ -55,7 +55,7 @@ interface EditorMenuProps {
 
 const EditorMenu: React.FC<EditorMenuProps> = ({ editor }) => {
   return (
-    <div className="flex items-center gap-1 p-2 border-b overflow-x-auto">
+    <div className="flex items-center gap-1 overflow-x-auto border-b p-2">
       {/* Text Style Group */}
       <MenuButton
         isActive={editor.isActive("bold")}

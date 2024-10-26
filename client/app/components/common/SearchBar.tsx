@@ -42,7 +42,7 @@ const SearchBar = ({
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex w-full items-center gap-2 h-12 relative"
+      className="relative flex h-12 w-full items-center gap-2"
     >
       <Input
         ref={inputRef}

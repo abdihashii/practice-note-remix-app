@@ -28,7 +28,7 @@ const CodeBlockComponent = ({ node, updateAttributes }: NodeViewProps) => {
   };
 
   return (
-    <NodeViewWrapper className="relative not-prose">
+    <NodeViewWrapper className="not-prose relative">
       <div className="absolute right-4 top-2 z-10">
         <Select value={language} onValueChange={handleLanguageChange}>
           <SelectTrigger className="h-7 w-40 bg-background text-xs">
@@ -47,7 +47,7 @@ const CodeBlockComponent = ({ node, updateAttributes }: NodeViewProps) => {
         className={cn(
           "mt-2 rounded-lg bg-muted px-4 py-4 pt-10",
           "font-mono text-sm",
-          "overflow-x-auto"
+          "overflow-x-auto",
         )}
       >
         <NodeViewContent as="code" />

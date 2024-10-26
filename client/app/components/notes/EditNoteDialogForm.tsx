@@ -75,7 +75,7 @@ export const EditNoteDialogForm = ({
         handleSubmit(handleEditNote)();
       }
     },
-    [handleSubmit, handleEditNote]
+    [handleSubmit, handleEditNote],
   );
 
   return (
@@ -96,9 +96,9 @@ export const EditNoteDialogForm = ({
             <Label htmlFor="title">Title</Label>
             <Input {...register("title")} placeholder="Enter note title" />
             {errors.title ? (
-              <p className="text-red-500 text-sm h-4">{errors.title.message}</p>
+              <p className="h-4 text-sm text-red-500">{errors.title.message}</p>
             ) : (
-              <p className="text-gray-500 text-sm h-4"></p>
+              <p className="h-4 text-sm text-gray-500"></p>
             )}
           </div>
           <div className="space-y-2">
@@ -116,18 +116,18 @@ export const EditNoteDialogForm = ({
               >
                 <KeyboardIcon size={16} />
                 {showShortcutHint && (
-                  <div className="absolute bottom-full right-0 mb-2 bg-secondary text-secondary-foreground text-xs py-2 px-4 rounded shadow w-48 text-center">
+                  <div className="absolute bottom-full right-0 mb-2 w-48 rounded bg-secondary px-4 py-2 text-center text-xs text-secondary-foreground shadow">
                     CMD + Enter to submit form
                   </div>
                 )}
               </div>
             </div>
             {errors.content ? (
-              <p className="text-red-500 text-sm h-4">
+              <p className="h-4 text-sm text-red-500">
                 {errors.content.message}
               </p>
             ) : (
-              <p className="text-gray-500 text-sm h-4"></p>
+              <p className="h-4 text-sm text-gray-500"></p>
             )}
           </div>
           <DialogFooter>
