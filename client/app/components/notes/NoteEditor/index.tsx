@@ -1,4 +1,7 @@
+// Tiptap
 import { EditorContent } from "@tiptap/react";
+
+// Third party components
 import {
   BoldIcon,
   ItalicIcon,
@@ -8,6 +11,8 @@ import {
   RedoIcon,
   UndoIcon,
 } from "lucide-react";
+
+// First party components
 import useNoteEditor from "./useNoteEditor";
 
 import "./styles.css";
