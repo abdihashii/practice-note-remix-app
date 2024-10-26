@@ -2,16 +2,15 @@
 import { Extension } from "@tiptap/core";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import { EditorContent } from "@tiptap/react";
-import { common, createLowlight } from "lowlight";
+
+// First party libraries
+import { lowlight } from "./utils/lowlight-utils";
 
 // First party components
 import EditorMenu from "./components/EditorMenu";
 import useNoteEditor from "./hooks/useNoteEditor";
 
 import "./styles/note-editor.scss";
-
-// Create lowlight instance with ALL common languages
-const lowlight = createLowlight(common);
 
 interface NoteEditorProps {
   initialContent?: string;
