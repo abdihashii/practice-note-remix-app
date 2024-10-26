@@ -77,7 +77,7 @@ const NoteEditor = ({ initialContent = "", onChange }: NoteEditorProps) => {
 
       <EditorContent
         editor={editor}
-        className="prose prose-sm max-w-none p-6 overflow-y-auto focus:outline-none"
+        className="prose prose-sm max-w-none px-4 py-2 overflow-y-auto focus:outline-none"
         style={{ height: `${editorHeight}px` }}
       />
 
