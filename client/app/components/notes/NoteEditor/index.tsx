@@ -5,8 +5,8 @@ import { EditorContent } from "@tiptap/react";
 import { common, createLowlight } from "lowlight";
 
 // First party components
-import EditorMenu from "./EditorMenu";
-import useNoteEditor from "./useNoteEditor";
+import EditorMenu from "./components/EditorMenu";
+import useNoteEditor from "./hooks/useNoteEditor";
 
 import "./styles/note-editor.scss";
 
