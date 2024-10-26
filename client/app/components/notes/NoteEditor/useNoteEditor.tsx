@@ -1,7 +1,12 @@
+// React
 import { useState } from "react";
+
+// Tiptap
 import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
+
+// Third party components
 import { Button } from "~/components/ui/button";
 
 const EDITOR_MIN_HEIGHT = 500;
@@ -73,5 +78,10 @@ export default function useNoteEditor({
     document.addEventListener("mouseup", onMouseUp);
   };
 
-  return { editor, editorHeight, MenuButton, handleResize };
+  return {
+    editor,
+    editorHeight,
+    MenuButton,
+    handleResize,
+  };
 }
