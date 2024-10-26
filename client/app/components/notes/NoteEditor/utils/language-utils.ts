@@ -1,7 +1,9 @@
 // Common languages with their display names
 export const LANGUAGES = [
-  { value: "javascript", label: "JavaScript (js, jsx)" },
-  { value: "typescript", label: "TypeScript (ts, tsx)" },
+  { value: "javascript", label: "JavaScript (js)" },
+  { value: "typescript", label: "TypeScript (ts)" },
+  { value: "jsx", label: "React (jsx)" },
+  { value: "tsx", label: "React (tsx)" },
   { value: "html", label: "HTML" },
   { value: "css", label: "CSS" },
   { value: "scss", label: "SCSS/SASS" },
@@ -24,11 +26,13 @@ export const LANGUAGES = [
 export const LANGUAGE_ALIASES: Record<string, string> = {
   // JavaScript
   js: "javascript",
-  jsx: "javascript",
   node: "javascript",
 
   // TypeScript
   ts: "typescript",
+
+  // React
+  jsx: "javascript",
   tsx: "typescript",
 
   // Python
