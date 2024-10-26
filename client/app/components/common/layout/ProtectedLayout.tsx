@@ -1,4 +1,4 @@
-import Header from "~/components/common/Header";
+import Header from "~/components/common/layout/Header";
 
 interface ProtectedLayoutProps {
   children: React.ReactNode;

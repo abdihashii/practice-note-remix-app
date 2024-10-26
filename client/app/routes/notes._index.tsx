@@ -21,7 +21,7 @@ import { Skeleton } from "~/components/ui/skeleton";
 
 // First party components
 import FloatingActionButton from "~/components/common/FloatingActionButton";
-import Header from "~/components/common/Header";
+import ProtectedLayout from "~/components/common/layout/ProtectedLayout";
 import SearchBar from "~/components/common/SearchBar";
 import { CreateNoteDialogForm } from "~/components/notes/CreateNoteDialogForm";
 import NoteCard from "~/components/notes/NoteCard";
@@ -104,7 +104,7 @@ export default function Index() {
   };
 
   return (
-    <Layout>
+    <ProtectedLayout>
       <div className="relative flex-grow space-y-4">
         <div>
           <SearchBar
@@ -147,19 +147,6 @@ export default function Index() {
           isPending={createNoteMutation.isPending}
         />
       </div>
-    </Layout>
+    </ProtectedLayout>
   );
 }
-
-const Layout = ({ children }: { children: ReactNode }) => {
-  return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      <main className="flex-grow flex flex-col">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full py-6 flex flex-col gap-4">
-          {children}
-        </div>
-      </main>
-    </div>
-  );
-};
