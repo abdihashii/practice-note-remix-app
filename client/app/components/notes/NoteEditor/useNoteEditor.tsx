@@ -6,9 +6,6 @@ import Placeholder from "@tiptap/extension-placeholder";
 import { Extension, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 
-// Third party components
-import { Button } from "~/components/ui/button";
-
 const EDITOR_MIN_HEIGHT = 500;
 
 export default function useNoteEditor({
@@ -50,31 +47,6 @@ export default function useNoteEditor({
     return null;
   }
 
-  const MenuButton = ({
-    isActive = false,
-    onClick,
-    children,
-    disabled = false,
-    title,
-  }: {
-    isActive?: boolean;
-    onClick: () => void;
-    children: React.ReactNode;
-    disabled?: boolean;
-    title?: string;
-  }) => (
-    <Button
-      variant="ghost"
-      size="sm"
-      className={`p-2 ${isActive ? "bg-primary text-secondary" : ""}`}
-      onClick={onClick}
-      disabled={disabled}
-      title={title}
-    >
-      {children}
-    </Button>
-  );
-
   const handleResize = (mouseDownEvent: React.MouseEvent) => {
     const startY = mouseDownEvent.clientY;
     const startHeight = editorHeight;
@@ -93,5 +65,5 @@ export default function useNoteEditor({
     document.addEventListener("mouseup", onMouseUp);
   };
 
-  return { editor, editorHeight, MenuButton, handleResize };
+  return { editor, editorHeight, handleResize };
 }
