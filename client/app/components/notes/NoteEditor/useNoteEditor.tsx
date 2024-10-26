@@ -67,7 +67,7 @@ export default function useNoteEditor({
     <Button
       variant="ghost"
       size="sm"
-      className={`p-2 ${isActive ? "bg-accent" : ""}`}
+      className={`p-2 ${isActive ? "bg-primary text-secondary" : ""}`}
       onClick={onClick}
       disabled={disabled}
       title={title}
