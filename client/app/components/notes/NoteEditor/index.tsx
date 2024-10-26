@@ -8,7 +8,7 @@ import { common, createLowlight } from "lowlight";
 import EditorMenu from "./EditorMenu";
 import useNoteEditor from "./useNoteEditor";
 
-import "./styles.scss";
+import "./styles/note-editor.scss";
 
 // Create lowlight instance with ALL common languages
 const lowlight = createLowlight(common);
