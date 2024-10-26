@@ -1,7 +1,7 @@
 // Remix and React
 import type { MetaFunction } from "@remix-run/node";
-import { useSearchParams } from "@remix-run/react";
-import { ReactNode, useEffect, useState } from "react";
+import { Link, useNavigate, useSearchParams } from "@remix-run/react";
+import { ReactNode, useState } from "react";
 
 // First party libraries
 import { createNote, getNotes } from "~/api/notes";
@@ -40,8 +40,8 @@ export default function Index() {
   const [openCreateNoteDialog, setOpenCreateNoteDialog] = useState(false);
   const [searchQuery, setSearchQuery] = useState(q);
 
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
-
   const {
     data: notes,
     isLoading: isNotesLoading,
@@ -91,7 +91,11 @@ export default function Index() {
               </CardFooter>
             </Card>
           ))
-        : notesToRender.map((note) => <NoteCard key={note.id} note={note} />)}
+        : notesToRender.map((note) => (
+            <Link to={`/notes/${note.id}`} key={note.id}>
+              <NoteCard note={note} />
+            </Link>
+          ))}
     </div>
   );
 
@@ -120,7 +124,7 @@ export default function Index() {
             <p className="text-gray-600 dark:text-gray-400 mb-4">
               We're having trouble loading your notes. Please try again later.
             </p>
-            <Button onClick={() => window.location.reload()}>
+            <Button onClick={() => navigate(".", { replace: true })}>
               Refresh Page
             </Button>
           </div>
