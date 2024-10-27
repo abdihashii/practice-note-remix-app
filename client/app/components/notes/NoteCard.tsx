@@ -61,11 +61,6 @@ const NoteCard = ({ note }: NoteCardProps) => {
             )}
           </Button>
         </CardHeader>
-        <CardContent className="flex-grow">
-          <p className="line-clamp-3 h-[4.5rem] overflow-hidden text-gray-700">
-            {note.content}
-          </p>
-        </CardContent>
         <CardFooter className="justify-end">
           <div className="flex w-full flex-col space-y-2 md:w-auto md:flex-row md:space-x-2 md:space-y-0">
             <Button
