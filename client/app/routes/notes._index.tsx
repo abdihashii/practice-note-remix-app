@@ -1,11 +1,12 @@
 // Remix and React
 import type { MetaFunction } from "@remix-run/node";
 import { Link, useNavigate, useSearchParams } from "@remix-run/react";
-import { ReactNode, useState } from "react";
+import { useState } from "react";
 
 // First party libraries
 import { createNote, getNotes } from "~/api/notes";
 import { searchNotes } from "~/api/search";
+import { cn } from "~/lib/utils";
 import { CreateNoteDto, Note } from "~/types";
 
 // Third party components
@@ -20,13 +21,11 @@ import {
 import { Skeleton } from "~/components/ui/skeleton";
 
 // First party components
-import FloatingActionButton from "~/components/common/FloatingActionButton";
+import AddNoteButton from "~/components/common/AddNoteButton";
 import ProtectedLayout from "~/components/common/layout/ProtectedLayout";
 import SearchBar from "~/components/common/SearchBar";
 import { CreateNoteDialogForm } from "~/components/notes/CreateNoteDialogForm";
 import NoteCard from "~/components/notes/NoteCard";
-import { cn } from "~/lib/utils";
-import { PlusIcon } from "lucide-react";
 
 export const meta: MetaFunction = () => {
   return [
@@ -121,14 +120,7 @@ export default function Index() {
             setSearchQuery={setSearchQuery}
             onSearch={handleSearch}
           />
-          <Button
-            size="sm"
-            onClick={handleFloatingActionClick}
-            className="flex h-full items-center justify-center gap-2 px-4 font-medium"
-          >
-            <PlusIcon className="h-4 w-4" />
-            <span>Add Note</span>
-          </Button>
+          <AddNoteButton onClick={handleFloatingActionClick} />
         </div>
 
         {isNotesLoading ? (
@@ -154,8 +146,6 @@ export default function Index() {
               : "No notes yet. Create one!"}
           </p>
         )}
-
-        <FloatingActionButton onClick={handleFloatingActionClick} />
 
         <CreateNoteDialogForm
           open={openCreateNoteDialog}
