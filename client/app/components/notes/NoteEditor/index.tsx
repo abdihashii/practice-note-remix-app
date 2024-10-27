@@ -1,10 +1,5 @@
 // Tiptap
-import { Extension } from "@tiptap/core";
-import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import { EditorContent } from "@tiptap/react";
-
-// First party libraries
-import { lowlight } from "./utils/lowlight-utils";
 
 // First party components
 import EditorMenu from "./components/EditorMenu";
@@ -21,15 +16,6 @@ const NoteEditor = ({ initialContent = "", onChange }: NoteEditorProps) => {
   const result = useNoteEditor({
     initialContent,
     onChange,
-    customExtensions: [
-      CodeBlockLowlight.configure({
-        lowlight,
-        defaultLanguage: "javascript",
-        HTMLAttributes: {
-          class: "not-prose relative rounded-md bg-muted",
-        },
-      }) as Extension,
-    ],
   });
 
   if (!result) {
