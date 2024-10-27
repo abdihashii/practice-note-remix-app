@@ -25,6 +25,7 @@ import ProtectedLayout from "~/components/common/layout/ProtectedLayout";
 import SearchBar from "~/components/common/SearchBar";
 import { CreateNoteDialogForm } from "~/components/notes/CreateNoteDialogForm";
 import NoteCard from "~/components/notes/NoteCard";
+import { cn } from "~/lib/utils";
 
 export const meta: MetaFunction = () => {
   return [
@@ -92,7 +93,14 @@ export default function Index() {
             </Card>
           ))
         : notesToRender.map((note) => (
-            <Link to={`/notes/${note.id}`} key={note.id}>
+            <Link
+              to={`/notes/${note.id}`}
+              key={note.id}
+              className={cn(
+                "group h-full transition-all duration-200 ease-in-out",
+                "hover:-translate-y-0.5",
+              )}
+            >
               <NoteCard note={note} />
             </Link>
           ))}
