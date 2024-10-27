@@ -33,7 +33,8 @@ noteRoutes.post("/", async (c) => {
   const db = c.get("db");
   const note = await c.req.json();
   const newNote = await db.insert(notesTable).values(note).returning();
-  return c.json(newNote);
+  const createdNote = newNote[0];
+  return c.json(createdNote);
 });
 
 // Update a note
