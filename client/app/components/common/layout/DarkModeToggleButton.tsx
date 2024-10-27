@@ -20,7 +20,7 @@ export default function DarkModeToggleButton() {
         variant="ghost"
         size="icon"
         onClick={toggleTheme}
-        className="h-8 w-8 sm:h-9 sm:w-9 rounded-full hover:bg-foreground/10"
+        className="h-8 w-8 rounded-full hover:bg-foreground/10 sm:h-9 sm:w-9"
         aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
       >
         {theme === "light" ? (

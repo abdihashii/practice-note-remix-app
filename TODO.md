@@ -3,8 +3,10 @@
 - [x] CRUD
 - [x] Excerpt
 - [x] Page instead of modal for viewing notes
-- [ ] Page instead of modal for creating/editing notes
-- [ ] Rich text editor
+- [x] Page instead of modal for creating/editing notes
+- [x] Rich text editor
+- [ ] Filter options
+- [ ] Sort options
 - [ ] Favorites
 - [ ] Auth
 - [ ] Secured user data

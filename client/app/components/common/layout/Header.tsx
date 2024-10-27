@@ -6,12 +6,12 @@ import DarkModeToggleButton from "~/components/common/layout/DarkModeToggleButto
 
 const Header = () => {
   return (
-    <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm border-b border-foreground/10">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-14 sm:h-16 md:h-20">
+    <header className="sticky top-0 z-10 border-b border-foreground/10 bg-background/80 backdrop-blur-sm">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex h-14 items-center justify-between sm:h-16 md:h-20">
           <Link
             to="/notes"
-            className="text-lg sm:text-xl md:text-2xl font-bold text-foreground hover:text-foreground/80 truncate"
+            className="truncate text-lg font-bold text-foreground hover:text-foreground/80 sm:text-xl md:text-2xl"
           >
             My Notes
           </Link>

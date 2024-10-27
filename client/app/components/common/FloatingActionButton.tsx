@@ -9,7 +9,7 @@ const FloatingActionButton = ({
 }) => {
   return (
     <button
-      className="fixed bottom-8 right-8 bg-blue-600 text-white rounded-full h-16 w-16 flex items-center justify-center shadow-lg"
+      className="fixed bottom-8 right-8 flex h-16 w-16 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg"
       aria-label="Add Note"
       onClick={() =>
         onClick({

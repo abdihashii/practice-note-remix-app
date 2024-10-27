@@ -7,6 +7,7 @@ import { getNoteById } from "~/api/notes";
 
 // First party components
 import ProtectedLayout from "~/components/common/layout/ProtectedLayout";
+import NoteEditor from "~/components/notes/NoteEditor";
 
 export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;
@@ -28,7 +29,17 @@ export default function NotePage() {
         <div className="flex flex-col gap-4">
           <h1 className="text-4xl font-bold">{note.title}</h1>
           <p className="text-sm text-muted-foreground">{note.createdAt}</p>
-          <p className="text-lg">{note.content}</p>
+
+          <NoteEditor
+            initialContent={note.content}
+            noteId={note.id}
+            onChange={() => {
+              // console.log("changed");
+            }}
+            onSave={() => {
+              // console.log("saved");
+            }}
+          />
         </div>
       ) : (
         <div>

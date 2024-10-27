@@ -34,7 +34,7 @@ export const DeleteConfirmationDialog = ({
             Deleting <strong>{noteTitle}</strong> is irreversible.
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter className="flex flex-col space-y-2 md:flex-row md:space-x-2 md:space-y-0 w-full md:w-auto">
+        <AlertDialogFooter className="flex w-full flex-col space-y-2 md:w-auto md:flex-row md:space-x-2 md:space-y-0">
           <Button
             variant="outline"
             className="w-full md:w-20"
