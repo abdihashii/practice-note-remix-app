@@ -2,7 +2,7 @@
 import { useState } from "react";
 
 // First party libraries
-import { LANGUAGE_ALIASES, lowlight } from "../utils";
+import { lowlight } from "../utils";
 
 // Tiptap
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
