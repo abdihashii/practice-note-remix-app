@@ -2,7 +2,7 @@
 import { EditorContent } from "@tiptap/react";
 
 // Third party components
-import { Save } from "lucide-react";
+import { Loader2Icon, SaveIcon } from "lucide-react";
 import { Button } from "~/components/ui/button";
 
 // First party components
@@ -53,10 +53,16 @@ const NoteEditor = ({
             size="sm"
             onClick={onSaveClick}
             disabled={isSaving}
-            className="h-8 gap-1.5 px-3 font-medium"
+            className="h-8 w-20 gap-1.5 px-3 font-medium"
           >
-            <Save className="h-3.5 w-3.5" />
-            {isSaving ? "Saving..." : "Save"}
+            {isSaving ? (
+              <Loader2Icon className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <>
+                <SaveIcon className="h-3.5 w-3.5" />
+                Save
+              </>
+            )}
           </Button>
         </div>
       </div>
