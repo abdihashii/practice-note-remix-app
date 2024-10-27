@@ -1,5 +1,5 @@
 // Third-party imports
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import { Hono } from "hono";
 
 // Local imports
@@ -11,7 +11,10 @@ export const noteRoutes = new Hono<CustomEnv>();
 // Get all notes
 noteRoutes.get("/", async (c) => {
   const db = c.get("db");
-  const notes = await db.select().from(notesTable);
+  const notes = await db
+    .select()
+    .from(notesTable)
+    .orderBy(desc(notesTable.updatedAt));
   return c.json(notes);
 });
 
@@ -38,7 +41,11 @@ noteRoutes.put("/:id", async (c) => {
   const db = c.get("db");
   const id = c.req.param("id");
   const note = await c.req.json();
-  await db.update(notesTable).set(note).where(eq(notesTable.id, id));
+  const updatedNote = {
+    ...note,
+    updatedAt: new Date().toISOString(),
+  };
+  await db.update(notesTable).set(updatedNote).where(eq(notesTable.id, id));
   return c.json({ message: `Note ${id} updated` });
 });
 
