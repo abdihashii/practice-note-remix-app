@@ -26,6 +26,7 @@ import SearchBar from "~/components/common/SearchBar";
 import { CreateNoteDialogForm } from "~/components/notes/CreateNoteDialogForm";
 import NoteCard from "~/components/notes/NoteCard";
 import { cn } from "~/lib/utils";
+import { PlusIcon } from "lucide-react";
 
 export const meta: MetaFunction = () => {
   return [
@@ -114,12 +115,20 @@ export default function Index() {
   return (
     <ProtectedLayout>
       <div className="relative flex-grow space-y-4">
-        <div>
+        <div className="flex h-12 items-center justify-between gap-4">
           <SearchBar
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
             onSearch={handleSearch}
           />
+          <Button
+            size="sm"
+            onClick={handleFloatingActionClick}
+            className="flex h-full items-center justify-center gap-2 px-4 font-medium"
+          >
+            <PlusIcon className="h-4 w-4" />
+            <span>Add Note</span>
+          </Button>
         </div>
 
         {isNotesLoading ? (
