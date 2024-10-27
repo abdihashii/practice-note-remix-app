@@ -1,14 +1,12 @@
 // Tiptap
 import { EditorContent } from "@tiptap/react";
 
-// Third party components
-import { Loader2Icon, SaveIcon } from "lucide-react";
-import { Button } from "~/components/ui/button";
-
 // First party components
 import EditorMenu from "./components/EditorMenu";
+import { SaveNoteButton } from "./components/SaveNoteButton";
 import useNoteEditor from "./hooks/useNoteEditor";
 
+// Styles
 import "./styles/note-editor.scss";
 
 interface NoteEditorProps {
@@ -24,7 +22,7 @@ const NoteEditor = ({
   onChange,
   onSave,
 }: NoteEditorProps) => {
-  const { editor, editorHeight, handleResize, handleSave, isSaving } =
+  const { editor, editorHeight, handleResize, handleSave, saveButtonState } =
     useNoteEditor({
       initialContent,
       onChange,
@@ -48,22 +46,10 @@ const NoteEditor = ({
         </div>
 
         <div className="ml-2 flex h-full items-center pl-2">
-          <Button
-            variant="default"
-            size="sm"
-            onClick={onSaveClick}
-            disabled={isSaving}
-            className="h-8 w-20 gap-1.5 px-3 font-medium"
-          >
-            {isSaving ? (
-              <Loader2Icon className="h-3.5 w-3.5 animate-spin" />
-            ) : (
-              <>
-                <SaveIcon className="h-3.5 w-3.5" />
-                Save
-              </>
-            )}
-          </Button>
+          <SaveNoteButton
+            saveButtonState={saveButtonState}
+            handleSave={onSaveClick}
+          />
         </div>
       </div>
 

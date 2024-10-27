@@ -3,6 +3,7 @@ import { useState } from "react";
 
 // First party libraries
 import { updateNote } from "~/api/notes";
+import { SaveButtonState } from "../types";
 import { lowlight } from "../utils";
 
 // Tiptap
@@ -29,7 +30,8 @@ export default function useNoteEditor({
   noteId?: string;
 }) {
   const [editorHeight, setEditorHeight] = useState(EDITOR_MIN_HEIGHT);
-  const [isSaving, setIsSaving] = useState(false);
+  const [saveButtonState, setSaveButtonState] =
+    useState<SaveButtonState>("default");
   const { toast } = useToast();
 
   const editor = useEditor({
@@ -89,7 +91,7 @@ export default function useNoteEditor({
     }
 
     try {
-      setIsSaving(true);
+      setSaveButtonState("loading");
       const content = editor.getHTML();
       const updatedNote = await updateNote(noteId, { content });
 
@@ -97,19 +99,23 @@ export default function useNoteEditor({
         throw new Error("Failed to update note");
       }
 
+      setSaveButtonState("success");
       toast({
         title: "Success",
         description: "Note saved successfully",
       });
     } catch (error) {
       console.error(error);
+      setSaveButtonState("failure");
       toast({
         title: "Error",
         description: "Failed to save note",
         variant: "destructive",
       });
     } finally {
-      setIsSaving(false);
+      setTimeout(() => {
+        setSaveButtonState("default");
+      }, 2000);
     }
   };
 
@@ -131,5 +137,5 @@ export default function useNoteEditor({
     document.addEventListener("mouseup", onMouseUp);
   };
 
-  return { editor, editorHeight, handleResize, handleSave, isSaving };
+  return { editor, editorHeight, handleResize, handleSave, saveButtonState };
 }
