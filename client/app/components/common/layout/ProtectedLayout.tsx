@@ -1,3 +1,7 @@
+// Third party components
+import { Toaster } from "~/components/ui/toaster";
+
+// First party components
 import Header from "~/components/common/layout/Header";
 
 interface ProtectedLayoutProps {
@@ -13,6 +17,7 @@ export default function ProtectedLayout({ children }: ProtectedLayoutProps) {
           {children}
         </div>
       </main>
+      <Toaster />
     </div>
   );
 }
