@@ -2,32 +2,25 @@
 import { useState } from "react";
 
 // First party libraries
-import { LANGUAGE_ALIASES } from "../utils";
+import { LANGUAGE_ALIASES, lowlight } from "../utils";
 
 // Tiptap
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import Placeholder from "@tiptap/extension-placeholder";
-import { Extension, ReactNodeViewRenderer, useEditor } from "@tiptap/react";
+import { ReactNodeViewRenderer, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-
-// Third party libraries
-import { common, createLowlight } from "lowlight";
 
 // First party components
 import CodeBlock from "../components/CodeBlock";
-
-const lowlight = createLowlight(common);
 
 const EDITOR_MIN_HEIGHT = 500;
 
 export default function useNoteEditor({
   initialContent,
   onChange,
-  customExtensions = [],
 }: {
   initialContent: string;
   onChange?: (markdown: string) => void;
-  customExtensions?: Extension[];
 }) {
   const [editorHeight, setEditorHeight] = useState(EDITOR_MIN_HEIGHT);
 
@@ -93,7 +86,6 @@ export default function useNoteEditor({
           class: "not-prose relative rounded-md",
         },
       }),
-      ...customExtensions,
     ],
     content: initialContent,
     onUpdate: ({ editor }) => {
