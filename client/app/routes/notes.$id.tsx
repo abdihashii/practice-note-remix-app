@@ -32,8 +32,12 @@ export default function NotePage() {
 
           <NoteEditor
             initialContent={note.content}
+            noteId={note.id}
             onChange={() => {
-              console.log("changed");
+              // console.log("changed");
+            }}
+            onSave={() => {
+              // console.log("saved");
             }}
           />
         </div>

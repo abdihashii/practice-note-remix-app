@@ -55,7 +55,7 @@ interface EditorMenuProps {
 
 const EditorMenu: React.FC<EditorMenuProps> = ({ editor }) => {
   return (
-    <div className="flex items-center gap-1 overflow-x-auto border-b p-2">
+    <div className="flex items-center gap-1 overflow-x-auto p-2">
       {/* Text Style Group */}
       <MenuButton
         isActive={editor.isActive("bold")}
@@ -179,6 +179,7 @@ const EditorMenu: React.FC<EditorMenuProps> = ({ editor }) => {
         >
           <RedoIcon className="h-4 w-4" />
         </MenuButton>
+        <Divider />
       </div>
     </div>
   );
