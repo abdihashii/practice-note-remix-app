@@ -51,34 +51,6 @@ export default function useNoteEditor({
             },
           };
         },
-        addKeyboardShortcuts() {
-          return {
-            "Mod-Alt-c": () => this.editor.commands.toggleCodeBlock(),
-            Backspace: () => {
-              const { selection, doc } = this.editor.state;
-              const pos = selection.$head.pos;
-              const before = doc.textBetween(Math.max(0, pos - 20), pos);
-
-              // Check for ```{language} pattern
-              const match = before.match(/```(\w+)\s*$/);
-              if (match) {
-                let language = match[1].toLowerCase();
-
-                // Check if it's an alias and map it to the full language name
-                language = LANGUAGE_ALIASES[language] || language;
-
-                // Replace the ```language with a code block
-                this.editor
-                  .chain()
-                  .deleteRange({ from: pos - match[0].length, to: pos })
-                  .setCodeBlock({ language })
-                  .run();
-                return true;
-              }
-              return false;
-            },
-          };
-        },
       }).configure({
         lowlight,
         defaultLanguage: "javascript",
