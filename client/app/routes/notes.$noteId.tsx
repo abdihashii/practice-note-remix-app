@@ -1,45 +1,106 @@
 // Remix and React
-import { json, LoaderFunctionArgs, redirect } from "@remix-run/node";
-import { Link, useLoaderData } from "@remix-run/react";
+import { Link, useParams } from "@remix-run/react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Loader2, PenLineIcon, SaveIcon } from "lucide-react";
+import { useState } from "react";
 
 // First party libraries
 import { getNoteById } from "~/api/notes";
 
+// Third party components
+import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
+
 // First party components
 import ProtectedLayout from "~/components/common/layout/ProtectedLayout";
 import NoteEditor from "~/components/notes/NoteEditor";
-
-export async function loader({ params }: LoaderFunctionArgs) {
-  const { noteId } = params;
-
-  if (!noteId) {
-    return redirect("/notes");
-  }
-
-  const note = await getNoteById(noteId);
-  return json({ note });
-}
+import useNoteEditor from "~/components/notes/NoteEditor/hooks/useNoteEditor";
 
 export default function NotePage() {
-  const { note } = useLoaderData<typeof loader>();
+  const params = useParams();
+  const queryClient = useQueryClient();
+
+  const {
+    data: note,
+    isLoading: isLoadingNote,
+    isError: isErrorNote,
+  } = useQuery({
+    queryKey: ["note", params.noteId],
+    queryFn: () => getNoteById(params.noteId!),
+    enabled: !!params.noteId,
+  });
+
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+
+  const { handleUpdateNote } = useNoteEditor({
+    initialContent: note?.content || "",
+    noteId: note?.id,
+  });
+
+  const onEditTitleClick = () => {
+    setIsEditingTitle(true);
+  };
+
+  const handleSaveTitle = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    try {
+      const formData = new FormData(e.currentTarget);
+      const title = formData.get("title") as string;
+
+      await handleUpdateNote(title);
+
+      // Invalidate the notes query
+      queryClient.invalidateQueries({ queryKey: ["note", params.noteId] });
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsEditingTitle(false);
+    }
+  };
+
+  if (isLoadingNote) {
+    return (
+      <ProtectedLayout>
+        <Loader2 className="animate-spin" />
+      </ProtectedLayout>
+    );
+  }
 
   return (
     <ProtectedLayout>
       {note ? (
         <div className="flex flex-col gap-4">
-          <h1 className="text-4xl font-bold">{note.title}</h1>
+          <div className="group flex items-center gap-2">
+            {isEditingTitle ? (
+              <form
+                onSubmit={handleSaveTitle}
+                className="flex flex-1 items-center gap-2"
+              >
+                <Input type="text" name="title" defaultValue={note.title} />
+                <Button
+                  type="submit"
+                  variant="outline"
+                  size="icon"
+                  className="cursor-pointer"
+                >
+                  <SaveIcon className="h-4 w-4" />
+                </Button>
+              </form>
+            ) : (
+              <>
+                <h1 className="text-4xl font-bold">{note.title}</h1>
+                <PenLineIcon
+                  className="hidden h-4 w-4 cursor-pointer group-hover:block"
+                  onClick={onEditTitleClick}
+                />
+              </>
+            )}
+          </div>
+
           <p className="text-sm text-muted-foreground">{note.createdAt}</p>
 
-          <NoteEditor
-            initialContent={note.content}
-            noteId={note.id}
-            onChange={() => {
-              // console.log("changed");
-            }}
-            onSave={() => {
-              // console.log("saved");
-            }}
-          />
+          <NoteEditor initialContent={note.content} noteId={note.id} />
         </div>
       ) : (
         <div>
