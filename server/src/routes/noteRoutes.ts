@@ -43,10 +43,15 @@ noteRoutes.put("/:id", async (c) => {
   const note = await c.req.json();
   const updatedNote = {
     ...note,
-    updatedAt: new Date().toISOString(),
+    updatedAt: new Date(), // Pass Date object directly instead of ISO string
   };
   await db.update(notesTable).set(updatedNote).where(eq(notesTable.id, id));
-  return c.json({ message: `Note ${id} updated` });
+
+  // Fetch and return the updated note
+  const updated = await db.query.notesTable.findFirst({
+    where: eq(notesTable.id, id),
+  });
+  return c.json(updated);
 });
 
 // Delete a note
