@@ -1,16 +1,9 @@
-// React
-import { useState } from "react";
-
-// First party libraries
-import { updateNote } from "~/api/notes";
-
 // Tiptap
 import { EditorContent } from "@tiptap/react";
 
 // Third party components
 import { Save } from "lucide-react";
 import { Button } from "~/components/ui/button";
-import { useToast } from "~/hooks/use-toast";
 
 // First party components
 import EditorMenu from "./components/EditorMenu";
@@ -31,57 +24,20 @@ const NoteEditor = ({
   onChange,
   onSave,
 }: NoteEditorProps) => {
-  const { toast } = useToast();
-  const [isSaving, setIsSaving] = useState(false);
+  const { editor, editorHeight, handleResize, handleSave, isSaving } =
+    useNoteEditor({
+      initialContent,
+      onChange,
+      noteId,
+    });
 
-  const result = useNoteEditor({
-    initialContent,
-    onChange,
-  });
-
-  if (!result) {
+  if (!editor) {
     return null;
   }
 
-  const { editor, editorHeight, handleResize } = result;
-
-  const handleSave = async () => {
-    if (!noteId) {
-      toast({
-        title: "Error",
-        description: "Note ID is required to save changes",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      setIsSaving(true);
-
-      const content = editor.getHTML();
-
-      const updatedNote = await updateNote(noteId, { content });
-
-      if (!updatedNote) {
-        throw new Error("Failed to update note");
-      }
-
-      toast({
-        title: "Success",
-        description: "Note saved successfully",
-      });
-
-      onSave?.();
-    } catch (error) {
-      console.error(error);
-      toast({
-        title: "Error",
-        description: "Failed to save note",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSaving(false);
-    }
+  const onSaveClick = async () => {
+    await handleSave();
+    onSave?.();
   };
 
   return (
@@ -95,7 +51,7 @@ const NoteEditor = ({
           <Button
             variant="default"
             size="sm"
-            onClick={handleSave}
+            onClick={onSaveClick}
             disabled={isSaving}
             className="h-8 gap-1.5 px-3 font-medium"
           >
