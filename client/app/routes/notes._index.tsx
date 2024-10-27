@@ -34,7 +34,7 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-export default function Index() {
+export default function NotesIndex() {
   const [searchParams, setSearchParams] = useSearchParams();
   const q = searchParams.get("q") || "";
 
