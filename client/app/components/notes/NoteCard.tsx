@@ -2,7 +2,7 @@
 import { useState } from "react";
 
 // Third party libraries
-import { format } from "date-fns";
+import { format, isAfter, parseISO } from "date-fns";
 import { cn } from "~/lib/utils";
 
 // First party libraries
@@ -40,7 +40,7 @@ const NoteCard = ({ note }: NoteCardProps) => {
             <p className="text-sm text-muted-foreground">
               {format(
                 new Date(
-                  note.updatedAt > note.createdAt
+                  isAfter(parseISO(note.updatedAt), parseISO(note.createdAt))
                     ? note.updatedAt
                     : note.createdAt,
                 ),
