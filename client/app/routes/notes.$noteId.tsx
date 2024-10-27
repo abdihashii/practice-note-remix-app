@@ -10,13 +10,13 @@ import ProtectedLayout from "~/components/common/layout/ProtectedLayout";
 import NoteEditor from "~/components/notes/NoteEditor";
 
 export async function loader({ params }: LoaderFunctionArgs) {
-  const { id } = params;
+  const { noteId } = params;
 
-  if (!id) {
+  if (!noteId) {
     return redirect("/notes");
   }
 
-  const note = await getNoteById(id);
+  const note = await getNoteById(noteId);
   return json({ note });
 }
 
