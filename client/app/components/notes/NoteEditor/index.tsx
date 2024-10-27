@@ -36,8 +36,11 @@ const NoteEditor = ({
   }
 
   const onSaveClick = async () => {
-    await handleSave(title);
-    onSave?.(noteId);
+    const newNoteId = await handleSave(title);
+
+    if (newNoteId) {
+      onSave?.(newNoteId);
+    }
   };
 
   return (
