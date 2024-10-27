@@ -120,7 +120,7 @@ export default function NotesIndex() {
             setSearchQuery={setSearchQuery}
             onSearch={handleSearch}
           />
-          <AddNoteButton onClick={handleFloatingActionClick} />
+          <AddNoteButton />
         </div>
 
         {isNotesLoading ? (
