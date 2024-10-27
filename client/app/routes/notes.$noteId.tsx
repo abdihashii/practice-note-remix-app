@@ -15,6 +15,7 @@ import { Input } from "~/components/ui/input";
 import ProtectedLayout from "~/components/common/layout/ProtectedLayout";
 import NoteEditor from "~/components/notes/NoteEditor";
 import useNoteEditor from "~/components/notes/NoteEditor/hooks/useNoteEditor";
+import { format } from "date-fns";
 
 export default function NotePage() {
   const params = useParams();
@@ -59,6 +60,10 @@ export default function NotePage() {
     }
   };
 
+  const handleSave = () => {
+    queryClient.invalidateQueries({ queryKey: ["note", params.noteId] });
+  };
+
   if (isLoadingNote) {
     return (
       <ProtectedLayout>
@@ -98,9 +103,16 @@ export default function NotePage() {
             )}
           </div>
 
-          <p className="text-sm text-muted-foreground">{note.createdAt}</p>
+          <p className="text-sm text-muted-foreground">
+            <span className="font-medium">Last updated at:</span>{" "}
+            {format(new Date(note.updatedAt), "MMM d, yyyy 'at' h:mm a")}
+          </p>
 
-          <NoteEditor initialContent={note.content} noteId={note.id} />
+          <NoteEditor
+            initialContent={note.content}
+            noteId={note.id}
+            onSave={handleSave}
+          />
         </div>
       ) : (
         <div>
