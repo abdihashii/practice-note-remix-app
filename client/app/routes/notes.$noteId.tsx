@@ -51,8 +51,7 @@ export default function NotePage() {
 
       await handleUpdateNote(title);
 
-      // Invalidate the notes query
-      queryClient.invalidateQueries({ queryKey: ["note", params.noteId] });
+      await handleSave();
     } catch (error) {
       console.error(error);
     } finally {
@@ -60,8 +59,9 @@ export default function NotePage() {
     }
   };
 
-  const handleSave = () => {
-    queryClient.invalidateQueries({ queryKey: ["note", params.noteId] });
+  const handleSave = async () => {
+    // Invalidate all queries
+    await queryClient.resetQueries();
   };
 
   if (isLoadingNote) {
