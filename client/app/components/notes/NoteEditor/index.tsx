@@ -12,21 +12,23 @@ import "./styles/note-editor.scss";
 interface NoteEditorProps {
   initialContent?: string;
   noteId?: string;
-  onChange?: (markdown: string) => void;
-  onSave?: () => void;
+  newNote?: boolean;
+  title?: string;
+  onSave?: (noteId?: string) => void;
 }
 
 const NoteEditor = ({
   initialContent = "",
   noteId,
-  onChange,
+  newNote = false,
+  title,
   onSave,
 }: NoteEditorProps) => {
   const { editor, editorHeight, handleResize, handleSave, saveButtonState } =
     useNoteEditor({
       initialContent,
-      onChange,
       noteId,
+      newNote,
     });
 
   if (!editor) {
@@ -34,8 +36,11 @@ const NoteEditor = ({
   }
 
   const onSaveClick = async () => {
-    await handleSave();
-    onSave?.();
+    const newNoteId = await handleSave(title);
+
+    if (newNoteId) {
+      onSave?.(newNoteId);
+    }
   };
 
   return (
@@ -49,6 +54,7 @@ const NoteEditor = ({
           <SaveNoteButton
             saveButtonState={saveButtonState}
             handleSave={onSaveClick}
+            newNote={newNote}
           />
         </div>
       </div>

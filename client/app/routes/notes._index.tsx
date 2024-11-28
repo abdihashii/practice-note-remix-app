@@ -1,11 +1,12 @@
 // Remix and React
 import type { MetaFunction } from "@remix-run/node";
 import { Link, useNavigate, useSearchParams } from "@remix-run/react";
-import { ReactNode, useState } from "react";
+import { useState } from "react";
 
 // First party libraries
 import { createNote, getNotes } from "~/api/notes";
 import { searchNotes } from "~/api/search";
+import { cn } from "~/lib/utils";
 import { CreateNoteDto, Note } from "~/types";
 
 // Third party components
@@ -20,12 +21,11 @@ import {
 import { Skeleton } from "~/components/ui/skeleton";
 
 // First party components
-import FloatingActionButton from "~/components/common/FloatingActionButton";
+import AddNoteButton from "~/components/common/AddNoteButton";
 import ProtectedLayout from "~/components/common/layout/ProtectedLayout";
 import SearchBar from "~/components/common/SearchBar";
 import { CreateNoteDialogForm } from "~/components/notes/CreateNoteDialogForm";
 import NoteCard from "~/components/notes/NoteCard";
-import { cn } from "~/lib/utils";
 
 export const meta: MetaFunction = () => {
   return [
@@ -34,7 +34,7 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-export default function Index() {
+export default function NotesIndex() {
   const [searchParams, setSearchParams] = useSearchParams();
   const q = searchParams.get("q") || "";
 
@@ -114,12 +114,13 @@ export default function Index() {
   return (
     <ProtectedLayout>
       <div className="relative flex-grow space-y-4">
-        <div>
+        <div className="flex h-12 items-center justify-between gap-4">
           <SearchBar
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
             onSearch={handleSearch}
           />
+          <AddNoteButton />
         </div>
 
         {isNotesLoading ? (
@@ -145,8 +146,6 @@ export default function Index() {
               : "No notes yet. Create one!"}
           </p>
         )}
-
-        <FloatingActionButton onClick={handleFloatingActionClick} />
 
         <CreateNoteDialogForm
           open={openCreateNoteDialog}

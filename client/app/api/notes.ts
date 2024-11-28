@@ -43,7 +43,7 @@ export const createNote = async (note: CreateNoteDto): Promise<Note | null> => {
 
 export const updateNote = async (
   id: string,
-  note: UpdateNoteDto
+  note: UpdateNoteDto,
 ): Promise<Note | null> => {
   try {
     const response = await fetch(`${API_URL}/notes/${id}`, {

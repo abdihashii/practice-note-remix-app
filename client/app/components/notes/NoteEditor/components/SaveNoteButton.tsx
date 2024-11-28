@@ -4,11 +4,13 @@ import { Button } from "~/components/ui/button";
 interface SaveNoteButtonProps {
   saveButtonState: "default" | "loading" | "success" | "failure";
   handleSave: () => void;
+  newNote?: boolean;
 }
 
 export function SaveNoteButton({
   saveButtonState,
   handleSave,
+  newNote = false,
 }: SaveNoteButtonProps) {
   const icons = {
     default: <SaveIcon className="h-4 w-4" />,
@@ -36,7 +38,7 @@ export function SaveNoteButton({
       {saveButtonState === "default" ? (
         <>
           {icons.default}
-          Save
+          {newNote ? "Create" : "Save"}
         </>
       ) : (
         icons[saveButtonState]

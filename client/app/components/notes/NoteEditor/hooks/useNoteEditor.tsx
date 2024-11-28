@@ -2,7 +2,7 @@
 import { useState } from "react";
 
 // First party libraries
-import { updateNote } from "~/api/notes";
+import { createNote, updateNote } from "~/api/notes";
 import { SaveButtonState } from "../types";
 import { lowlight } from "../utils";
 
@@ -22,12 +22,12 @@ const EDITOR_MIN_HEIGHT = 500;
 
 export default function useNoteEditor({
   initialContent,
-  onChange,
   noteId,
+  newNote = false,
 }: {
   initialContent: string;
-  onChange?: (markdown: string) => void;
   noteId?: string;
+  newNote?: boolean;
 }) {
   const [editorHeight, setEditorHeight] = useState(EDITOR_MIN_HEIGHT);
   const [saveButtonState, setSaveButtonState] =
@@ -70,9 +70,6 @@ export default function useNoteEditor({
       }),
     ],
     content: initialContent,
-    onUpdate: ({ editor }) => {
-      onChange?.(editor.getText());
-    },
     editorProps: {
       attributes: {
         class: "prose-sm focus:outline-none max-w-full",
@@ -80,7 +77,7 @@ export default function useNoteEditor({
     },
   });
 
-  const handleSave = async () => {
+  const handleUpdateNote = async (title?: string) => {
     if (!noteId || !editor) {
       toast({
         title: "Error",
@@ -93,7 +90,7 @@ export default function useNoteEditor({
     try {
       setSaveButtonState("loading");
       const content = editor.getHTML();
-      const updatedNote = await updateNote(noteId, { content });
+      const updatedNote = await updateNote(noteId, { content, title });
 
       if (!updatedNote) {
         throw new Error("Failed to update note");
@@ -119,6 +116,64 @@ export default function useNoteEditor({
     }
   };
 
+  const handleCreateNote = async (title: string) => {
+    if (!editor || !title) {
+      toast({
+        title: "Error",
+        description: "Both editor and title are required to create a note",
+        variant: "destructive",
+      });
+      return null;
+    }
+
+    try {
+      setSaveButtonState("loading");
+      const content = editor.getHTML();
+      const createdNote = await createNote({ title, content });
+
+      if (!createdNote) {
+        throw new Error("Failed to create note");
+      }
+
+      setSaveButtonState("success");
+      toast({
+        title: "Success",
+        description: "Note created successfully",
+      });
+
+      return createdNote.id; // Return the new note ID
+    } catch (error) {
+      console.error(error);
+      setSaveButtonState("failure");
+      toast({
+        title: "Error",
+        description: "Failed to create note",
+        variant: "destructive",
+      });
+      return null;
+    } finally {
+      setTimeout(() => {
+        setSaveButtonState("default");
+      }, 2000);
+    }
+  };
+
+  const handleSave = async (title?: string) => {
+    if (newNote) {
+      if (!title) {
+        toast({
+          title: "Error",
+          description: "Title is required for new notes",
+          variant: "destructive",
+        });
+        return null;
+      }
+      return handleCreateNote(title);
+    }
+    await handleUpdateNote();
+    return noteId;
+  };
+
   const handleResize = (mouseDownEvent: React.MouseEvent) => {
     const startY = mouseDownEvent.clientY;
     const startHeight = editorHeight;
@@ -137,5 +192,12 @@ export default function useNoteEditor({
     document.addEventListener("mouseup", onMouseUp);
   };
 
-  return { editor, editorHeight, handleResize, handleSave, saveButtonState };
+  return {
+    editor,
+    editorHeight,
+    handleResize,
+    handleSave,
+    saveButtonState,
+    handleUpdateNote,
+  };
 }
