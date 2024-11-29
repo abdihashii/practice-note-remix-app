@@ -1,0 +1,72 @@
+name: Publish Types Package
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "packages/types/**"
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+    paths:
+      - "packages/types/**"
+
+jobs:
+  publish:
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://npm.pkg.github.com"
+          scope: "@notes-app"
+
+      # Determine version bump based on commit messages
+      - name: Determine Version
+        id: version
+        uses: paulhatch/semantic-version@v5.3.0
+        with:
+          tag_prefix: "v"
+          major_pattern: "BREAKING CHANGE:"
+          minor_pattern: "feat:"
+          patch_pattern: "fix:"
+          bump_each_commit: false
+
+      # Update package.json version
+      - name: Update Version
+        run: |
+          cd packages/types
+          npm version ${{ steps.version.outputs.version }} --no-git-tag-version
+
+      - name: Install dependencies
+        run: cd packages/types && npm install
+
+      - name: Build
+        run: cd packages/types && npm run build
+
+      - name: Publish
+        run: cd packages/types && npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Create a release
+      - name: Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          release_name: Release v${{ steps.version.outputs.version }}
+          body: |
+            Changes in this Release:
+            ${{ steps.version.outputs.changelog }}

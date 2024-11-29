@@ -32,7 +32,7 @@ services:
     restart: unless-stopped
     environment:
       NODE_ENV: ${NODE_ENV:-development}
-      DATABASE_URL: postgres://myuser:mypassword@postgres:5432/mydatabase
+      DB_URL: ${DB_URL}
       PORT: 8000
       HOST: "0.0.0.0"
     ports:

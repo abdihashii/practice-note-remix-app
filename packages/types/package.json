@@ -1,7 +1,21 @@
 {
   "name": "@notes-app/types",
   "version": "0.0.1",
-  "main": "index.ts",
-  "types": "index.ts",
-  "type": "module"
+  "private": true,
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abdihashii/practice-note-remix-app"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
+  }
 }
