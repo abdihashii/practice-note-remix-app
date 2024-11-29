@@ -1,4 +1,5 @@
-import { CreateNoteDto, Note, UpdateNoteDto } from "~/types";
+// Third party libraries
+import { CreateNoteDto, Note, UpdateNoteDto } from "@notes-app/types";
 
 const API_URL = "http://localhost:8000";
 

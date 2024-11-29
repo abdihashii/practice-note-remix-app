@@ -1,9 +1,11 @@
 // Third party libraries
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { UpdateNoteDto } from "@notes-app/types";
 
 // First party libraries
 import { deleteNote, updateNote } from "~/api/notes";
-import { UpdateNoteDto } from "~/types";
+
+// Third party components
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export const useNote = () => {
   const queryClient = useQueryClient();

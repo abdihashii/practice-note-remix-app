@@ -2,11 +2,9 @@
 import { useState } from "react";
 
 // Third party libraries
+import { Note } from "@notes-app/types";
 import { format, isAfter, parseISO } from "date-fns";
 import { cn } from "~/lib/utils";
-
-// First party libraries
-import { Note } from "~/types";
 
 // Third party components
 import { Card, CardHeader, CardTitle } from "~/components/ui/card";

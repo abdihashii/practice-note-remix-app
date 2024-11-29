@@ -1,12 +1,12 @@
 // Remix and React
 import React, { useState } from "react";
 
-// First party libraries
-import { CreateNoteDto } from "~/types";
-
 // Third party libraries
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+
+// First party libraries
+import { CreateNoteDto } from "@notes-app/types";
 
 // Third party components
 import { Loader2Icon, KeyboardIcon } from "lucide-react";
