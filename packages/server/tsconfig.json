@@ -1,0 +1,25 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    // Enable latest features
+    "lib": ["ESNext", "DOM"],
+    "moduleDetection": "force",
+    "allowJs": false,
+
+    // Bundler mode
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "noEmit": true,
+
+    // Type declarations
+    "types": ["./types.d.ts"],
+
+    // Set base directory for resolving non-relative imports.
+    "baseUrl": "./",
+
+    // Define alias for cleaner imports
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "name": "notes-app",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "bun run --parallel dev:*",
+    "dev:client": "bun run --cwd packages/client dev",
+    "dev:server": "bun run --cwd packages/server dev",
+    "build": "bun run --parallel build:*",
+    "build:client": "bun run --cwd packages/client build",
+    "build:server": "bun run --cwd packages/server build",
+    "typecheck": "bun run --parallel typecheck:*",
+    "typecheck:client": "bun run --cwd packages/client typecheck",
+    "typecheck:server": "bun run --cwd packages/server typecheck",
+    "docker:up": "docker compose up --build",
+    "docker:down": "docker compose down"
+  },
+  "devDependencies": {
+    "typescript": "^5.1.6"
+  }
+}

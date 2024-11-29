@@ -1,0 +1,28 @@
+# Dependencies
+node_modules
+**/node_modules
+
+# Environment
+.env*
+!.env.example
+
+# Git
+.git
+.gitignore
+
+# IDE
+.vscode
+.idea
+
+# Logs
+*.log
+
+# Build outputs
+packages/client/build
+packages/client/.cache
+packages/server/drizzle
+
+# Development
+*.test.ts
+*.spec.ts
+README.md 
