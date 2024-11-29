@@ -7,7 +7,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/abdihashii/practice-note-remix-app"
+    "url": "git+https://github.com/abdihashii/practice-note-remix-app.git"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
