@@ -9,7 +9,7 @@
     "db:push": "drizzle-kit push"
   },
   "dependencies": {
-    "@notes-app/types": "^0.0.1",
+    "@notes-app/types": "workspace:*",
     "@hono/node-server": "^1.13.2",
     "dotenv": "^16.4.5",
     "drizzle-orm": "^0.34.1",
