@@ -1,15 +1,16 @@
 {
-  "name": "@notes-app/server",
+  "name": "server",
   "private": true,
   "scripts": {
     "start": "bun run db:migrate && bun run db:push && bun run src/main.ts",
     "dev": "bun run db:migrate && bun run db:push && bun --watch src/main.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "bun run src/db/migrate.ts",
-    "db:push": "drizzle-kit push"
+    "db:push": "drizzle-kit push",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down"
   },
   "dependencies": {
-    "@notes-app/types": "workspace:*",
     "@hono/node-server": "^1.13.2",
     "dotenv": "^16.4.5",
     "drizzle-orm": "^0.34.1",
@@ -19,7 +20,7 @@
   "devDependencies": {
     "@types/node": "^22.8.0",
     "@types/pg": "^8.11.10",
-    "drizzle-kit": "^0.25.0"
-  },
-  "npmrc": ".npmrc"
+    "drizzle-kit": "^0.25.0",
+    "bun-types": "latest"
+  }
 }

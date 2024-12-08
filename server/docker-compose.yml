@@ -23,16 +23,16 @@ services:
     networks:
       - app-network
 
-  # Backend web server
-  server:
+  # Backend API server
+  api:
     build:
       context: .
-      dockerfile: packages/server/Dockerfile
+      dockerfile: Dockerfile
     container_name: notes-api
     restart: unless-stopped
     environment:
       NODE_ENV: ${NODE_ENV:-development}
-      DB_URL: ${DB_URL}
+      DATABASE_URL: postgresql://${DB_USER:-myuser}:${DB_PASSWORD:-mypassword}@postgres:5432/${DB_NAME:-mydatabase}
       PORT: 8000
       HOST: "0.0.0.0"
     ports:
@@ -41,8 +41,8 @@ services:
       postgres:
         condition: service_healthy
     volumes:
-      - ./packages/server/src:/app/src:ro
-      - server_modules:/app/node_modules
+      - .:/app
+      - /app/node_modules
     networks:
       - app-network
     healthcheck:
@@ -50,11 +50,9 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-    command: bun run start
 
 volumes:
   postgres_data:
-  server_modules:
 
 networks:
   app-network:

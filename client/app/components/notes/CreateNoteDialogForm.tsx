@@ -1,10 +1,12 @@
 // Remix and React
-import React, { useState } from "react";
+import { useCallback, useState } from "react";
 
 // Third party libraries
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Note, UpdateNoteDto } from "@notes-app/types";
 import * as z from "zod";
+
+// First party libraries
+import { CreateNoteDto } from "../../../../types";
 
 // Third party components
 import { KeyboardIcon, Loader2Icon } from "lucide-react";
@@ -27,18 +29,16 @@ const createNoteSchema = z.object({
   content: z.string().min(1, { message: "Content is required" }),
 });
 
-export const EditNoteDialogForm = ({
+export const CreateNoteDialogForm = ({
   open,
   onClose,
   onSubmit,
   isPending,
-  note,
 }: {
   open: boolean;
   onClose: () => void;
-  onSubmit: (note: UpdateNoteDto) => void;
+  onSubmit: (note: CreateNoteDto) => void;
   isPending: boolean;
-  note: Note;
 }) => {
   const [showShortcutHint, setShowShortcutHint] = useState(false);
 
@@ -47,12 +47,8 @@ export const EditNoteDialogForm = ({
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm<UpdateNoteDto>({
+  } = useForm<CreateNoteDto>({
     resolver: zodResolver(createNoteSchema),
-    defaultValues: {
-      title: note.title,
-      content: note.content,
-    },
   });
 
   const handleCloseDialog = () => {
@@ -60,33 +56,33 @@ export const EditNoteDialogForm = ({
     onClose();
   };
 
-  const handleEditNote = (data: UpdateNoteDto) => {
+  const handleCreateNote = (data: CreateNoteDto) => {
     onSubmit(data);
     reset();
     onClose();
   };
 
-  const handleKeyDown = React.useCallback(
+  const handleKeyDown = useCallback(
     (event: React.KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
         event.preventDefault();
-        handleSubmit(handleEditNote)();
+        handleSubmit(handleCreateNote)();
       }
     },
-    [handleSubmit, handleEditNote],
+    [handleSubmit, handleCreateNote],
   );
 
   return (
     <Dialog open={open} onOpenChange={handleCloseDialog}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Edit note</DialogTitle>
+          <DialogTitle>Create a new note</DialogTitle>
           <DialogDescription>
-            Edit the title and content for your note.
+            Add a title and content for your new note.
           </DialogDescription>
         </DialogHeader>
         <form
-          onSubmit={handleSubmit(handleEditNote)}
+          onSubmit={handleSubmit(handleCreateNote)}
           className="space-y-4"
           onKeyDown={handleKeyDown}
         >
@@ -108,7 +104,7 @@ export const EditNoteDialogForm = ({
                 className="min-h-[100px] pr-8"
               />
               <div
-                className="absolute bottom-2 right-6 text-muted-foreground"
+                className="absolute bottom-2 right-2 text-muted-foreground"
                 onMouseEnter={() => setShowShortcutHint(true)}
                 onMouseLeave={() => setShowShortcutHint(false)}
               >
@@ -137,7 +133,7 @@ export const EditNoteDialogForm = ({
               {isPending ? (
                 <Loader2Icon className="animate-spin" />
               ) : (
-                "Edit Note"
+                "Create Note"
               )}
             </Button>
           </DialogFooter>
