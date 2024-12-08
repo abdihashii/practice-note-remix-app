@@ -1,4 +1,5 @@
 {
+  "extends": "../../tsconfig.json",
   "include": [
     "**/*.ts",
     "**/*.tsx",
@@ -10,23 +11,15 @@
   "compilerOptions": {
     "lib": ["DOM", "DOM.Iterable", "ES2022"],
     "types": ["@remix-run/node", "vite/client"],
-    "isolatedModules": true,
-    "esModuleInterop": true,
     "jsx": "react-jsx",
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
-    "resolveJsonModule": true,
-    "target": "ES2022",
-    "strict": true,
-    "allowJs": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
     "baseUrl": ".",
     "paths": {
       "~/*": ["./app/*"]
     },
 
-    // Vite takes care of building everything, not tsc.
-    "noEmit": true
+    // Disabled because some React/UI libraries use export patterns that are incompatible
+    // with verbatimModuleSyntax. For example, @tiptap/react's named exports would fail
+    // with this setting enabled.
+    "verbatimModuleSyntax": false
   }
 }
