@@ -6,7 +6,8 @@
     "packages/*"
   ],
   "scripts": {
-    "dev:client": "bun run --cwd apps/client dev"
+    "dev:client": "bun run --cwd apps/client dev",
+    "clean": "bun run --cwd apps/* clean && bun run --cwd packages/* clean"
   },
   "devDependencies": {
     "typescript": "^5.7.2"

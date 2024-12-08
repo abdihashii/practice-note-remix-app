@@ -8,6 +8,7 @@
     "dev": "remix vite:dev",
     "lint": "eslint --ignore-path .gitignore .",
     "start": "remix-serve ./build/index.js",
+    "clean": "rm -rf build dist node_modules",
     "typecheck": "tsc"
   },
   "dependencies": {
