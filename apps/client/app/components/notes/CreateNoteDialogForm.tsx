@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 
 // First party libraries
-import { CreateNoteDto } from "../../../../packages/types";
+import { CreateNoteDto } from "@notes-app/types";
 
 // Third party components
 import { KeyboardIcon, Loader2Icon } from "lucide-react";
