@@ -1,5 +1,5 @@
 // Third party libraries
-import { UpdateNoteDto } from "../../../types";
+import { UpdateNoteDto } from "../../../packages/types";
 
 // First party libraries
 import { deleteNote, updateNote } from "~/api/notes";

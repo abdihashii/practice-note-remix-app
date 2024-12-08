@@ -4,7 +4,7 @@ import { useCallback, useState } from "react";
 // Third party libraries
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Note, UpdateNoteDto } from "../../../../types";
+import { Note, UpdateNoteDto } from "../../../../packages/types";
 
 // Third party components
 import { KeyboardIcon, Loader2Icon } from "lucide-react";

@@ -1,5 +1,5 @@
 // Third party libraries
-import { CreateNoteDto, Note, UpdateNoteDto } from "../../../types";
+import { CreateNoteDto, Note, UpdateNoteDto } from "../../../packages/types";
 
 const API_URL = import.meta.env.VITE_API_URL;
 

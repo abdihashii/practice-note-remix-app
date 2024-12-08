@@ -1,0 +1,14 @@
+{
+  "name": "notes-app",
+  "version": "1.0.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:client": "bun run --cwd apps/client dev"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2"
+  }
+}

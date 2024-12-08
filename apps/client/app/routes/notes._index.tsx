@@ -4,7 +4,7 @@ import { Link, useNavigate, useSearchParams } from "@remix-run/react";
 import { useState } from "react";
 
 // Third party libraries
-import { CreateNoteDto, Note } from "../../../types";
+import { CreateNoteDto, Note } from "@notes-app/types";
 
 // First party libraries
 import { createNote, getNotes } from "~/api/notes";
