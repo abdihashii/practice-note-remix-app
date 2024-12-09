@@ -32,3 +32,6 @@ client/.cache
 
 # Server
 server/.DS_Store
+
+# Keep scripts executable
+!scripts/*.sh

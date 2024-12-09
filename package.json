@@ -24,8 +24,8 @@
     "start:server": "bun run --cwd apps/server start",
     "docker:up": "bun run --cwd apps/server docker:up",
     "docker:down": "bun run --cwd apps/server docker:down",
-    "setup": "chmod +x startup.sh && ./startup.sh",
-    "postinstall": "chmod +x startup.sh"
+    "setup": "chmod +x scripts/startup.sh && ./scripts/startup.sh",
+    "postinstall": "chmod +x scripts/startup.sh"
   },
   "devDependencies": {
     "typescript": "^5.7.2"
