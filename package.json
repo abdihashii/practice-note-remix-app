@@ -12,6 +12,8 @@
     "clean:server": "bun run --cwd apps/server clean",
     "clean:client": "bun run --cwd apps/client clean",
     "clean:types": "bun run --cwd packages/types clean",
+    "postgres:up": "bun run --cwd apps/server postgres:up",
+    "postgres:down": "bun run --cwd apps/server postgres:down",
     "dev": "bun run --cwd apps/server dev & bun run --cwd apps/client dev",
     "dev:client": "bun run --cwd apps/client dev",
     "dev:server": "bun run --cwd apps/server dev",
