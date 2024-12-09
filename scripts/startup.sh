@@ -121,48 +121,16 @@ main_setup() {
 
     # Show setup options
     echo -e "\n${BLUE}Please choose your setup configuration:${NC}"
-    echo "1) Frontend only"
-    echo "2) Backend only"
-    echo "3) Full stack (Frontend + Backend)"
+    echo "1) Full stack (Frontend + Backend) [Recommended]"
+    echo "2) Frontend only"
+    echo "3) Backend only"
     read -p "Enter your choice (1-3): " setup_choice
 
     case $setup_choice in
         1)
-            setup_frontend
-            echo -e "\n${GREEN}✅ Frontend setup complete!${NC}"
-            echo -e "\nTo start frontend development:"
-            echo "Run: bun run dev:client"
-            echo "Visit: http://localhost:5173"
-            ;;
-        2)
             echo -e "\n${BLUE}Choose backend configuration:${NC}"
-            echo "1) Run server locally with PostgreSQL in container"
-            echo "2) Run server in Docker container"
-            read -p "Enter your choice (1-2): " backend_choice
-            
-            case $backend_choice in
-                1)
-                    setup_backend_local
-                    echo -e "\n${GREEN}✅ Backend setup complete! (Local server)${NC}"
-                    echo -e "\nTo start backend development:"
-                    echo "Run: bun run dev:server"
-                    echo "Server will be running at: http://localhost:8000"
-                    ;;
-                2)
-                    setup_backend_docker
-                    echo -e "\n${GREEN}✅ Backend setup complete! (Docker)${NC}"
-                    echo -e "\nServer is running at: http://localhost:8000"
-                    echo "Note: Hot Module Reloading is not available in Docker mode"
-                    ;;
-                *)
-                    handle_error 1 "Invalid backend configuration choice"
-                    ;;
-            esac
-            ;;
-        3)
-            echo -e "\n${BLUE}Choose backend configuration:${NC}"
-            echo "1) Run server locally with PostgreSQL in container"
-            echo "2) Run server in Docker container"
+            echo "1) Run server locally with PostgreSQL in container [Recommended]"
+            echo "2) Run server in Docker container (No Hot Reload)"
             read -p "Enter your choice (1-2): " backend_choice
             
             setup_frontend
@@ -184,6 +152,38 @@ main_setup() {
                     echo "2. Run: bun run dev:client"
                     echo "3. Visit: http://localhost:5173"
                     echo "Note: Backend Hot Module Reloading is not available in Docker mode"
+                    ;;
+                *)
+                    handle_error 1 "Invalid backend configuration choice"
+                    ;;
+            esac
+            ;;
+        2)
+            setup_frontend
+            echo -e "\n${GREEN}✅ Frontend setup complete!${NC}"
+            echo -e "\nTo start frontend development:"
+            echo "Run: bun run dev:client"
+            echo "Visit: http://localhost:5173"
+            ;;
+        3)
+            echo -e "\n${BLUE}Choose backend configuration:${NC}"
+            echo "1) Run server locally with PostgreSQL in container [Recommended]"
+            echo "2) Run server in Docker container (No Hot Reload)"
+            read -p "Enter your choice (1-2): " backend_choice
+            
+            case $backend_choice in
+                1)
+                    setup_backend_local
+                    echo -e "\n${GREEN}✅ Backend setup complete! (Local server)${NC}"
+                    echo -e "\nTo start backend development:"
+                    echo "Run: bun run dev:server"
+                    echo "Server will be running at: http://localhost:8000"
+                    ;;
+                2)
+                    setup_backend_docker
+                    echo -e "\n${GREEN}✅ Backend setup complete! (Docker)${NC}"
+                    echo -e "\nServer is running at: http://localhost:8000"
+                    echo "Note: Hot Module Reloading is not available in Docker mode"
                     ;;
                 *)
                     handle_error 1 "Invalid backend configuration choice"
