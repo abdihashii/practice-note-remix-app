@@ -8,10 +8,11 @@
   "scripts": {
     "clean": "bun run clean:workspaces",
     "clean:workspaces": "bun ./scripts/clean-workspaces.ts",
+    "clean:install": "bun run clean:workspaces && bun install",
     "clean:server": "bun run --cwd apps/server clean",
     "clean:client": "bun run --cwd apps/client clean",
     "clean:types": "bun run --cwd packages/types clean",
-    "dev": "bun run --cwd apps/client dev & bun run --cwd apps/server dev",
+    "dev": "bun run --cwd apps/server dev & bun run --cwd apps/client dev",
     "dev:client": "bun run --cwd apps/client dev",
     "dev:server": "bun run --cwd apps/server dev",
     "build:client": "bun run --cwd apps/client build",
