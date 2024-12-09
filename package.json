@@ -6,8 +6,15 @@
     "packages/*"
   ],
   "scripts": {
+    "clean": "bun run clean:workspaces",
+    "clean:workspaces": "bun ./scripts/clean-workspaces.ts",
+    "clean:server": "bun run --cwd apps/server clean",
+    "clean:client": "bun run --cwd apps/client clean",
+    "clean:types": "bun run --cwd packages/types clean",
+    "dev": "bun run --cwd apps/client dev & bun run --cwd apps/server dev",
     "dev:client": "bun run --cwd apps/client dev",
-    "clean": "bun run --cwd apps/* clean && bun run --cwd packages/* clean"
+    "dev:server": "bun run --cwd apps/server dev",
+    "docker:up-server": "bun run --cwd apps/server docker:up"
   },
   "devDependencies": {
     "typescript": "^5.7.2"
