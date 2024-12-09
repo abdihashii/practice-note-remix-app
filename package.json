@@ -14,7 +14,8 @@
     "dev": "bun run --cwd apps/client dev & bun run --cwd apps/server dev",
     "dev:client": "bun run --cwd apps/client dev",
     "dev:server": "bun run --cwd apps/server dev",
-    "docker:up-server": "bun run --cwd apps/server docker:up"
+    "docker:up-server": "bun run --cwd apps/server docker:up",
+    "docker:down-server": "bun run --cwd apps/server docker:down"
   },
   "devDependencies": {
     "typescript": "^5.7.2"
