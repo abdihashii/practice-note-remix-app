@@ -38,6 +38,16 @@ bun install
 bun run build:types
 ```
 
+4. Optional: generate migrations (if drizzle folder is empty)
+
+```bash
+# Navigate to server directory
+cd apps/server
+
+# Generate migrations
+bun run db:generate
+```
+
 ## Development
 
 ### Option 1: Full Stack Development (Recommended)
@@ -48,16 +58,16 @@ Run both the client and server in development mode:
 # Navigate to server directory
 cd apps/server
 
-# Generate migrations
-bun run db:generate
-
 # Start PostgreSQL container in detached mode
-bun run docker:up postgres -d
+docker compose up postgres -d
 
-# Start hono server and client
+# Navigate back to root
+cd ../..
+
+# Start hono server and client from root
 bun run dev
 
-# In a new terminal, do a health check on the server to ensure it's running
+# In a new terminal, ensure the server is running with a health check
 curl http://localhost:8000/health
 ```
 
@@ -80,11 +90,8 @@ bun run dev:client
 # Navigate to server directory
 cd apps/server
 
-# Generate migrations
-bun run db:generate
-
 # Start PostgreSQL container in detached mode
-bun run docker:up postgres -d
+docker compose up postgres -d
 
 # Start hono server
 bun run dev
@@ -94,7 +101,10 @@ bun run dev
 
 ```bash
 # Start server + PostgreSQL
-bun run docker:up-server && bun run dev:server
+bun run docker:up
+
+# In a new terminal, ensure the server is running with a health check
+curl http://localhost:8000/health
 ```
 
 ## Database Management
@@ -109,7 +119,8 @@ bun run --cwd apps/server db:generate
 bun run --cwd apps/server db:push
 
 # Run Drizzle Studio (DB GUI)
-bunx --cwd apps/server drizzle-kit studio
+cd apps/server
+bunx drizzle-kit studio
 ```
 
 ## Clean Up
@@ -120,16 +131,10 @@ Remove all build artifacts and dependencies:
 bun run clean
 ```
 
-Shut down PostgreSQL container:
-
-```bash
-docker compose down postgres
-```
-
 Shut down all containers:
 
 ```bash
-bun run docker:down-server
+bun run docker:down
 ```
 
 ## Additional Notes
