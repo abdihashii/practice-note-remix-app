@@ -2,6 +2,7 @@
   "name": "server",
   "private": true,
   "scripts": {
+    "clean": "rm -rf node_modules drizzle",
     "start": "bun run db:migrate && bun run db:push && bun run src/main.ts",
     "dev": "bun run db:migrate && bun run db:push && bun --watch src/main.ts",
     "db:generate": "drizzle-kit generate",
