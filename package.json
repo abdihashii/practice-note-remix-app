@@ -20,8 +20,8 @@
     "build:types": "bun run --cwd packages/types build",
     "start:client": "bun run --cwd apps/client start",
     "start:server": "bun run --cwd apps/server start",
-    "docker:up-server": "bun run --cwd apps/server docker:up",
-    "docker:down-server": "bun run --cwd apps/server docker:down"
+    "docker:up": "bun run --cwd apps/server docker:up",
+    "docker:down": "bun run --cwd apps/server docker:down"
   },
   "devDependencies": {
     "typescript": "^5.7.2"
