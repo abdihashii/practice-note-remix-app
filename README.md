@@ -5,8 +5,8 @@ A full-stack notes application with a React frontend and Bun/Hono backend.
 ## Prerequisites
 
 - [Bun](https://bun.sh) (for both client and server)
-- [Docker](https://www.docker.com/) (optional, for server)
 - [Node.js](https://nodejs.org/) 18+ (recommended)
+- [Docker](https://www.docker.com/) (optional, for server and PostgreSQL)
 
 ## Project Structure
 
@@ -45,7 +45,20 @@ bun run build:types
 Run both the client and server in development mode:
 
 ```bash
+# Navigate to server directory
+cd apps/server
+
+# Generate migrations
+bun run db:generate
+
+# Start PostgreSQL container in detached mode
+bun run docker:up postgres -d
+
+# Start hono server and client
 bun run dev
+
+# In a new terminal, do a health check on the server to ensure it's running
+curl http://localhost:8000/health
 ```
 
 - Client: [http://localhost:5173](http://localhost:5173)
@@ -64,7 +77,17 @@ bun run dev:client
 **With Local PostgresSQL:**
 
 ```bash
-bun run dev:server
+# Navigate to server directory
+cd apps/server
+
+# Generate migrations
+bun run db:generate
+
+# Start PostgreSQL container in detached mode
+bun run docker:up postgres -d
+
+# Start hono server
+bun run dev
 ```
 
 **With Docker (Note: No Hot Module Reloading):**
@@ -72,11 +95,6 @@ bun run dev:server
 ```bash
 # Start server + PostgreSQL
 bun run docker:up-server && bun run dev:server
-```
-
-```bash
-# Stop server + PostgreSQL containers
-bun run docker:down-server
 ```
 
 ## Database Management
@@ -100,6 +118,18 @@ Remove all build artifacts and dependencies:
 
 ```bash
 bun run clean
+```
+
+Shut down PostgreSQL container:
+
+```bash
+docker compose down postgres
+```
+
+Shut down all containers:
+
+```bash
+bun run docker:down-server
 ```
 
 ## Additional Notes
