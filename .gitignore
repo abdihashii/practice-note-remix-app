@@ -26,3 +26,9 @@ yarn-error.log*
 
 # Bun
 bun.lockb 
+
+# Client
+client/.cache
+
+# Server
+server/.DS_Store

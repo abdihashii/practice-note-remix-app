@@ -11,18 +11,15 @@
   "compilerOptions": {
     "lib": ["DOM", "DOM.Iterable", "ES2022"],
     "types": ["@remix-run/node", "vite/client"],
-    "isolatedModules": true,
     "jsx": "react-jsx",
-
-    // Set base directory for resolving non-relative imports.
     "baseUrl": ".",
-
-    // Define alias for cleaner imports
     "paths": {
       "~/*": ["./app/*"]
     },
 
-    // Vite takes care of building everything, not tsc.
-    "noEmit": true
+    // Disabled because some React/UI libraries use export patterns that are incompatible
+    // with verbatimModuleSyntax. For example, @tiptap/react's named exports would fail
+    // with this setting enabled.
+    "verbatimModuleSyntax": false
   }
 }

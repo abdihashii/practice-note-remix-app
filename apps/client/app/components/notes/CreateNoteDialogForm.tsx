@@ -1,5 +1,5 @@
 // Remix and React
-import React, { useState } from "react";
+import { useCallback, useState } from "react";
 
 // Third party libraries
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,7 +9,7 @@ import * as z from "zod";
 import { CreateNoteDto } from "@notes-app/types";
 
 // Third party components
-import { Loader2Icon, KeyboardIcon } from "lucide-react";
+import { KeyboardIcon, Loader2Icon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { Button } from "~/components/ui/button";
 import {
@@ -62,7 +62,7 @@ export const CreateNoteDialogForm = ({
     onClose();
   };
 
-  const handleKeyDown = React.useCallback(
+  const handleKeyDown = useCallback(
     (event: React.KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
         event.preventDefault();

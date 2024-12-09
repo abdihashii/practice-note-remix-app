@@ -1,23 +1,29 @@
 {
   "name": "notes-app",
-  "private": true,
+  "version": "1.0.0",
   "workspaces": [
+    "apps/*",
     "packages/*"
   ],
   "scripts": {
-    "dev": "bun run --parallel dev:*",
-    "dev:client": "bun run --cwd packages/client dev",
-    "dev:server": "bun run --cwd packages/server dev",
-    "build": "bun run --parallel build:*",
-    "build:client": "bun run --cwd packages/client build",
-    "build:server": "bun run --cwd packages/server build",
-    "typecheck": "bun run --parallel typecheck:*",
-    "typecheck:client": "bun run --cwd packages/client typecheck",
-    "typecheck:server": "bun run --cwd packages/server typecheck",
-    "docker:up": "docker compose up --build",
-    "docker:down": "docker compose down"
+    "clean": "bun run clean:workspaces",
+    "clean:workspaces": "bun ./scripts/clean-workspaces.ts",
+    "clean:install": "bun run clean:workspaces && bun install",
+    "clean:server": "bun run --cwd apps/server clean",
+    "clean:client": "bun run --cwd apps/client clean",
+    "clean:types": "bun run --cwd packages/types clean",
+    "dev": "bun run --cwd apps/server dev & bun run --cwd apps/client dev",
+    "dev:client": "bun run --cwd apps/client dev",
+    "dev:server": "bun run --cwd apps/server dev",
+    "build:client": "bun run --cwd apps/client build",
+    "build:server": "bun run --cwd apps/server build",
+    "build:types": "bun run --cwd packages/types build",
+    "start:client": "bun run --cwd apps/client start",
+    "start:server": "bun run --cwd apps/server start",
+    "docker:up": "bun run --cwd apps/server docker:up",
+    "docker:down": "bun run --cwd apps/server docker:down"
   },
   "devDependencies": {
-    "typescript": "^5.1.6"
+    "typescript": "^5.7.2"
   }
 }
