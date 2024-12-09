@@ -9,7 +9,9 @@
     "db:migrate": "bun run src/db/migrate.ts",
     "db:push": "drizzle-kit push",
     "docker:up": "docker compose up -d",
-    "docker:down": "docker compose down"
+    "docker:down": "docker compose down",
+    "postgres:up": "docker compose up postgres -d",
+    "postgres:down": "docker compose down"
   },
   "dependencies": {
     "@hono/node-server": "^1.13.2",
