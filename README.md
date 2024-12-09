@@ -55,14 +55,8 @@ bun run db:generate
 Run both the client and server in development mode:
 
 ```bash
-# Navigate to server directory
-cd apps/server
-
 # Start PostgreSQL container in detached mode
-docker compose up postgres -d
-
-# Navigate back to root
-cd ../..
+bun run postgres:up
 
 # Start hono server and client from root
 bun run dev
@@ -87,11 +81,8 @@ bun run dev:client
 **With Local PostgresSQL:**
 
 ```bash
-# Navigate to server directory
-cd apps/server
-
 # Start PostgreSQL container in detached mode
-docker compose up postgres -d
+bun run postgres:up
 
 # Start hono server
 bun run dev
