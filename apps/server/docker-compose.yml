@@ -7,6 +7,8 @@ services:
     image: postgres:latest
     container_name: notes-app-postgres-db
     restart: unless-stopped
+    env_file:
+      - .env
     environment:
       POSTGRES_USER: ${DB_USER:-myuser}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-mypassword}
@@ -30,11 +32,12 @@ services:
       dockerfile: Dockerfile
     container_name: notes-api
     restart: unless-stopped
+    env_file:
+      - .env
     environment:
-      NODE_ENV: ${NODE_ENV:-development}
-      DATABASE_URL: postgresql://${DB_USER:-myuser}:${DB_PASSWORD:-mypassword}@postgres:5432/${DB_NAME:-mydatabase}
-      PORT: 8000
-      HOST: "0.0.0.0"
+      DATABASE_URL: postgres://${DB_USER:-myuser}:${DB_PASSWORD:-mypassword}@postgres:5432/${DB_NAME:-mydatabase}
+      PORT: ${PORT:-8000}
+      HOST: ${HOST:-0.0.0.0}
     ports:
       - "8000:8000"
     depends_on:
