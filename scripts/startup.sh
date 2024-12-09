@@ -32,6 +32,23 @@ run_command() {
     fi
 }
 
+# Function to get valid user input
+get_valid_input() {
+    local prompt=$1
+    local max=$2
+    local choice
+
+    while true; do
+        read -p "$prompt" choice
+        if [[ "$choice" =~ ^[0-9]+$ ]] && [ "$choice" -ge 1 ] && [ "$choice" -le "$max" ]; then
+            echo "$choice"
+            return
+        else
+            echo -e "${YELLOW}Please enter a number between 1 and $max${NC}"
+        fi
+    done
+}
+
 # Function to setup frontend
 setup_frontend() {
     echo "Setting up frontend..."
@@ -124,14 +141,14 @@ main_setup() {
     echo "1) Full stack (Frontend + Backend) [Recommended]"
     echo "2) Frontend only"
     echo "3) Backend only"
-    read -p "Enter your choice (1-3): " setup_choice
+    setup_choice=$(get_valid_input "Enter your choice (1-3): " 3)
 
     case $setup_choice in
         1)
             echo -e "\n${BLUE}Choose backend configuration:${NC}"
             echo "1) Run server locally with PostgreSQL in container [Recommended]"
             echo "2) Run server in Docker container (No Hot Reload)"
-            read -p "Enter your choice (1-2): " backend_choice
+            backend_choice=$(get_valid_input "Enter your choice (1-2): " 2)
             
             setup_frontend
             
@@ -139,19 +156,21 @@ main_setup() {
                 1)
                     setup_backend_local
                     echo -e "\n${GREEN}✅ Full stack setup complete! (Local server)${NC}"
-                    echo -e "\nTo start development:"
-                    echo "Run: bun run dev"
-                    echo "Frontend: http://localhost:5173"
-                    echo "Backend: http://localhost:8000"
+                    echo -e "\n${BLUE}Starting development servers...${NC}"
+                    echo "Frontend will be available at: http://localhost:5173"
+                    echo "Backend will be available at: http://localhost:8000"
+                    echo -e "\n${YELLOW}Press Ctrl+C to stop the servers${NC}"
+                    run_command "bun run dev" "Failed to start development servers"
                     ;;
                 2)
                     setup_backend_docker
                     echo -e "\n${GREEN}✅ Full stack setup complete! (Docker)${NC}"
-                    echo -e "\nTo start development:"
-                    echo "1. Backend is running at: http://localhost:8000"
-                    echo "2. Run: bun run dev:client"
-                    echo "3. Visit: http://localhost:5173"
-                    echo "Note: Backend Hot Module Reloading is not available in Docker mode"
+                    echo -e "\n${BLUE}Starting frontend development server...${NC}"
+                    echo "Frontend will be available at: http://localhost:5173"
+                    echo "Backend is running at: http://localhost:8000"
+                    echo -e "${YELLOW}Note: Backend Hot Module Reloading is not available in Docker mode${NC}"
+                    echo -e "\n${YELLOW}Press Ctrl+C to stop the frontend server${NC}"
+                    run_command "bun run dev:client" "Failed to start frontend server"
                     ;;
                 *)
                     handle_error 1 "Invalid backend configuration choice"
@@ -161,29 +180,32 @@ main_setup() {
         2)
             setup_frontend
             echo -e "\n${GREEN}✅ Frontend setup complete!${NC}"
-            echo -e "\nTo start frontend development:"
-            echo "Run: bun run dev:client"
-            echo "Visit: http://localhost:5173"
+            echo -e "\n${BLUE}Starting frontend development server...${NC}"
+            echo "Frontend will be available at: http://localhost:5173"
+            echo -e "\n${YELLOW}Press Ctrl+C to stop the server${NC}"
+            run_command "bun run dev:client" "Failed to start frontend server"
             ;;
         3)
             echo -e "\n${BLUE}Choose backend configuration:${NC}"
             echo "1) Run server locally with PostgreSQL in container [Recommended]"
             echo "2) Run server in Docker container (No Hot Reload)"
-            read -p "Enter your choice (1-2): " backend_choice
+            backend_choice=$(get_valid_input "Enter your choice (1-2): " 2)
             
             case $backend_choice in
                 1)
                     setup_backend_local
                     echo -e "\n${GREEN}✅ Backend setup complete! (Local server)${NC}"
-                    echo -e "\nTo start backend development:"
-                    echo "Run: bun run dev:server"
-                    echo "Server will be running at: http://localhost:8000"
+                    echo -e "\n${BLUE}Starting backend development server...${NC}"
+                    echo "Backend will be available at: http://localhost:8000"
+                    echo -e "\n${YELLOW}Press Ctrl+C to stop the server${NC}"
+                    run_command "bun run dev:server" "Failed to start backend server"
                     ;;
                 2)
                     setup_backend_docker
                     echo -e "\n${GREEN}✅ Backend setup complete! (Docker)${NC}"
-                    echo -e "\nServer is running at: http://localhost:8000"
-                    echo "Note: Hot Module Reloading is not available in Docker mode"
+                    echo -e "\n${BLUE}Server is running at: http://localhost:8000${NC}"
+                    echo -e "${YELLOW}Note: Hot Module Reloading is not available in Docker mode${NC}"
+                    echo -e "\nUse 'bun run docker:down' to stop the server when done"
                     ;;
                 *)
                     handle_error 1 "Invalid backend configuration choice"
