@@ -38,7 +38,7 @@
 
 ## Engineering
 
-- [ ] Monorepo setup
+- [x] Monorepo setup
 - [x] Docker setup for server
 - [ ] Docker setup for client
 - [ ] Deployment
