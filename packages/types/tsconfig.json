@@ -4,7 +4,8 @@
     "outDir": "./dist",
     "declaration": true,
     "emitDeclarationOnly": false,
-    "noEmit": false
+    "noEmit": false,
+    "allowImportingTsExtensions": false
   },
   "include": ["index.ts"],
   "exclude": ["node_modules", "dist"]
