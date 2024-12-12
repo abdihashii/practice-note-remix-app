@@ -56,7 +56,7 @@ export default function useNoteEditor({
               default: "javascript",
               parseHTML: (element) => element.getAttribute("data-language"),
               renderHTML: (attributes) => ({
-                "data-language": attributes.language,
+                "data-language": attributes["language"],
               }),
             },
           };
