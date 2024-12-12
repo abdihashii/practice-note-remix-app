@@ -31,7 +31,7 @@ const NoteCard = ({ note }: NoteCardProps) => {
           "group-hover:bg-secondary/50",
         )}
       >
-        <CardHeader className="flex flex-row items-center justify-between space-x-0 space-y-0">
+        <CardHeader className="relative flex flex-row items-center justify-between space-x-0 space-y-0">
           <div className="flex flex-col gap-1">
             <CardTitle className="text-lg font-semibold group-hover:text-primary">
               {note.title}
