@@ -74,3 +74,24 @@ export const deleteNote = async (id: string): Promise<Note | null> => {
     return null;
   }
 };
+
+export const toggleNoteFavorite = async (id: string): Promise<Note | null> => {
+    const response = await fetch(`${API_URL}/notes/${id}/favorite`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (!data) {
+      throw new Error("Failed to toggle favorite status");
+    }
+
+    return data as Note;
+};
