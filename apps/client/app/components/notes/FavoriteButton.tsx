@@ -12,11 +12,11 @@ interface FavoriteButtonProps {
   variant?: "ghost" | "outline" | "default";
 }
 
-export function FavoriteButton({ 
-  noteId, 
-  isFavorite, 
+export function FavoriteButton({
+  noteId,
+  isFavorite,
   size = "default",
-  variant = "ghost" 
+  variant = "ghost",
 }: FavoriteButtonProps) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -24,7 +24,13 @@ export function FavoriteButton({
   const toggleFavoriteMutation = useMutation({
     mutationFn: toggleNoteFavorite,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["notes"] });
+      queryClient.invalidateQueries({
+        queryKey: ["notes"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["note", noteId],
+      });
+
       toast({
         title: isFavorite ? "Removed from favorites" : "Added to favorites",
         duration: 2000,
@@ -53,7 +59,7 @@ export function FavoriteButton({
       className={cn(
         "group",
         toggleFavoriteMutation.isPending && "animate-pulse",
-        size === "sm" && "h-8 w-8"
+        size === "sm" && "h-8 w-8",
       )}
       title={isFavorite ? "Remove from favorites" : "Add to favorites"}
     >
@@ -62,9 +68,9 @@ export function FavoriteButton({
           "h-[1.2rem] w-[1.2rem] transition-colors",
           size === "sm" && "h-4 w-4",
           isFavorite && "fill-yellow-500 text-yellow-500",
-          !isFavorite && "group-hover:fill-yellow-500/10"
+          !isFavorite && "group-hover:fill-yellow-500/10",
         )}
       />
     </Button>
   );
-} 
+}
