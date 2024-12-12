@@ -12,6 +12,7 @@ import { Card, CardHeader, CardTitle } from "~/components/ui/card";
 // First party components
 import { useNote } from "~/hooks/useNote";
 import { EditNoteDialogForm } from "./EditNoteDialogForm";
+import { FavoriteButton } from "./FavoriteButton";
 
 interface NoteCardProps {
   note: Note;
@@ -30,7 +31,7 @@ const NoteCard = ({ note }: NoteCardProps) => {
           "group-hover:bg-secondary/50",
         )}
       >
-        <CardHeader className="flex flex-row items-center justify-between space-x-0 space-y-0">
+        <CardHeader className="relative flex flex-row items-center justify-between space-x-0 space-y-0">
           <div className="flex flex-col gap-1">
             <CardTitle className="text-lg font-semibold group-hover:text-primary">
               {note.title}
@@ -45,6 +46,13 @@ const NoteCard = ({ note }: NoteCardProps) => {
                 "MMM d, yyyy 'at' h:mm a",
               )}
             </p>
+          </div>
+          <div className="absolute right-2 top-2 z-10">
+            <FavoriteButton
+              noteId={note.id}
+              isFavorite={note.favorite}
+              size="sm"
+            />
           </div>
         </CardHeader>
       </Card>

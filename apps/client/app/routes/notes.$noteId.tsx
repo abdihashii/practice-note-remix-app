@@ -16,19 +16,16 @@ import ProtectedLayout from "~/components/common/layout/ProtectedLayout";
 import NoteEditor from "~/components/notes/NoteEditor";
 import useNoteEditor from "~/components/notes/NoteEditor/hooks/useNoteEditor";
 import { format } from "date-fns";
+import { FavoriteButton } from "~/components/notes/FavoriteButton";
 
 export default function NotePage() {
   const params = useParams();
   const queryClient = useQueryClient();
 
-  const {
-    data: note,
-    isLoading: isLoadingNote,
-    isError: isErrorNote,
-  } = useQuery({
-    queryKey: ["note", params.noteId],
-    queryFn: () => getNoteById(params.noteId!),
-    enabled: !!params.noteId,
+  const { data: note, isLoading: isLoadingNote } = useQuery({
+    queryKey: ["note", params["noteId"]],
+    queryFn: () => getNoteById(params["noteId"]!),
+    enabled: !!params["noteId"],
   });
 
   const [isEditingTitle, setIsEditingTitle] = useState(false);
@@ -76,6 +73,13 @@ export default function NotePage() {
     <ProtectedLayout>
       {note ? (
         <div className="flex flex-col gap-4">
+          <div className="w-fit">
+            <FavoriteButton
+              noteId={note.id}
+              isFavorite={note.favorite}
+              variant="outline"
+            />
+          </div>
           <div className="group flex items-center gap-2">
             {isEditingTitle ? (
               <form
