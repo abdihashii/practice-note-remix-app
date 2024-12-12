@@ -7,7 +7,7 @@
 - [x] Rich text editor
 - [ ] Filter options
 - [ ] Sort options
-- [ ] Favorites
+- [x] Favorites
 - [ ] Auth
 - [ ] Secured user data
 - [x] Search
@@ -17,7 +17,7 @@
 - [ ] Collections
 - [x] Dark theme
 
-## Nice to haves
+## Nice to have features
 
 - [ ] Settings
 - [ ] Templates
@@ -40,8 +40,9 @@
 
 - [x] Monorepo setup
 - [x] Docker setup for server
-- [ ] Docker setup for client
+- [ ] ESLint setup
 - [ ] Deployment
 - [ ] Unit testing for the server code
 - [ ] Integration testing for the server code
 - [ ] End to end testing for the client code
+- [ ] Docker setup for client
