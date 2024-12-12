@@ -21,6 +21,30 @@ notes-app/
 
 ## Quick Start
 
+### Option 1: Interactive Setup (Recommended)
+
+Run the interactive setup script:
+
+```bash
+bun run setup
+```
+
+This will guide you through:
+
+- Installing dependencies
+- Setting up environment files
+- Building shared packages
+- Choosing your development configuration:
+  1. Full stack (Frontend + Backend)
+     - Local server with PostgreSQL in container
+     - Server in Docker container
+  2. Frontend only
+  3. Backend only
+     - Local server with PostgreSQL in container
+     - Server in Docker container
+
+### Option 2: Manual Setup
+
 1. Install dependencies:
 
 ```bash
