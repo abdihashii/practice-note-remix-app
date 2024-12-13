@@ -29,7 +29,8 @@
 - [ ] Share notes
 - [ ] Collaboration
 - [ ] Version history
-- [ ] Markdown 
+- [ ] Markdown export
+- [ ] Markdown import
 
 ## AI
 
