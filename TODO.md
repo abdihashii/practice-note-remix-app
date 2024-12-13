@@ -5,6 +5,7 @@
 - [x] Page instead of modal for viewing notes
 - [x] Page instead of modal for creating/editing notes
 - [x] Rich text editor
+- [ ] Checkbox for todo items
 - [ ] Filter options
 - [ ] Sort options
 - [x] Favorites
@@ -16,6 +17,7 @@
 - [ ] Manual tags
 - [ ] Collections
 - [x] Dark theme
+- [ ] Spell check
 
 ## Nice to have features
 
@@ -27,6 +29,7 @@
 - [ ] Share notes
 - [ ] Collaboration
 - [ ] Version history
+- [ ] Markdown 
 
 ## AI
 
