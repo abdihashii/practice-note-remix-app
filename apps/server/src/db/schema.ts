@@ -6,6 +6,7 @@ import {
   timestamp,
   boolean,
   jsonb,
+  integer,
 } from "drizzle-orm/pg-core";
 
 export const notesTable = pgTable("notes", {
@@ -59,7 +60,18 @@ export const usersTable = pgTable("users", {
   // Account status & management
   isActive: boolean("is_active").default(true),
   deletedAt: timestamp("deleted_at", { withTimezone: true }),
+
+  // User preferences & settings
   settings: jsonb("settings").default({}),
+  notificationPreferences: jsonb("notification_preferences").default({}),
+  theme: varchar("theme", { length: 50 }).default("system"),
+
+  // Activity tracking
+  lastActivityAt: timestamp("last_activity_at", { withTimezone: true }),
+  lastSuccessfulLogin: timestamp("last_successful_login", {
+    withTimezone: true,
+  }),
+  loginCount: integer("login_count").default(0),
 });
 
 // You can add type inference helpers if needed
