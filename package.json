@@ -1,10 +1,9 @@
 {
   "name": "notes-app",
   "version": "1.0.0",
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
+  "devDependencies": {
+    "typescript": "^5.7.2"
+  },
   "scripts": {
     "clean": "bun run clean:workspaces",
     "clean:workspaces": "bun ./scripts/clean-workspaces.ts",
@@ -27,7 +26,8 @@
     "setup": "chmod +x scripts/startup.sh && ./scripts/startup.sh",
     "postinstall": "chmod +x scripts/startup.sh"
   },
-  "devDependencies": {
-    "typescript": "^5.7.2"
-  }
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
 }
