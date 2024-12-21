@@ -15,6 +15,13 @@
       "when": 1734753650411,
       "tag": "0001_fancy_odin",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1734754390819,
+      "tag": "0002_boring_princess_powerful",
+      "breakpoints": true
     }
   ]
 }
