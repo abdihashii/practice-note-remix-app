@@ -22,6 +22,13 @@
       "when": 1734754390819,
       "tag": "0002_boring_princess_powerful",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1734756207019,
+      "tag": "0003_shiny_master_chief",
+      "breakpoints": true
     }
   ]
 }

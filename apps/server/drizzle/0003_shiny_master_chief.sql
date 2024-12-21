@@ -1,0 +1,2 @@
+ALTER TABLE "users" ALTER COLUMN "settings" SET DEFAULT '{"preferences":{}}'::jsonb;--> statement-breakpoint
+ALTER TABLE "users" ALTER COLUMN "notification_preferences" SET DEFAULT '{"notifications":{}}'::jsonb;
