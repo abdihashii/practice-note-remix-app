@@ -1,4 +1,5 @@
 // Third-party imports
+import type { CreateNoteDto, UpdateNoteDto } from "@notes-app/types";
 import { desc, eq } from "drizzle-orm";
 import { Hono } from "hono";
 import { bearerAuth } from "hono/bearer-auth";
@@ -45,6 +46,8 @@ noteRoutes.use(
 noteRoutes.get("/", async (c) => {
   const db = c.get("db");
   const token = c.req.header("Authorization")?.split(" ")[1];
+
+  // Check if token is present before verifying
   if (!token) return c.json({ error: "Unauthorized" }, 401);
 
   const payload = (await verify(
@@ -65,36 +68,113 @@ noteRoutes.get("/", async (c) => {
 noteRoutes.get("/:id", async (c) => {
   const db = c.get("db");
   const id = c.req.param("id");
+  const token = c.req.header("Authorization")?.split(" ")[1];
+
+  // Check if token is present before verifying
+  if (!token) return c.json({ error: "Unauthorized" }, 401);
+
+  // Verify token before accessing database
+  const payload = (await verify(
+    token,
+    process.env["JWT_SECRET"]!
+  )) as unknown as JWTPayload;
+
   const note = await db.query.notesTable.findFirst({
     where: eq(notesTable.id, id),
   });
+
+  // Check if note exists
+  if (!note) {
+    return c.json({ error: "Note not found" }, 404);
+  }
+
+  // Verify ownership
+  if (note.userId !== payload.userId) {
+    return c.json({ error: "Unauthorized" }, 403);
+  }
+
+  // Return note
   return c.json(note);
 });
 
 // Create a new note
 noteRoutes.post("/", async (c) => {
   const db = c.get("db");
-  const note = await c.req.json();
-  const newNote = await db.insert(notesTable).values(note).returning();
-  const createdNote = newNote[0];
-  return c.json(createdNote);
+  const token = c.req.header("Authorization")?.split(" ")[1];
+
+  // Check if token is present before verifying
+  if (!token) return c.json({ error: "Unauthorized" }, 401);
+
+  // Verify token before accessing database
+  const payload = (await verify(
+    token,
+    process.env["JWT_SECRET"]!
+  )) as unknown as JWTPayload;
+
+  // Get note data from request body
+  const noteData = await c.req.json<CreateNoteDto>();
+
+  // Create note object with userId
+  const note = {
+    ...noteData,
+    userId: payload.userId,
+  };
+
+  // Insert note into database
+  const [newNote] = await db.insert(notesTable).values(note).returning();
+
+  // Return new note
+  return c.json(newNote);
 });
 
 // Update a note
 noteRoutes.put("/:id", async (c) => {
   const db = c.get("db");
   const id = c.req.param("id");
-  const note = await c.req.json();
+  const token = c.req.header("Authorization")?.split(" ")[1];
+
+  // Check if token is present before verifying
+  if (!token) return c.json({ error: "Unauthorized" }, 401);
+
+  // Verify token before accessing database
+  const payload = (await verify(
+    token,
+    process.env["JWT_SECRET"]!
+  )) as unknown as JWTPayload;
+
+  // Verify note ownership
+  const existingNote = await db.query.notesTable.findFirst({
+    where: eq(notesTable.id, id),
+  });
+
+  // Check if note exists
+  if (!existingNote) {
+    return c.json({ error: "Note not found" }, 404);
+  }
+
+  // Verify ownership
+  if (existingNote.userId !== payload.userId) {
+    return c.json({ error: "Unauthorized" }, 403);
+  }
+
+  // Update note
+  const noteData = await c.req.json<UpdateNoteDto>();
+
+  // Create updated note object
   const updatedNote = {
-    ...note,
-    updatedAt: new Date(), // Pass Date object directly instead of ISO string
+    ...noteData,
+    updatedAt: new Date(),
   };
+
+  // Update note in database
   await db.update(notesTable).set(updatedNote).where(eq(notesTable.id, id));
 
-  // Fetch and return the updated note
+  // Return updated note
   const updated = await db.query.notesTable.findFirst({
     where: eq(notesTable.id, id),
   });
+
+  // Return updated note
   return c.json(updated);
 });
 
@@ -102,7 +182,36 @@ noteRoutes.put("/:id", async (c) => {
 noteRoutes.delete("/:id", async (c) => {
   const db = c.get("db");
   const id = c.req.param("id");
+  const token = c.req.header("Authorization")?.split(" ")[1];
+
+  // Check if token is present before verifying
+  if (!token) return c.json({ error: "Unauthorized" }, 401);
+
+  // Verify token before accessing database
+  const payload = (await verify(
+    token,
+    process.env["JWT_SECRET"]!
+  )) as unknown as JWTPayload;
+
+  // Verify note ownership
+  const existingNote = await db.query.notesTable.findFirst({
+    where: eq(notesTable.id, id),
+  });
+
+  // Check if note exists
+  if (!existingNote) {
+    return c.json({ error: "Note not found" }, 404);
+  }
+
+  // Verify ownership
+  if (existingNote.userId !== payload.userId) {
+    return c.json({ error: "Unauthorized" }, 403);
+  }
+
+  // Delete note from database
   await db.delete(notesTable).where(eq(notesTable.id, id));
+
+  // Return success message
   return c.json({ message: `Note ${id} deleted` });
 });
 
@@ -110,17 +219,33 @@ noteRoutes.delete("/:id", async (c) => {
 noteRoutes.patch("/:id/favorite", async (c) => {
   const db = c.get("db");
   const id = c.req.param("id");
+  const token = c.req.header("Authorization")?.split(" ")[1];
+
+  // Check if token is present before verifying
+  if (!token) return c.json({ error: "Unauthorized" }, 401);
+
+  // Verify token before accessing database
+  const payload = (await verify(
+    token,
+    process.env["JWT_SECRET"]!
+  )) as unknown as JWTPayload;
 
   // Get current note to toggle its favorite status
   const currentNote = await db.query.notesTable.findFirst({
     where: eq(notesTable.id, id),
   });
 
+  // Check if note exists
   if (!currentNote) {
     return c.json({ error: "Note not found" }, 404);
   }
 
-  // Toggle the favorite status
+  // Verify ownership
+  if (currentNote.userId !== payload.userId) {
+    return c.json({ error: "Unauthorized" }, 403);
+  }
+
+  // Toggle the favorite status in the database
   const updatedNote = await db
     .update(notesTable)
     .set({
@@ -130,5 +255,6 @@ noteRoutes.patch("/:id/favorite", async (c) => {
     .where(eq(notesTable.id, id))
     .returning();
 
+  // Return updated note
   return c.json(updatedNote[0]);
 });
