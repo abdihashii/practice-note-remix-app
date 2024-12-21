@@ -1,5 +1,9 @@
 // Third-party imports
-import type { NotificationPreferences, UserSettings } from "@notes-app/types";
+import {
+  validatePassword,
+  type NotificationPreferences,
+  type UserSettings,
+} from "@notes-app/types";
 import argon2 from "argon2";
 import { eq } from "drizzle-orm";
 import { Hono } from "hono";
@@ -65,6 +69,10 @@ async function generateTokens(userId: string) {
   return { accessToken, refreshToken };
 }
 
+function isStrongPassword(password: string): boolean {
+  return validatePassword(password).isValid;
+}
+
 /**
  * Register a new user
  * POST /auth/register
@@ -81,6 +89,18 @@ authRoutes.post("/register", async (c) => {
 
     if (existingUser) {
       return c.json({ error: "Email already registered" }, 400);
+    }
+
+    // Check if password is strong
+    if (!isStrongPassword(data.password)) {
+      const { errors } = validatePassword(data.password);
+      return c.json(
+        {
+          error: "Invalid password",
+          details: errors,
+        },
+        400
+      );
     }
 
     // Hash password using Argon2
