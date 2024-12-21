@@ -1,7 +1,7 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Client } from "pg";
 import dotenv from "dotenv";
-import { notesTable } from "./schema";
+import { notesTable, usersTable } from "./schema";
 
 dotenv.config();
 
@@ -20,5 +20,5 @@ export async function dbConnect() {
 
   await client.connect();
 
-  return drizzle(client, { schema: { notesTable } });
+  return drizzle(client, { schema: { notesTable, usersTable } });
 }
