@@ -78,7 +78,6 @@ export const usersTable = pgTable("users", {
       alerts: true,
     },
   } as Record<string, unknown>),
-  theme: varchar("theme", { length: 50 }).default("system"),
 
   // Activity tracking
   lastActivityAt: timestamp("last_activity_at", { withTimezone: true }),

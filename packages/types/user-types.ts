@@ -14,7 +14,6 @@ export interface User {
   deletedAt: string | null;
   settings: UserSettings /** JSON object for user preferences */;
   notificationPreferences: NotificationPreferences /** JSON object for notification settings */;
-  theme: string;
   lastActivityAt: string | null;
   lastSuccessfulLogin: string | null;
   loginCount: number;
@@ -57,7 +56,7 @@ export interface AuthResponse {
 }
 
 export interface UserSettings {
-  theme: "system" | string;
+  theme: "system" | "light" | "dark";
   language: string;
   timezone: string;
 }
@@ -65,7 +64,7 @@ export interface UserSettings {
 export interface NotificationPreferences {
   email: {
     enabled: boolean;
-    digest: string;
+    digest: "never" | "daily" | "weekly" | "monthly";
     marketing: boolean;
   };
   push: {

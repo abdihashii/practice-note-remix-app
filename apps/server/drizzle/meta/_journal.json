@@ -36,6 +36,13 @@
       "when": 1734757866479,
       "tag": "0004_salty_sabretooth",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1734813632653,
+      "tag": "0005_swift_vin_gonzales",
+      "breakpoints": true
     }
   ]
 }

@@ -10,20 +10,28 @@ INSERT INTO "users" (
     is_active,
     settings,
     notification_preferences,
-    theme,
     login_count
 ) VALUES (
-    'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',  -- Fixed UUID for testing
-    'test@example.com',
+    '94e0f505-2c87-4735-aac7-5f9e1d2b79ea',  -- Fixed UUID for testing
+    'test+2@example.com',
     '$2b$10$6YgKtZHbN7hTKY.C.VhgYOxqH/t9yNPkJHZF5KPZsWBzKIp8VZKHm',  -- hashed value of 'password123'
-    'Test User',
+    'Test User 2',
     CURRENT_TIMESTAMP,
     CURRENT_TIMESTAMP,
     true,
     true,
-    '{"language": "en"}',
-    '{"email": true, "push": false}',
-    'light',
+    '{"theme": "system", "language": "en", "timezone": "cst"}',
+    '{
+      "email": {
+        "enabled": false,
+        "digest": "never",
+        "marketing": false
+      },
+      "push": {
+        "enabled": false,
+        "alerts": false
+      }
+    }',
     1
 );
 
@@ -36,6 +44,6 @@ INSERT INTO "notes" (
 ) VALUES (
     'Welcome Note',
     'Welcome to your notes app! This is your first note.',
-    'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
+    '94e0f505-2c87-4735-aac7-5f9e1d2b79ea',
     true
 );
