@@ -7,6 +7,7 @@ import type { MiddlewareHandler } from "hono/types";
 import { dbConnect } from "@/db";
 import { noteRoutes } from "@/routes/noteRoutes";
 import { searchRoutes } from "@/routes/searchRoutes";
+import { authRoutes } from "@/routes/authRoutes";
 import type { CustomEnv } from "@/types";
 
 // Create a new Hono app with the custom environment
@@ -17,7 +18,7 @@ app.use(
   cors({
     origin: "*",
     allowMethods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowHeaders: ["Content-Type"],
+    allowHeaders: ["Content-Type", "Authorization"],
     exposeHeaders: ["Content-Length", "X-Requested-With"],
     credentials: true,
     maxAge: 600,
@@ -51,6 +52,9 @@ app.use("*", async (c, next) => {
 });
 
 app.use(dbMiddleware);
+
+// Mount auth routes
+app.route("/auth", authRoutes);
 
 // Mount note routes
 app.route("/notes", noteRoutes);
