@@ -62,10 +62,22 @@ export const usersTable = pgTable("users", {
   deletedAt: timestamp("deleted_at", { withTimezone: true }),
 
   // User preferences & settings
-  settings: jsonb("settings").default({ preferences: {} }),
+  settings: jsonb("settings").default({
+    theme: "system",
+    language: "en",
+    timezone: "UTC",
+  } as Record<string, unknown>),
   notificationPreferences: jsonb("notification_preferences").default({
-    notifications: {},
-  }),
+    email: {
+      enabled: true,
+      digest: "daily",
+      marketing: false,
+    },
+    push: {
+      enabled: true,
+      alerts: true,
+    },
+  } as Record<string, unknown>),
   theme: varchar("theme", { length: 50 }).default("system"),
 
   // Activity tracking

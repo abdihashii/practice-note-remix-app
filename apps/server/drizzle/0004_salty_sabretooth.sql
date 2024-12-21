@@ -1,0 +1,2 @@
+ALTER TABLE "users" ALTER COLUMN "settings" SET DEFAULT '{"theme":"system","language":"en","timezone":"UTC"}'::jsonb;--> statement-breakpoint
+ALTER TABLE "users" ALTER COLUMN "notification_preferences" SET DEFAULT '{"email":{"enabled":true,"digest":"daily","marketing":false},"push":{"enabled":true,"alerts":true}}'::jsonb;

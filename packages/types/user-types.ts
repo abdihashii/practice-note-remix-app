@@ -12,11 +12,8 @@ export interface User {
   emailVerified: boolean;
   isActive: boolean;
   deletedAt: string | null;
-  settings: Record<string, unknown> /** JSON object for user preferences */;
-  notificationPreferences: Record<
-    string,
-    unknown
-  > /** JSON object for notification settings */;
+  settings: UserSettings /** JSON object for user preferences */;
+  notificationPreferences: NotificationPreferences /** JSON object for notification settings */;
   theme: string;
   lastActivityAt: string | null;
   lastSuccessfulLogin: string | null;
@@ -57,4 +54,22 @@ export interface AuthResponse {
   user: User;
   accessToken: string;
   refreshToken: string;
+}
+
+export interface UserSettings {
+  theme: "system" | string;
+  language: string;
+  timezone: string;
+}
+
+export interface NotificationPreferences {
+  email: {
+    enabled: boolean;
+    digest: string;
+    marketing: boolean;
+  };
+  push: {
+    enabled: boolean;
+    alerts: boolean;
+  };
 }
