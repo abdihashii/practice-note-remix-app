@@ -7,6 +7,7 @@ import {
 import argon2 from "argon2";
 import { eq } from "drizzle-orm";
 import { Hono } from "hono";
+import { HTTPException } from "hono/http-exception";
 import { sign } from "hono/jwt";
 
 // Local imports
@@ -172,6 +173,9 @@ authRoutes.post("/register", async (c) => {
       refreshToken,
     });
   } catch (error) {
+    if (error instanceof HTTPException && error.status === 403) {
+      return c.json({ error: "Invalid or missing CSRF token" }, 403);
+    }
     console.error("Registration error:", error);
     return c.json({ error: "Registration failed" }, 500);
   }
@@ -257,6 +261,9 @@ authRoutes.post("/login", async (c) => {
       refreshToken,
     });
   } catch (error) {
+    if (error instanceof HTTPException && error.status === 403) {
+      return c.json({ error: "Invalid or missing CSRF token" }, 403);
+    }
     console.error("Login error:", error);
     return c.json({ error: "Login failed" }, 500);
   }
@@ -304,6 +311,9 @@ authRoutes.post("/refresh", async (c) => {
       refreshToken: newRefreshToken,
     });
   } catch (error) {
+    if (error instanceof HTTPException && error.status === 403) {
+      return c.json({ error: "Invalid or missing CSRF token" }, 403);
+    }
     console.error("Token refresh error:", error);
     return c.json({ error: "Token refresh failed" }, 500);
   }
@@ -330,6 +340,9 @@ authRoutes.post("/logout", async (c) => {
 
     return c.json({ message: "Logged out successfully" });
   } catch (error) {
+    if (error instanceof HTTPException && error.status === 403) {
+      return c.json({ error: "Invalid or missing CSRF token" }, 403);
+    }
     console.error("Logout error:", error);
     return c.json({ error: "Logout failed" }, 500);
   }
