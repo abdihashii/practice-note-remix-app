@@ -12,6 +12,23 @@ import { noteRoutes } from "@/routes/noteRoutes";
 import { searchRoutes } from "@/routes/searchRoutes";
 import type { CustomEnv } from "@/types";
 
+// Helper function to validate environment variables
+function validateEnvironment() {
+  const required = ["JWT_SECRET", "DATABASE_URL"];
+  if (process.env.NODE_ENV === "production") {
+    required.push("APP_URL");
+  }
+
+  for (const env of required) {
+    if (!process.env[env]) {
+      throw new Error(`Missing required environment variable: ${env}`);
+    }
+  }
+}
+
+// Validate environment before app initialization
+validateEnvironment();
+
 // Create a new Hono app with the custom environment
 const app = new Hono<CustomEnv>();
 
