@@ -1,6 +1,8 @@
 // Third-party imports
 import { desc, eq } from "drizzle-orm";
 import { Hono } from "hono";
+import { bearerAuth } from "hono/bearer-auth";
+import { verify } from "hono/jwt";
 
 // Local imports
 import { notesTable } from "@/db/schema";
@@ -8,13 +10,54 @@ import type { CustomEnv } from "@/types";
 
 export const noteRoutes = new Hono<CustomEnv>();
 
-// Get all notes
+interface JWTPayload {
+  userId: string;
+  exp?: number;
+}
+
+// Protect routes with JWT
+noteRoutes.use(
+  "*",
+  bearerAuth({
+    token: process.env["JWT_SECRET"],
+    verifyToken: async (token) => {
+      try {
+        const secret = process.env["JWT_SECRET"];
+        if (!secret) throw new Error("JWT_SECRET not configured");
+
+        const payload = (await verify(token, secret)) as unknown as JWTPayload;
+
+        // Check if token is expired
+        if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) {
+          return false;
+        }
+
+        // Add userId to context for route handlers
+        return true;
+      } catch {
+        return false;
+      }
+    },
+  })
+);
+
+// Get all notes (only user's notes)
 noteRoutes.get("/", async (c) => {
   const db = c.get("db");
+  const token = c.req.header("Authorization")?.split(" ")[1];
+  if (!token) return c.json({ error: "Unauthorized" }, 401);
+
+  const payload = (await verify(
+    token,
+    process.env["JWT_SECRET"]!
+  )) as unknown as JWTPayload;
+
   const notes = await db
     .select()
     .from(notesTable)
+    .where(eq(notesTable.userId, payload.userId))
     .orderBy(desc(notesTable.updatedAt));
+
   return c.json(notes);
 });
 
