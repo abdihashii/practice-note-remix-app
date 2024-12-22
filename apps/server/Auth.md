@@ -2,6 +2,44 @@
 
 > **Security Notice**: This documentation describes general authentication flows and publicly known best practices. No sensitive information, secrets, or implementation-specific vulnerabilities are exposed here. All examples use placeholder values.
 
+## Table of Contents
+
+1. [How to Use This Document](#how-to-use-this-document)
+2. [Quick Start](#quick-start)
+3. [Overview](#overview)
+4. [Key Features](#key-features)
+5. [Authentication Flow](#authentication-flow)
+6. [Security Measures](#security-measures)
+   - [Password Security](#password-security)
+   - [Token Management](#token-management)
+   - [Session Security](#session-security)
+7. [Implementation Details](#implementation-details)
+   - [Database Schema](#database-schema)
+   - [Token Generation](#token-generation)
+   - [Password Hashing](#password-hashing)
+8. [Security Best Practices](#security-best-practices)
+9. [Error Handling](#error-handling)
+10. [Troubleshooting](#troubleshooting)
+11. [Future Improvements](#future-improvements)
+
+## How to Use This Document
+
+- Overview of the authentication system
+- Implementation details for developers
+- Security best practices and configurations
+- Common error scenarios and handling
+- Future roadmap for authentication features
+
+## Quick Start
+
+### Required Environment Variables
+
+```env
+JWT_SECRET=your_secure_secret_here
+APP_URL=http://localhost:3000
+DATABASE_URL=postgresql://user:pass@localhost:5432/dbname
+```
+
 ## Overview
 
 The authentication system uses JWT (JSON Web Tokens) with a refresh token rotation strategy for secure session management. All sensitive operations are protected by CSRF tokens.
@@ -14,6 +52,54 @@ The authentication system uses JWT (JSON Web Tokens) with a refresh token rotati
 - CSRF protection
 - Activity tracking
 - Session management with automatic expiration
+
+## Authentication Flow
+
+### 1. Registration
+
+```mermaid
+sequenceDiagram
+    Client->>Server: POST /auth/register with email, password, name
+    Note over Server: Validate email format & password strength
+    Note over Server: Check if email already exists
+    Note over Server: Hash password with Argon2id
+    Note over Server: Create user record
+    Note over Server: Generate access & refresh tokens
+    Server->>Client: Return user data & tokens
+    Note over Client: Store tokens securely
+```
+
+### 2. Login
+
+```mermaid
+sequenceDiagram
+    Client->>Server: POST /auth/login
+    Note over Server: Verify credentials
+    Note over Server: Generate tokens
+    Note over Server: Update login stats
+    Server->>Client: Return user & tokens
+```
+
+### 3. Token Refresh
+
+```mermaid
+sequenceDiagram
+    Client->>Server: POST /auth/refresh
+    Note over Server: Verify refresh token
+    Note over Server: Generate new tokens
+    Note over Server: Invalidate old token
+    Server->>Client: Return new tokens
+```
+
+### 4. Logout
+
+```mermaid
+sequenceDiagram
+    Client->>Server: POST /auth/logout
+    Note over Server: Invalidate refresh token
+    Note over Server: Update last activity
+    Server->>Client: Confirm logout
+```
 
 ## Security Measures
 
@@ -49,62 +135,6 @@ The authentication system uses JWT (JSON Web Tokens) with a refresh token rotati
 - Token invalidation on logout
 - Activity tracking
 - Automatic session expiration after 15 minutes of inactivity
-
-## Authentication Flow
-
-### 1. Registration
-
-```mermaid
-sequenceDiagram
-    Client->>Server: POST /auth/register
-    Note over Server: Validate input
-    Note over Server: Hash password
-    Note over Server: Create user
-    Note over Server: Generate tokens
-    Server->>Client: Return user & tokens
-```
-
-### 2. Login
-
-```mermaid
-sequenceDiagram
-    Client->>Server: POST /auth/login
-    Note over Server: Verify credentials
-    Note over Server: Generate tokens
-    Note over Server: Update login stats
-    Server->>Client: Return user & tokens
-```
-
-### 3. Token Refresh
-
-```mermaid
-sequenceDiagram
-    Client->>Server: POST /auth/refresh
-    Note over Server: Verify refresh token
-    Note over Server: Generate new tokens
-    Note over Server: Invalidate old token
-    Server->>Client: Return new tokens
-```
-
-### 4. Logout
-
-```mermaid
-sequenceDiagram
-    Client->>Server: POST /auth/logout
-    Note over Server: Invalidate refresh token
-    Note over Server: Update last activity
-    Server->>Client: Confirm logout
-```
-
-## Database Schema
-
-### Users Table
-
-- Core fields: id, email, hashedPassword, name
-- Security fields: refreshToken, refreshTokenExpiresAt, lastTokenInvalidation
-- Status fields: emailVerified, isActive, deletedAt
-- Activity fields: lastActivityAt, lastSuccessfulLogin, loginCount
-- Preference fields: settings, notificationPreferences
 
 ## Implementation Details
 
@@ -142,6 +172,16 @@ async function hashPassword(password: string): Promise<string> {
   });
 }
 ```
+
+## Database Schema
+
+### Users Table
+
+- Core fields: id, email, hashedPassword, name
+- Security fields: refreshToken, refreshTokenExpiresAt, lastTokenInvalidation
+- Status fields: emailVerified, isActive, deletedAt
+- Activity fields: lastActivityAt, lastSuccessfulLogin, loginCount
+- Preference fields: settings, notificationPreferences
 
 ## Security Best Practices
 
@@ -195,6 +235,47 @@ Common error scenarios and their responses:
   "error": "Invalid or missing CSRF token"
 }
 ```
+
+4. Registration Error
+
+```json
+{
+  "error": "Email already registered"
+}
+```
+
+5. Password Validation Error
+
+```json
+{
+  "error": "Invalid password",
+  "details": [
+    "Password must be at least 8 characters",
+    "Password must contain at least one uppercase letter"
+  ]
+}
+```
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Token Expired**
+
+   - Check system clock synchronization
+   - Verify token expiration times
+   - Ensure refresh flow is implemented
+
+2. **CSRF Failures**
+
+   - Verify origin configuration
+   - Check token header presence
+   - Confirm cookie settings
+
+3. **Authentication Failures**
+   - Validate token format
+   - Check authorization headers
+   - Verify token signing
 
 ## Future Improvements
 
