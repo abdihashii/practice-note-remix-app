@@ -1,5 +1,7 @@
 # Authentication System Documentation
 
+> **Security Notice**: This documentation describes general authentication flows and publicly known best practices. No sensitive information, secrets, or implementation-specific vulnerabilities are exposed here. All examples use placeholder values.
+
 ## Overview
 
 The authentication system uses JWT (JSON Web Tokens) with a refresh token rotation strategy for secure session management. All sensitive operations are protected by CSRF tokens.
