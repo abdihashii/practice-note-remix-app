@@ -1,12 +1,11 @@
 // Third-party imports
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import { csrf } from "hono/csrf";
-import { secureHeaders } from "hono/secure-headers";
 import type { MiddlewareHandler } from "hono/types";
 
 // Local imports
 import { dbConnect } from "@/db";
+import { csrfMiddleware, securityHeadersMiddleware } from "@/middleware/auth";
 import { authRoutes } from "@/routes/authRoutes";
 import { noteRoutes } from "@/routes/noteRoutes";
 import { searchRoutes } from "@/routes/searchRoutes";
@@ -32,6 +31,7 @@ validateEnvironment();
 // Create a new Hono app with the custom environment
 const app = new Hono<CustomEnv>();
 
+// Apply CORS middleware
 app.use(
   "*",
   cors({
@@ -85,33 +85,10 @@ app.route("/search", searchRoutes);
 app.get("/health", (c) => c.json({ status: "ok" }));
 
 // Add CSRF protection middleware
-// This helps prevent Cross-Site Request Forgery attacks by requiring a token
-// The token must be included in requests that modify data (POST, PUT, DELETE)
-app.use(
-  "*",
-  csrf({
-    origin: process.env["APP_URL"], // Only allow requests from our frontend
-  })
-);
+app.use("*", csrfMiddleware);
 
 // Add security headers middleware
-// These HTTP headers help protect against common web vulnerabilities
-app.use(
-  "*",
-  secureHeaders({
-    contentSecurityPolicy: {
-      defaultSrc: ["'self'"], // Only allow resources from same origin
-      scriptSrc: ["'self'"], // Only allow scripts from same origin
-      styleSrc: ["'self'"], // Only allow styles from same origin
-      imgSrc: ["'self'", "data:", "blob:"], // Allow images from same origin + data/blob URLs
-      connectSrc: ["'self'", "ws:", "wss:"], // Allow WebSocket connections
-    },
-    xFrameOptions: "DENY", // Prevent site from being embedded in iframes
-    xContentTypeOptions: "nosniff", // Prevent MIME type sniffing
-    referrerPolicy: "strict-origin-when-cross-origin", // Control referrer information
-    strictTransportSecurity: "max-age=31536000; includeSubDomains", // Require HTTPS
-  })
-);
+app.use("*", securityHeadersMiddleware);
 
 // Use Bun's serve instead of node-server
 export default {
