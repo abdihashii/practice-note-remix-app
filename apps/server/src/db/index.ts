@@ -1,24 +1,60 @@
-import { drizzle } from "drizzle-orm/node-postgres";
-import { Client } from "pg";
+/**
+ * Database Connection Module
+ *
+ * Establishes and manages PostgreSQL database connections using connection pooling.
+ * This module:
+ * - Creates a connection pool for better performance and resource management
+ * - Configures connection timeouts and error handling
+ * - Initializes Drizzle ORM with the database schema
+ * - Provides a single connection point for the entire application
+ */
+
+// Third-party imports
 import dotenv from "dotenv";
-import { notesTable, usersTable } from "./schema";
+import { drizzle } from "drizzle-orm/node-postgres";
+import { Pool } from "pg";
+
+// Local imports
+import * as schema from "./schema";
 
 dotenv.config();
 
-const databaseUrl =
-  process.env.DATABASE_URL ||
-  "postgres://myuser:mypassword@postgres:5432/mydatabase";
+const databaseUrl = process.env.DATABASE_URL;
 
 export async function dbConnect() {
   if (!databaseUrl) {
     throw new Error("DATABASE_URL is not set");
   }
 
-  const client = new Client({
+  // Log connection attempt (hiding sensitive credentials)
+  console.log("Connecting to database...");
+  console.log("Database URL:", databaseUrl.replace(/:[^:@]+@/, ":***@"));
+
+  // Initialize connection pool with configuration
+  const pool = new Pool({
     connectionString: databaseUrl,
+    max: 10, // Maximum number of clients in the pool
+    idleTimeoutMillis: 30000, // Close idle connections after 30 seconds
+    connectionTimeoutMillis: 5000, // Fail if connection takes longer than 5 seconds
   });
 
-  await client.connect();
+  // Handle errors on idle clients to prevent crashes
+  // This catches errors that occur when the client is not being used
+  pool.on("error", (err) => {
+    console.error("Unexpected error on idle client", err);
+  });
 
-  return drizzle(client, { schema: { notesTable, usersTable } });
+  try {
+    // Test the connection by attempting to connect
+    await pool.connect();
+    console.log("Successfully connected to database");
+
+    // Initialize and return Drizzle ORM instance
+    // This wraps the pool with Drizzle's query builder and schema
+    return drizzle(pool, { schema });
+  } catch (error) {
+    // Log any connection errors and rethrow
+    console.error("Failed to connect to database:", error);
+    throw error;
+  }
 }
