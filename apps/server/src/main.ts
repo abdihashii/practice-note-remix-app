@@ -5,7 +5,10 @@ import type { MiddlewareHandler } from "hono/types";
 
 // Local imports
 import { dbConnect } from "@/db";
-import { csrfMiddleware, securityHeadersMiddleware } from "@/middleware/auth";
+import {
+  csrfMiddleware,
+  securityHeadersMiddleware,
+} from "@/middleware/authMiddleware";
 import { authRoutes } from "@/routes/authRoutes";
 import { noteRoutes } from "@/routes/noteRoutes";
 import { searchRoutes } from "@/routes/searchRoutes";
