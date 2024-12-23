@@ -12,6 +12,9 @@ import type { CustomEnv } from "@/types";
 // Create a new Hono app with the custom environment
 const app = new Hono<CustomEnv>();
 
+// Add basic health check before any database operations
+app.get("/health", (c) => c.json({ status: "ok" }));
+
 app.use(
   "*",
   cors({
@@ -25,13 +28,22 @@ app.use(
 );
 
 console.log("Initializing server...");
-const db = await dbConnect();
-console.log("Database connected successfully");
+let dbConnection = null;
+try {
+  dbConnection = await dbConnect();
+  console.log("Database connected successfully");
+} catch (err) {
+  console.error("Database connection failed:", err);
+  console.log("Starting server without database connection...");
+}
 
 // Middleware to pass the database connection to the routes
 const dbMiddleware: MiddlewareHandler<CustomEnv> = async (c, next) => {
   try {
-    c.set("db", db);
+    if (!dbConnection) {
+      return c.json({ error: "Database not available" }, 503);
+    }
+    c.set("db", dbConnection);
     await next();
   } catch (err) {
     console.error("Middleware error:", err);
@@ -50,7 +62,9 @@ app.use("*", async (c, next) => {
   }
 });
 
-app.use(dbMiddleware);
+// Mount routes with database middleware
+app.use("/notes/*", dbMiddleware);
+app.use("/search/*", dbMiddleware);
 
 // Mount note routes
 app.route("/notes", noteRoutes);
@@ -58,11 +72,9 @@ app.route("/notes", noteRoutes);
 // Mount search routes
 app.route("/search", searchRoutes);
 
-// Add basic health check
-app.get("/health", (c) => c.json({ status: "ok" }));
-
 // Use Bun's serve instead of node-server
 export default {
   port: process.env["PORT"] ? parseInt(process.env["PORT"]) : 8000,
+  hostname: "0.0.0.0",
   fetch: app.fetch,
 };

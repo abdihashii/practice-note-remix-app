@@ -11,7 +11,6 @@ primary_region = 'ord'
 
 [deploy]
   strategy = 'rolling'
-  release_command = 'bun run db:migrate && bun run db:push'
 
 [env]
   HOST = '0.0.0.0'
@@ -31,7 +30,7 @@ primary_region = 'ord'
     grace_period = '10s'
     method = 'GET'
     path = '/health'
-    protocol = 'http'
+    protocol = 'https'
 
 [[vm]]
   memory = '1gb'
