@@ -17,7 +17,7 @@ RUN groupadd -r appgroup && \
 # Copy root package files
 COPY package.json .
 # Only copy lockfile if it exists
-COPY bun.lockb ./ 2>/dev/null || true
+RUN [ -f "../bun.lockb" ] && cp ../bun.lockb . || true
 
 # Copy the server's package.json
 COPY apps/server/package.json ./apps/server/
