@@ -36,12 +36,10 @@ This will guide you through:
 - Building shared packages
 - Choosing your development configuration:
   1. Full stack (Frontend + Backend)
-     - Local server with PostgreSQL in container
-     - Server in Docker container
   2. Frontend only
   3. Backend only
-     - Local server with PostgreSQL in container
-     - Server in Docker container
+
+Each option will set up PostgreSQL in a container and start the appropriate services.
 
 ### Option 2: Manual Setup
 
