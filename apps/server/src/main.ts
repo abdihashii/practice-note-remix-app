@@ -4,6 +4,7 @@ import type { MiddlewareHandler } from "hono/types";
 
 // Local imports
 import { dbConnect } from "@/db";
+import { errorHandler } from "@/middleware/errorMiddleware";
 import {
   corsMiddleware,
   securityMiddleware,
@@ -33,6 +34,9 @@ validateEnvironment();
 // Create a new Hono app with the custom environment
 const app = new Hono<CustomEnv>();
 
+// Apply error handler first to catch all errors
+app.use("*", errorHandler);
+
 // Apply CORS middleware
 app.use("*", corsMiddleware);
 
@@ -51,8 +55,7 @@ const dbMiddleware: MiddlewareHandler<CustomEnv> = async (c, next) => {
     c.set("db", db);
     await next();
   } catch (err) {
-    console.error("Middleware error:", err);
-    throw err;
+    throw err; // Let error handler middleware handle it
   }
 };
 
@@ -62,8 +65,7 @@ app.use("*", async (c, next) => {
   try {
     await next();
   } catch (err) {
-    console.error("Request error:", err);
-    return c.json({ error: "Internal Server Error" }, 500);
+    throw err; // Let error handler middleware handle it
   }
 });
 
