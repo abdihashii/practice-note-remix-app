@@ -1,17 +1,22 @@
 // Third-party imports
-import { sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { Hono } from "hono";
 
 // Local imports
 import { notesTable } from "@/db/schema";
+import { verifyJWT } from "@/middleware/authMiddleware";
 import type { CustomEnv } from "@/types";
 
 export const searchRoutes = new Hono<CustomEnv>();
+
+// Protect all search routes
+searchRoutes.use("*", verifyJWT);
 
 // Search notes table
 searchRoutes.get("/", async (c) => {
   try {
     const db = c.get("db");
+    const userId = c.get("userId");
 
     const searchQuery = c.req.query("q");
     const normalizedSearchQuery = searchQuery
@@ -21,14 +26,22 @@ searchRoutes.get("/", async (c) => {
     let searchResults;
 
     if (normalizedSearchQuery === "") {
-      // Return all notes if the search query is empty
-      searchResults = await db.select().from(notesTable);
-    } else {
-      // Perform search with the given query
+      // Return all notes if the search query is empty (only user's notes)
       searchResults = await db
         .select()
         .from(notesTable)
-        .where(sql`LOWER(title) LIKE ${`%${normalizedSearchQuery}%`}`);
+        .where(eq(notesTable.userId, userId));
+    } else {
+      // Perform search with the given query (only user's notes)
+      searchResults = await db
+        .select()
+        .from(notesTable)
+        .where(
+          sql`LOWER(title) LIKE ${`%${normalizedSearchQuery}%`} AND ${eq(
+            notesTable.userId,
+            userId
+          )}`
+        );
     }
 
     if (searchResults.length === 0) {
