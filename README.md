@@ -6,7 +6,7 @@ A full-stack notes application with a React frontend and Bun/Hono backend.
 
 - [Bun](https://bun.sh) (for both client and server)
 - [Node.js](https://nodejs.org/) 18+ (recommended)
-- [Docker](https://www.docker.com/) (optional, for server and PostgreSQL)
+- [Docker](https://www.docker.com/) (for PostgreSQL database)
 
 ## Project Structure
 
@@ -82,7 +82,7 @@ Run both the client and server in development mode:
 # Start PostgreSQL container in detached mode
 bun run postgres:up
 
-# Start hono server and client from root
+# Start both frontend and backend
 bun run dev
 
 # In a new terminal, ensure the server is running with a health check
@@ -102,24 +102,12 @@ bun run dev:client
 
 #### Server Only
 
-**With Local PostgresSQL:**
-
 ```bash
 # Start PostgreSQL container in detached mode
 bun run postgres:up
 
 # Start hono server
-bun run dev
-```
-
-**With Docker (Note: No Hot Module Reloading):**
-
-```bash
-# Start server + PostgreSQL
-bun run docker:up
-
-# In a new terminal, ensure the server is running with a health check
-curl http://localhost:8000/health
+bun run dev:server
 ```
 
 ## Database Management
@@ -146,16 +134,16 @@ Remove all build artifacts and dependencies:
 bun run clean
 ```
 
-Shut down all containers:
+Stop PostgreSQL container:
 
 ```bash
-bun run docker:down
+bun run postgres:down
 ```
 
 ## Additional Notes
 
-- The server supports both Docker and local development modes
-- Docker mode is great for production-like environment but doesn't support HMR
-- Local development mode provides the best developer experience with HMR
+- PostgreSQL runs in a Docker container for development
+- The server uses Bun for fast performance and modern JavaScript features
+- Hot Module Reloading (HMR) is available for both client and server
 - The client is built with Remix and includes a rich text editor
 - TypeScript is used throughout the project for type safety
