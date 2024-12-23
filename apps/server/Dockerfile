@@ -18,13 +18,12 @@ RUN groupadd -r appgroup && \
 # These paths are relative to the build context (monorepo root)
 # Then save to the working directory (server directory - docker setup)
 # The '.' is the working directory (server directory - docker setup)
-COPY package.json .
-COPY bun.lockb .
+# For Render: Copy from parent directories since build context is apps/server
+COPY ../../package.json .
+COPY ../../bun.lockb .
 
-# Copy the server's package.json to its respective directory
-# The first part of the path is relative to the build context (monorepo root)
-# The second part is relative to the working directory (server directory - docker setup)
-COPY apps/server/package.json ./apps/server/
+# Copy the server's package.json
+COPY package.json ./apps/server/
 
 # Install all dependencies (both root and server)
 RUN bun install --frozen-lockfile
@@ -33,7 +32,7 @@ RUN bun install --frozen-lockfile
 # Copy server source code to its directory
 # In production, this contains all the code
 # In development, this is partially overridden by volume mounts
-COPY apps/server ./apps/server/
+COPY . ./apps/server/
 
 # Ensure proper permissions
 RUN chown -R appuser:appgroup /app
