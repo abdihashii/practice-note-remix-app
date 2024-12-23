@@ -22,6 +22,9 @@ RUN [ -f "../bun.lockb" ] && cp ../bun.lockb . || true
 # Copy the server's package.json
 COPY apps/server/package.json ./apps/server/
 
+# Copy scripts directory
+COPY scripts ./scripts/
+
 # Install all dependencies (both root and server)
 RUN bun install
 

@@ -1,30 +1,39 @@
-app = "notes-api"
-primary_region = "ord"
+# fly.toml app configuration file generated for notes-api-icy-pond-1313 on 2024-12-23T13:31:07-06:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'notes-api-icy-pond-1313'
+primary_region = 'ord'
 
 [build]
-  dockerfile = "docker/server.Dockerfile"
-  builder = "dockerfile"
+  dockerfile = 'docker/server.Dockerfile'
+
+[deploy]
+  strategy = 'rolling'
+  release_command = 'bun run db:migrate && bun run db:push'
 
 [env]
-  PORT = "8000"
-  HOST = "0.0.0.0"
+  HOST = '0.0.0.0'
+  PORT = '8000'
 
 [http_service]
   internal_port = 8000
   force_https = true
-  auto_stop_machines = true
+  auto_stop_machines = 'stop'
   auto_start_machines = true
   min_machines_running = 0
-  processes = ["app"]
+  processes = ['app']
 
   [[http_service.checks]]
-    interval = "30s"
-    timeout = "5s"
-    grace_period = "10s"
-    method = "GET"
-    path = "/health"
-    protocol = "http"
+    interval = '30s'
+    timeout = '5s'
+    grace_period = '10s'
+    method = 'GET'
+    path = '/health'
+    protocol = 'http'
 
-[deploy]
-  strategy = "rolling"
-  release_command = "bun run db:migrate && bun run db:push" 
+[[vm]]
+  memory = '1gb'
+  cpu_kind = 'shared'
+  cpus = 1
