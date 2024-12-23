@@ -6,7 +6,14 @@ import { Hono } from "hono";
 // Local imports
 import { notesTable } from "@/db/schema";
 import { verifyJWT } from "@/middleware/authMiddleware";
+import { handleValidationError } from "@/middleware/errorMiddleware";
 import type { CustomEnv } from "@/types";
+import {
+  handleNoteDbError,
+  validateCreateNote,
+  validateUpdateNote,
+  verifyNoteAccess,
+} from "@/utils/noteUtils";
 
 export const noteRoutes = new Hono<CustomEnv>();
 
@@ -18,37 +25,32 @@ noteRoutes.get("/", async (c) => {
   const db = c.get("db");
   const userId = c.get("userId");
 
-  const notes = await db
-    .select()
-    .from(notesTable)
-    .where(eq(notesTable.userId, userId))
-    .orderBy(desc(notesTable.updatedAt));
+  try {
+    const notes = await db
+      .select()
+      .from(notesTable)
+      .where(eq(notesTable.userId, userId))
+      .orderBy(desc(notesTable.updatedAt));
 
-  return c.json(notes);
+    return c.json(notes);
+  } catch (error) {
+    return handleNoteDbError(c, error, undefined, "read");
+  }
 });
 
 // Get a note by id
 noteRoutes.get("/:id", async (c) => {
-  const db = c.get("db");
-  const userId = c.get("userId");
   const id = c.req.param("id");
 
-  const note = await db.query.notesTable.findFirst({
-    where: eq(notesTable.id, id),
-  });
-
-  // Check if note exists
-  if (!note) {
-    return c.json({ error: "Note not found" }, 404);
+  try {
+    const note = await verifyNoteAccess(c, id, "read");
+    return c.json(note);
+  } catch (error) {
+    if (error instanceof Response) {
+      return error;
+    }
+    return handleNoteDbError(c, error, id, "read");
   }
-
-  // Verify ownership
-  if (note.userId !== userId) {
-    return c.json({ error: "Unauthorized" }, 403);
-  }
-
-  // Return note
-  return c.json(note);
 });
 
 // Create a new note
@@ -59,120 +61,117 @@ noteRoutes.post("/", async (c) => {
   // Get note data from request body
   const noteData = await c.req.json<CreateNoteDto>();
 
-  // Create note object with userId
-  const note = {
-    ...noteData,
-    userId,
-  };
+  // Validate input
+  const validationErrors = validateCreateNote(noteData);
+  if (validationErrors.length > 0) {
+    return handleValidationError(c, "Invalid note data", validationErrors);
+  }
 
-  // Insert note into database
-  const [newNote] = await db.insert(notesTable).values(note).returning();
+  try {
+    // Create note object with userId and insert into database
+    const [newNote] = await db
+      .insert(notesTable)
+      .values({ ...noteData, userId })
+      .returning();
 
-  // Return new note
-  return c.json(newNote);
+    // Return new note
+    return c.json(newNote);
+  } catch (error) {
+    return handleNoteDbError(c, error, undefined, "create");
+  }
 });
 
 // Update a note
 noteRoutes.put("/:id", async (c) => {
   const db = c.get("db");
-  const userId = c.get("userId");
   const id = c.req.param("id");
 
-  // Verify note ownership
-  const existingNote = await db.query.notesTable.findFirst({
-    where: eq(notesTable.id, id),
-  });
-
-  // Check if note exists
-  if (!existingNote) {
-    return c.json({ error: "Note not found" }, 404);
-  }
-
-  // Verify ownership
-  if (existingNote.userId !== userId) {
-    return c.json({ error: "Unauthorized" }, 403);
-  }
-
-  // Update note
+  // Get update data from request body
   const noteData = await c.req.json<UpdateNoteDto>();
 
-  // Create updated note object
-  const updatedNote = {
-    ...noteData,
-    updatedAt: new Date(),
-  };
+  // Validate input
+  const validationErrors = validateUpdateNote(noteData);
+  if (validationErrors.length > 0) {
+    return handleValidationError(c, "Invalid note data", validationErrors);
+  }
 
-  // Update note in database
-  await db.update(notesTable).set(updatedNote).where(eq(notesTable.id, id));
+  try {
+    // Verify note access and existence
+    await verifyNoteAccess(c, id, "update");
 
-  // Return updated note
-  const updated = await db.query.notesTable.findFirst({
-    where: eq(notesTable.id, id),
-  });
+    // Update note in database
+    const updatedNote = {
+      ...noteData,
+      updatedAt: new Date(),
+    };
 
-  // Return updated note
-  return c.json(updated);
+    // Update note in database
+    await db.update(notesTable).set(updatedNote).where(eq(notesTable.id, id));
+
+    // Return updated note
+    const updated = await db.query.notesTable.findFirst({
+      where: eq(notesTable.id, id),
+    });
+
+    return c.json(updated);
+  } catch (error) {
+    if (error instanceof Response) {
+      return error;
+    }
+    return handleNoteDbError(c, error, id, "update");
+  }
 });
 
 // Delete a note
 noteRoutes.delete("/:id", async (c) => {
   const db = c.get("db");
-  const userId = c.get("userId");
   const id = c.req.param("id");
 
-  // Verify note ownership
-  const existingNote = await db.query.notesTable.findFirst({
-    where: eq(notesTable.id, id),
-  });
+  try {
+    // Verify note access and existence
+    await verifyNoteAccess(c, id, "delete");
 
-  // Check if note exists
-  if (!existingNote) {
-    return c.json({ error: "Note not found" }, 404);
+    // Delete note from database
+    await db.delete(notesTable).where(eq(notesTable.id, id));
+
+    // Return success message
+    return c.json({
+      message: "Note deleted successfully",
+      noteId: id,
+    });
+  } catch (error) {
+    if (error instanceof Response) {
+      return error;
+    }
+    return handleNoteDbError(c, error, id, "delete");
   }
-
-  // Verify ownership
-  if (existingNote.userId !== userId) {
-    return c.json({ error: "Unauthorized" }, 403);
-  }
-
-  // Delete note from database
-  await db.delete(notesTable).where(eq(notesTable.id, id));
-
-  // Return success message
-  return c.json({ message: `Note ${id} deleted` });
 });
 
 // Toggle favorite status
 noteRoutes.patch("/:id/favorite", async (c) => {
   const db = c.get("db");
-  const userId = c.get("userId");
   const id = c.req.param("id");
 
-  // Get current note to toggle its favorite status
-  const currentNote = await db.query.notesTable.findFirst({
-    where: eq(notesTable.id, id),
-  });
+  try {
+    // Verify note access and get current note
+    const currentNote = await verifyNoteAccess(c, id, "update");
 
-  // Check if note exists
-  if (!currentNote) {
-    return c.json({ error: "Note not found" }, 404);
+    // Toggle the favorite status in the database
+    const updatedNote = await db
+      .update(notesTable)
+      .set({
+        favorite: !currentNote.favorite,
+        updatedAt: new Date(),
+      })
+      .where(eq(notesTable.id, id))
+      .returning();
+
+    // Return updated note
+    return c.json(updatedNote[0]);
+  } catch (error) {
+    if (error instanceof Response) {
+      return error;
+    }
+    return handleNoteDbError(c, error, id, "update");
   }
-
-  // Verify ownership
-  if (currentNote.userId !== userId) {
-    return c.json({ error: "Unauthorized" }, 403);
-  }
-
-  // Toggle the favorite status in the database
-  const updatedNote = await db
-    .update(notesTable)
-    .set({
-      favorite: !currentNote.favorite,
-      updatedAt: new Date(),
-    })
-    .where(eq(notesTable.id, id))
-    .returning();
-
-  // Return updated note
-  return c.json(updatedNote[0]);
 });
