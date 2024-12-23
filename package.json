@@ -22,8 +22,10 @@
     "build:types": "bun run --cwd packages/types build",
     "start:client": "bun run --cwd apps/client start",
     "start:server": "bun run --cwd apps/server start",
-    "docker:up": "bun run --cwd apps/server docker:up",
-    "docker:down": "bun run --cwd apps/server docker:down",
+    "docker:copy-env": "cp apps/server/.env .",
+    "docker:up": "bun run docker:copy-env && cd docker && docker compose up -d && cd ..",
+    "docker:down": "cd docker && docker compose down && cd .. && rm -f .env",
+    "docker:logs": "cd docker && docker compose logs -f",
     "setup": "chmod +x scripts/startup.sh && ./scripts/startup.sh",
     "postinstall": "chmod +x scripts/startup.sh"
   },
