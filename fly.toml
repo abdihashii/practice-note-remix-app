@@ -1,0 +1,29 @@
+app = "notes-api"
+primary_region = "ord"
+
+[build]
+  dockerfile = "docker/server.Dockerfile"
+
+[env]
+  PORT = "8000"
+  HOST = "0.0.0.0"
+
+[http_service]
+  internal_port = 8000
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["app"]
+
+  [[http_service.checks]]
+    interval = "30s"
+    timeout = "5s"
+    grace_period = "10s"
+    method = "GET"
+    path = "/health"
+    protocol = "http"
+
+[deploy]
+  strategy = "rolling"
+  release_command = "bun run db:migrate && bun run db:push" 
