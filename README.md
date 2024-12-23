@@ -6,7 +6,7 @@ A full-stack notes application with a React frontend and Bun/Hono backend.
 
 - [Bun](https://bun.sh) (for both client and server)
 - [Node.js](https://nodejs.org/) 18+ (recommended)
-- [Docker](https://www.docker.com/) (optional, for server and PostgreSQL)
+- [Docker](https://www.docker.com/) (for PostgreSQL database)
 
 ## Project Structure
 
@@ -36,12 +36,10 @@ This will guide you through:
 - Building shared packages
 - Choosing your development configuration:
   1. Full stack (Frontend + Backend)
-     - Local server with PostgreSQL in container
-     - Server in Docker container
   2. Frontend only
   3. Backend only
-     - Local server with PostgreSQL in container
-     - Server in Docker container
+
+Each option will set up PostgreSQL in a container and start the appropriate services.
 
 ### Option 2: Manual Setup
 
@@ -82,7 +80,7 @@ Run both the client and server in development mode:
 # Start PostgreSQL container in detached mode
 bun run postgres:up
 
-# Start hono server and client from root
+# Start both frontend and backend
 bun run dev
 
 # In a new terminal, ensure the server is running with a health check
@@ -102,24 +100,12 @@ bun run dev:client
 
 #### Server Only
 
-**With Local PostgresSQL:**
-
 ```bash
 # Start PostgreSQL container in detached mode
 bun run postgres:up
 
 # Start hono server
-bun run dev
-```
-
-**With Docker (Note: No Hot Module Reloading):**
-
-```bash
-# Start server + PostgreSQL
-bun run docker:up
-
-# In a new terminal, ensure the server is running with a health check
-curl http://localhost:8000/health
+bun run dev:server
 ```
 
 ## Database Management
@@ -146,16 +132,47 @@ Remove all build artifacts and dependencies:
 bun run clean
 ```
 
-Shut down all containers:
+Stop PostgreSQL container:
 
 ```bash
-bun run docker:down
+bun run postgres:down
+```
+
+## Production Deployment
+
+### Build
+
+```bash
+# Build all packages
+bun run build:types
+bun run build:server
+bun run build:client
+```
+
+### Start Production Server
+
+```bash
+# Start the server
+NODE_ENV=production bun run start:server
+
+# Start the client
+NODE_ENV=production bun run start:client
+```
+
+### Environment Variables
+
+Make sure to set these in your production environment:
+
+```env
+NODE_ENV=production
+DATABASE_URL=your_production_db_url
+FRONTEND_URL=https://your-frontend-domain.com
 ```
 
 ## Additional Notes
 
-- The server supports both Docker and local development modes
-- Docker mode is great for production-like environment but doesn't support HMR
-- Local development mode provides the best developer experience with HMR
+- PostgreSQL runs in a Docker container for development
+- The server uses Bun for fast performance and modern JavaScript features
+- Hot Module Reloading (HMR) is available for both client and server
 - The client is built with Remix and includes a rich text editor
 - TypeScript is used throughout the project for type safety

@@ -85,6 +85,19 @@ setup_backend_local() {
         echo -e "${GREEN}✓ Created apps/server/.env${NC}"
     fi
     
+    # Create root .env file for Docker Compose
+    if [ ! -f ".env" ]; then
+        echo "Creating root .env file for Docker Compose..."
+        cat > .env << EOL
+DB_USER=myuser
+DB_PASSWORD=mypassword
+DB_NAME=mydatabase
+PORT=8000
+HOST=0.0.0.0
+EOL
+        echo -e "${GREEN}✓ Created root .env file${NC}"
+    fi
+    
     # Start PostgreSQL
     echo "Starting PostgreSQL container..."
     run_command "bun run postgres:up" "Failed to start PostgreSQL container"
@@ -101,22 +114,6 @@ setup_backend_local() {
     if [ $RETRIES -eq 0 ]; then
         handle_error 1 "PostgreSQL failed to start within the timeout period"
     fi
-}
-
-# Function to setup backend with Docker
-setup_backend_docker() {
-    echo "Setting up backend (Docker)..."
-    
-    # Check Docker prerequisites
-    if ! command_exists docker; then
-        handle_error 1 "Docker is not installed. Please install it from https://www.docker.com"
-    fi
-
-    if ! docker info >/dev/null 2>&1; then
-        handle_error 1 "Docker daemon is not running. Please start Docker and try again."
-    fi
-    
-    run_command "bun run docker:up" "Failed to start Docker containers"
 }
 
 # Main setup function
@@ -138,44 +135,21 @@ main_setup() {
 
     # Show setup options
     echo -e "\n${BLUE}Please choose your setup configuration:${NC}"
-    echo "1) Full stack (Frontend + Backend) [Recommended]"
+    echo "1) Full stack (Frontend + Backend)"
     echo "2) Frontend only"
     echo "3) Backend only"
     setup_choice=$(get_valid_input "Enter your choice (1-3): " 3)
 
     case $setup_choice in
         1)
-            echo -e "\n${BLUE}Choose backend configuration:${NC}"
-            echo "1) Run server locally with PostgreSQL in container [Recommended]"
-            echo "2) Run server in Docker container (No Hot Reload)"
-            backend_choice=$(get_valid_input "Enter your choice (1-2): " 2)
-            
             setup_frontend
-            
-            case $backend_choice in
-                1)
-                    setup_backend_local
-                    echo -e "\n${GREEN}✅ Full stack setup complete! (Local server)${NC}"
-                    echo -e "\n${BLUE}Starting development servers...${NC}"
-                    echo "Frontend will be available at: http://localhost:5173"
-                    echo "Backend will be available at: http://localhost:8000"
-                    echo -e "\n${YELLOW}Press Ctrl+C to stop the servers${NC}"
-                    run_command "bun run dev" "Failed to start development servers"
-                    ;;
-                2)
-                    setup_backend_docker
-                    echo -e "\n${GREEN}✅ Full stack setup complete! (Docker)${NC}"
-                    echo -e "\n${BLUE}Starting frontend development server...${NC}"
-                    echo "Frontend will be available at: http://localhost:5173"
-                    echo "Backend is running at: http://localhost:8000"
-                    echo -e "${YELLOW}Note: Backend Hot Module Reloading is not available in Docker mode${NC}"
-                    echo -e "\n${YELLOW}Press Ctrl+C to stop the frontend server${NC}"
-                    run_command "bun run dev:client" "Failed to start frontend server"
-                    ;;
-                *)
-                    handle_error 1 "Invalid backend configuration choice"
-                    ;;
-            esac
+            setup_backend_local
+            echo -e "\n${GREEN}✅ Full stack setup complete!${NC}"
+            echo -e "\n${BLUE}Starting development servers...${NC}"
+            echo "Frontend will be available at: http://localhost:5173"
+            echo "Backend will be available at: http://localhost:8000"
+            echo -e "\n${YELLOW}Press Ctrl+C to stop the servers${NC}"
+            run_command "bun run dev" "Failed to start development servers"
             ;;
         2)
             setup_frontend
@@ -186,31 +160,12 @@ main_setup() {
             run_command "bun run dev:client" "Failed to start frontend server"
             ;;
         3)
-            echo -e "\n${BLUE}Choose backend configuration:${NC}"
-            echo "1) Run server locally with PostgreSQL in container [Recommended]"
-            echo "2) Run server in Docker container (No Hot Reload)"
-            backend_choice=$(get_valid_input "Enter your choice (1-2): " 2)
-            
-            case $backend_choice in
-                1)
-                    setup_backend_local
-                    echo -e "\n${GREEN}✅ Backend setup complete! (Local server)${NC}"
-                    echo -e "\n${BLUE}Starting backend development server...${NC}"
-                    echo "Backend will be available at: http://localhost:8000"
-                    echo -e "\n${YELLOW}Press Ctrl+C to stop the server${NC}"
-                    run_command "bun run dev:server" "Failed to start backend server"
-                    ;;
-                2)
-                    setup_backend_docker
-                    echo -e "\n${GREEN}✅ Backend setup complete! (Docker)${NC}"
-                    echo -e "\n${BLUE}Server is running at: http://localhost:8000${NC}"
-                    echo -e "${YELLOW}Note: Hot Module Reloading is not available in Docker mode${NC}"
-                    echo -e "\nUse 'bun run docker:down' to stop the server when done"
-                    ;;
-                *)
-                    handle_error 1 "Invalid backend configuration choice"
-                    ;;
-            esac
+            setup_backend_local
+            echo -e "\n${GREEN}✅ Backend setup complete!${NC}"
+            echo -e "\n${BLUE}Starting backend development server...${NC}"
+            echo "Backend will be available at: http://localhost:8000"
+            echo -e "\n${YELLOW}Press Ctrl+C to stop the server${NC}"
+            run_command "bun run dev:server" "Failed to start backend server"
             ;;
         *)
             handle_error 1 "Invalid setup choice"
