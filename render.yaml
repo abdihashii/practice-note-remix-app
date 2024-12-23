@@ -2,11 +2,11 @@ services:
   - type: web
     name: api
     env: docker
-    rootDir: apps/server
-    region: oregon # Change this to your preferred region
+    rootDir: .
+    region: oregon
     healthCheckPath: /health
-    dockerfilePath: ../../Dockerfile # Path relative to rootDir
-    buildCommand: docker build -t api ../../ # Build from monorepo root
+    dockerfilePath: docker/server.Dockerfile
+    buildCommand: docker build -t api -f docker/server.Dockerfile .
     envVars:
       - key: NODE_ENV
         value: production
@@ -14,11 +14,12 @@ services:
         value: 10000
       - key: DATABASE_URL
         sync: false # This will be set manually in the dashboard
-    preDeployCommand: bun run db:migrate && bun run db:push
+    preDeployCommand: cd apps/server && bun run db:migrate && bun run db:push
     buildFilter:
       paths:
-        - apps/server/** # Changed to absolute path from monorepo root
-        - packages/types/** # Changed to absolute path from monorepo root
+        - apps/server/**
+        - packages/types/**
+        - docker/**
       ignoredPaths:
         - apps/server/**/*.test.ts
         - apps/server/**/*.spec.ts
