@@ -9,6 +9,9 @@ import { noteRoutes } from "@/routes/noteRoutes";
 import { searchRoutes } from "@/routes/searchRoutes";
 import type { CustomEnv } from "@/types";
 
+// Add production configuration
+const isProd = process.env.NODE_ENV === "production";
+
 // Create a new Hono app with the custom environment
 const app = new Hono<CustomEnv>();
 
@@ -18,7 +21,9 @@ app.get("/health", (c) => c.json({ status: "ok" }));
 app.use(
   "*",
   cors({
-    origin: "*",
+    origin: isProd
+      ? [process.env["FRONTEND_URL"] ?? "http://localhost:5173"]
+      : "*",
     allowMethods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowHeaders: ["Content-Type"],
     exposeHeaders: ["Content-Length", "X-Requested-With"],
@@ -51,14 +56,18 @@ const dbMiddleware: MiddlewareHandler<CustomEnv> = async (c, next) => {
   }
 };
 
-// Add request logging
+// Add better error handling for production
 app.use("*", async (c, next) => {
-  console.log(`${c.req.method} ${c.req.url}`);
   try {
     await next();
   } catch (err) {
     console.error("Request error:", err);
-    return c.json({ error: "Internal Server Error" }, 500);
+    return c.json(
+      {
+        error: isProd ? "Internal Server Error" : (err as Error).message,
+      },
+      500
+    );
   }
 });
 
