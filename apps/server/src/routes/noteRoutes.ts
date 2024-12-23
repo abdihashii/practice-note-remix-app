@@ -2,63 +2,26 @@
 import type { CreateNoteDto, UpdateNoteDto } from "@notes-app/types";
 import { desc, eq } from "drizzle-orm";
 import { Hono } from "hono";
-import { bearerAuth } from "hono/bearer-auth";
-import { verify } from "hono/jwt";
 
 // Local imports
 import { notesTable } from "@/db/schema";
+import { verifyJWT } from "@/middleware/authMiddleware";
 import type { CustomEnv } from "@/types";
 
 export const noteRoutes = new Hono<CustomEnv>();
 
-interface JWTPayload {
-  userId: string;
-  exp?: number;
-}
-
-// Protect routes with JWT
-noteRoutes.use(
-  "*",
-  bearerAuth({
-    token: process.env["JWT_SECRET"],
-    verifyToken: async (token) => {
-      try {
-        const secret = process.env["JWT_SECRET"];
-        if (!secret) throw new Error("JWT_SECRET not configured");
-
-        const payload = (await verify(token, secret)) as unknown as JWTPayload;
-
-        // Check if token is expired
-        if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) {
-          return false;
-        }
-
-        // Add userId to context for route handlers
-        return true;
-      } catch {
-        return false;
-      }
-    },
-  })
-);
+// Protect all note routes with JWT
+noteRoutes.use("*", verifyJWT);
 
 // Get all notes (only user's notes)
 noteRoutes.get("/", async (c) => {
   const db = c.get("db");
-  const token = c.req.header("Authorization")?.split(" ")[1];
-
-  // Check if token is present before verifying
-  if (!token) return c.json({ error: "Unauthorized" }, 401);
-
-  const payload = (await verify(
-    token,
-    process.env["JWT_SECRET"]!
-  )) as unknown as JWTPayload;
+  const userId = c.get("userId");
 
   const notes = await db
     .select()
     .from(notesTable)
-    .where(eq(notesTable.userId, payload.userId))
+    .where(eq(notesTable.userId, userId))
     .orderBy(desc(notesTable.updatedAt));
 
   return c.json(notes);
@@ -67,17 +30,8 @@ noteRoutes.get("/", async (c) => {
 // Get a note by id
 noteRoutes.get("/:id", async (c) => {
   const db = c.get("db");
+  const userId = c.get("userId");
   const id = c.req.param("id");
-  const token = c.req.header("Authorization")?.split(" ")[1];
-
-  // Check if token is present before verifying
-  if (!token) return c.json({ error: "Unauthorized" }, 401);
-
-  // Verify token before accessing database
-  const payload = (await verify(
-    token,
-    process.env["JWT_SECRET"]!
-  )) as unknown as JWTPayload;
 
   const note = await db.query.notesTable.findFirst({
     where: eq(notesTable.id, id),
@@ -89,7 +43,7 @@ noteRoutes.get("/:id", async (c) => {
   }
 
   // Verify ownership
-  if (note.userId !== payload.userId) {
+  if (note.userId !== userId) {
     return c.json({ error: "Unauthorized" }, 403);
   }
 
@@ -100,16 +54,7 @@ noteRoutes.get("/:id", async (c) => {
 // Create a new note
 noteRoutes.post("/", async (c) => {
   const db = c.get("db");
-  const token = c.req.header("Authorization")?.split(" ")[1];
-
-  // Check if token is present before verifying
-  if (!token) return c.json({ error: "Unauthorized" }, 401);
-
-  // Verify token before accessing database
-  const payload = (await verify(
-    token,
-    process.env["JWT_SECRET"]!
-  )) as unknown as JWTPayload;
+  const userId = c.get("userId");
 
   // Get note data from request body
   const noteData = await c.req.json<CreateNoteDto>();
@@ -117,7 +62,7 @@ noteRoutes.post("/", async (c) => {
   // Create note object with userId
   const note = {
     ...noteData,
-    userId: payload.userId,
+    userId,
   };
 
   // Insert note into database
@@ -130,17 +75,8 @@ noteRoutes.post("/", async (c) => {
 // Update a note
 noteRoutes.put("/:id", async (c) => {
   const db = c.get("db");
+  const userId = c.get("userId");
   const id = c.req.param("id");
-  const token = c.req.header("Authorization")?.split(" ")[1];
-
-  // Check if token is present before verifying
-  if (!token) return c.json({ error: "Unauthorized" }, 401);
-
-  // Verify token before accessing database
-  const payload = (await verify(
-    token,
-    process.env["JWT_SECRET"]!
-  )) as unknown as JWTPayload;
 
   // Verify note ownership
   const existingNote = await db.query.notesTable.findFirst({
@@ -153,7 +89,7 @@ noteRoutes.put("/:id", async (c) => {
   }
 
   // Verify ownership
-  if (existingNote.userId !== payload.userId) {
+  if (existingNote.userId !== userId) {
     return c.json({ error: "Unauthorized" }, 403);
   }
 
@@ -181,17 +117,8 @@ noteRoutes.put("/:id", async (c) => {
 // Delete a note
 noteRoutes.delete("/:id", async (c) => {
   const db = c.get("db");
+  const userId = c.get("userId");
   const id = c.req.param("id");
-  const token = c.req.header("Authorization")?.split(" ")[1];
-
-  // Check if token is present before verifying
-  if (!token) return c.json({ error: "Unauthorized" }, 401);
-
-  // Verify token before accessing database
-  const payload = (await verify(
-    token,
-    process.env["JWT_SECRET"]!
-  )) as unknown as JWTPayload;
 
   // Verify note ownership
   const existingNote = await db.query.notesTable.findFirst({
@@ -204,7 +131,7 @@ noteRoutes.delete("/:id", async (c) => {
   }
 
   // Verify ownership
-  if (existingNote.userId !== payload.userId) {
+  if (existingNote.userId !== userId) {
     return c.json({ error: "Unauthorized" }, 403);
   }
 
@@ -218,17 +145,8 @@ noteRoutes.delete("/:id", async (c) => {
 // Toggle favorite status
 noteRoutes.patch("/:id/favorite", async (c) => {
   const db = c.get("db");
+  const userId = c.get("userId");
   const id = c.req.param("id");
-  const token = c.req.header("Authorization")?.split(" ")[1];
-
-  // Check if token is present before verifying
-  if (!token) return c.json({ error: "Unauthorized" }, 401);
-
-  // Verify token before accessing database
-  const payload = (await verify(
-    token,
-    process.env["JWT_SECRET"]!
-  )) as unknown as JWTPayload;
 
   // Get current note to toggle its favorite status
   const currentNote = await db.query.notesTable.findFirst({
@@ -241,7 +159,7 @@ noteRoutes.patch("/:id/favorite", async (c) => {
   }
 
   // Verify ownership
-  if (currentNote.userId !== payload.userId) {
+  if (currentNote.userId !== userId) {
     return c.json({ error: "Unauthorized" }, 403);
   }
 
