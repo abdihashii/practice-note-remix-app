@@ -6,6 +6,7 @@ import type { MiddlewareHandler } from "hono/types";
 // Local imports
 import { usersTable } from "@/db/schema";
 import type { CustomEnv } from "@/types";
+import { handleAuthError, handleTokenError } from "./errorMiddleware";
 
 interface CustomJWTPayload {
   userId: string;
@@ -24,7 +25,7 @@ export const verifyJWT: MiddlewareHandler<CustomEnv> = async (c, next) => {
   try {
     const token = c.req.header("Authorization")?.split(" ")[1];
     if (!token) {
-      return c.json({ error: "No token provided" }, 401);
+      return handleAuthError(c, "No token provided");
     }
 
     const secret = process.env["JWT_SECRET"];
@@ -37,13 +38,13 @@ export const verifyJWT: MiddlewareHandler<CustomEnv> = async (c, next) => {
       const payload = decoded as unknown as CustomJWTPayload;
 
       if (!payload.userId) {
-        return c.json({ error: "Invalid token format" }, 401);
+        return handleTokenError(c, "Invalid token format");
       }
 
       // Check if token is expired
       const now = Math.floor(Date.now() / 1000);
       if (payload.exp < now) {
-        return c.json({ error: "Token expired" }, 401);
+        return handleTokenError(c, "Token expired");
       }
 
       // Add user ID to request context
@@ -62,17 +63,23 @@ export const verifyJWT: MiddlewareHandler<CustomEnv> = async (c, next) => {
         );
 
         if (tokenIssuedAt < invalidationTime) {
-          return c.json({ error: "Token has been invalidated" }, 401);
+          return handleTokenError(c, "Token has been invalidated", {
+            invalidatedAt: user.lastTokenInvalidation.toISOString(),
+          });
         }
       }
 
       await next();
     } catch (err) {
       console.error("JWT verification error:", err);
-      return c.json({ error: "Invalid token" }, 401);
+      return handleTokenError(c, "Invalid token", {
+        error: err instanceof Error ? err.message : String(err),
+      });
     }
   } catch (err) {
     console.error("Auth middleware error:", err);
-    return c.json({ error: "Authentication failed" }, 500);
+    return handleAuthError(c, "Authentication failed", {
+      error: err instanceof Error ? err.message : String(err),
+    });
   }
 };
