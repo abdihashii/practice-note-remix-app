@@ -5,6 +5,7 @@ import { Hono } from "hono";
 // Local imports
 import { notesTable } from "@/db/schema";
 import { verifyJWT } from "@/middleware/authMiddleware";
+import { handleAuthError } from "@/middleware/errorMiddleware";
 import type { CustomEnv } from "@/types";
 
 export const searchRoutes = new Hono<CustomEnv>();
@@ -46,20 +47,19 @@ searchRoutes.get("/", async (c) => {
 
     if (searchResults.length === 0) {
       return c.json({
-        error: `No results found for ${searchQuery}`,
+        message: `No results found for "${searchQuery}"`,
         searchResults: [],
       });
     }
 
     return c.json({
-      error: null,
+      message: `Found ${searchResults.length} results for "${searchQuery}"`,
       searchResults,
     });
-  } catch (error) {
-    console.error("Error in search endpoint:", error);
-    return c.json(
-      { error: "An unexpected error occurred. Please try again later." },
-      500
-    );
+  } catch (err) {
+    return handleAuthError(c, "Search operation failed", {
+      error: err instanceof Error ? err.message : String(err),
+      query: c.req.query("q"),
+    });
   }
 });
