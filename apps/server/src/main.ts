@@ -63,6 +63,6 @@ app.get("/health", (c) => c.json({ status: "ok" }));
 
 // Use Bun's serve instead of node-server
 export default {
-  port: 8000,
+  port: process.env["PORT"] ? parseInt(process.env["PORT"]) : 8000,
   fetch: app.fetch,
 };
