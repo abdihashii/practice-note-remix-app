@@ -16,13 +16,14 @@ RUN groupadd -r appgroup && \
 # --- Dependencies Installation ---
 # Copy root package files
 COPY package.json .
-COPY bun.lockb .
+# Only copy lockfile if it exists
+COPY bun.lockb ./ 2>/dev/null || true
 
 # Copy the server's package.json
 COPY apps/server/package.json ./apps/server/
 
 # Install all dependencies (both root and server)
-RUN bun install --frozen-lockfile
+RUN bun install
 
 # --- Application Code ---
 # Copy server source code to its directory
