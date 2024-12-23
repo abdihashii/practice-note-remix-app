@@ -12,6 +12,7 @@ import { sign } from "hono/jwt";
 
 // Local imports
 import { usersTable } from "@/db/schema";
+import { handleAuthError, handleCSRFError } from "@/middleware/errorMiddleware";
 import type { CustomEnv } from "@/types";
 import type { CreateUserDto, User } from "@notes-app/types";
 
@@ -89,19 +90,17 @@ authRoutes.post("/register", async (c) => {
     });
 
     if (existingUser) {
-      return c.json({ error: "Email already registered" }, 400);
+      return handleAuthError(c, "Email already registered", {
+        email: data.email,
+      });
     }
 
     // Check if password is strong
     if (!isStrongPassword(data.password)) {
       const { errors } = validatePassword(data.password);
-      return c.json(
-        {
-          error: "Invalid password",
-          details: errors,
-        },
-        400
-      );
+      return handleAuthError(c, "Invalid password", {
+        errors,
+      });
     }
 
     // Hash password using Argon2
@@ -174,10 +173,11 @@ authRoutes.post("/register", async (c) => {
     });
   } catch (error) {
     if (error instanceof HTTPException && error.status === 403) {
-      return c.json({ error: "Invalid or missing CSRF token" }, 403);
+      return handleCSRFError(c, "Invalid or missing CSRF token");
     }
-    console.error("Registration error:", error);
-    return c.json({ error: "Registration failed" }, 500);
+    return handleAuthError(c, "Registration failed", {
+      error: error instanceof Error ? error.message : String(error),
+    });
   }
 });
 
@@ -199,13 +199,13 @@ authRoutes.post("/login", async (c) => {
     });
 
     if (!user) {
-      return c.json({ error: "Invalid credentials" }, 401);
+      return handleAuthError(c, "Invalid credentials");
     }
 
     // Verify password using Argon2
     const isValidPassword = await verifyPassword(password, user.hashedPassword);
     if (!isValidPassword) {
-      return c.json({ error: "Invalid credentials" }, 401);
+      return handleAuthError(c, "Invalid credentials");
     }
 
     // Generate tokens
@@ -262,10 +262,11 @@ authRoutes.post("/login", async (c) => {
     });
   } catch (error) {
     if (error instanceof HTTPException && error.status === 403) {
-      return c.json({ error: "Invalid or missing CSRF token" }, 403);
+      return handleCSRFError(c, "Invalid or missing CSRF token");
     }
-    console.error("Login error:", error);
-    return c.json({ error: "Login failed" }, 500);
+    return handleAuthError(c, "Login failed", {
+      error: error instanceof Error ? error.message : String(error),
+    });
   }
 });
 
@@ -284,12 +285,14 @@ authRoutes.post("/refresh", async (c) => {
     });
 
     if (!user || !user.refreshTokenExpiresAt) {
-      return c.json({ error: "Invalid refresh token" }, 401);
+      return handleAuthError(c, "Invalid refresh token");
     }
 
     // Check if refresh token is expired
     if (user.refreshTokenExpiresAt < new Date()) {
-      return c.json({ error: "Refresh token expired" }, 401);
+      return handleAuthError(c, "Refresh token expired", {
+        expiredAt: user.refreshTokenExpiresAt.toISOString(),
+      });
     }
 
     const oldToken = user.refreshToken;
@@ -300,7 +303,7 @@ authRoutes.post("/refresh", async (c) => {
         .set({ refreshToken: null })
         .where(eq(usersTable.id, user.id));
     } else {
-      return c.json({ error: "Invalid refresh token" }, 401);
+      return handleAuthError(c, "Invalid refresh token");
     }
 
     // Generate new tokens
@@ -323,10 +326,11 @@ authRoutes.post("/refresh", async (c) => {
     });
   } catch (error) {
     if (error instanceof HTTPException && error.status === 403) {
-      return c.json({ error: "Invalid or missing CSRF token" }, 403);
+      return handleCSRFError(c, "Invalid or missing CSRF token");
     }
-    console.error("Token refresh error:", error);
-    return c.json({ error: "Token refresh failed" }, 500);
+    return handleAuthError(c, "Token refresh failed", {
+      error: error instanceof Error ? error.message : String(error),
+    });
   }
 });
 
@@ -352,9 +356,10 @@ authRoutes.post("/logout", async (c) => {
     return c.json({ message: "Logged out successfully" });
   } catch (error) {
     if (error instanceof HTTPException && error.status === 403) {
-      return c.json({ error: "Invalid or missing CSRF token" }, 403);
+      return handleCSRFError(c, "Invalid or missing CSRF token");
     }
-    console.error("Logout error:", error);
-    return c.json({ error: "Logout failed" }, 500);
+    return handleAuthError(c, "Logout failed", {
+      error: error instanceof Error ? error.message : String(error),
+    });
   }
 });
