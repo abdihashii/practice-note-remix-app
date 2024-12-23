@@ -2,7 +2,7 @@ version: "3.8"
 name: notes-app
 
 services:
-  # Postgres database
+  # Postgres database service
   postgres:
     image: postgres:latest
     container_name: notes-app-postgres-db
@@ -13,6 +13,7 @@ services:
       POSTGRES_USER: ${DB_USER:-myuser}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-mypassword}
       POSTGRES_DB: ${DB_NAME:-mydatabase}
+    # Health check ensures database is ready before API starts
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U myuser -d mydatabase"]
       interval: 10s
@@ -28,35 +29,47 @@ services:
   # Backend API server
   api:
     build:
-      context: .
-      dockerfile: Dockerfile
+      # Build context is set to monorepo root for proper file access
+      context: ../..
+      dockerfile: apps/server/Dockerfile
     container_name: notes-api
     restart: unless-stopped
     env_file:
       - .env
     environment:
+      # Database URL points to the postgres service (not localhost)
       DATABASE_URL: postgres://${DB_USER:-myuser}:${DB_PASSWORD:-mypassword}@postgres:5432/${DB_NAME:-mydatabase}
       PORT: ${PORT:-8000}
       HOST: ${HOST:-0.0.0.0}
     ports:
       - "8000:8000"
+    # Wait for postgres to be healthy before starting
     depends_on:
       postgres:
         condition: service_healthy
+    # Development-only volume mounts
+    # These override the files copied in Dockerfile for hot reloading
     volumes:
-      - .:/app
+      # Mount source code for hot reloading
+      - ../../apps/server/src:/app/apps/server/src
+      # Mount drizzle directory for database migrations
+      - ../../apps/server/drizzle:/app/apps/server/drizzle
+      # Preserve node_modules from build
       - /app/node_modules
     networks:
       - app-network
+    # Health check for container orchestration
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
       timeout: 10s
       retries: 3
 
+# Persistent volume for database data
 volumes:
   postgres_data:
 
+# Internal network for service communication
 networks:
   app-network:
     driver: bridge

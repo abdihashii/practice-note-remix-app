@@ -18,9 +18,10 @@ node_modules
 *.log
 
 # Build outputs
-packages/client/build
-packages/client/.cache
-packages/server/drizzle
+dist
+build
+**/dist
+**/build
 
 # Development
 *.test.ts
