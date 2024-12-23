@@ -9,9 +9,6 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "bun run src/db/migrate.ts",
     "db:push": "drizzle-kit push",
-    "docker:up": "bun run --cwd ../.. docker:up",
-    "docker:down": "bun run --cwd ../.. docker:down",
-    "docker:logs": "bun run --cwd ../.. docker:logs",
     "postgres:up": "docker compose -f ../../docker/docker-compose.yml up postgres -d",
     "postgres:down": "docker compose -f ../../docker/docker-compose.yml down"
   },

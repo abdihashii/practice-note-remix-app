@@ -140,6 +140,37 @@ Stop PostgreSQL container:
 bun run postgres:down
 ```
 
+## Production Deployment
+
+### Build
+
+```bash
+# Build all packages
+bun run build:types
+bun run build:server
+bun run build:client
+```
+
+### Start Production Server
+
+```bash
+# Start the server
+NODE_ENV=production bun run start:server
+
+# Start the client
+NODE_ENV=production bun run start:client
+```
+
+### Environment Variables
+
+Make sure to set these in your production environment:
+
+```env
+NODE_ENV=production
+DATABASE_URL=your_production_db_url
+FRONTEND_URL=https://your-frontend-domain.com
+```
+
 ## Additional Notes
 
 - PostgreSQL runs in a Docker container for development

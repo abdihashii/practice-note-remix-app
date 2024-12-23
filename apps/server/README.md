@@ -92,3 +92,24 @@ Required variables:
 - `PORT`: Server port (default: 8000)
 - `HOST`: Server host (default: 0.0.0.0)
 - `FRONTEND_URL`: Frontend URL for CORS (production only)
+
+## Production
+
+### Build
+
+```bash
+bun run build
+```
+
+### Start
+
+```bash
+NODE_ENV=production bun run start
+```
+
+### Database Migrations
+
+```bash
+# Run migrations on production database
+DATABASE_URL=your_prod_db_url bun run db:migrate
+```
