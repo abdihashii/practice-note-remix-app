@@ -3,6 +3,7 @@ primary_region = "ord"
 
 [build]
   dockerfile = "docker/server.Dockerfile"
+  builder = "dockerfile"
 
 [env]
   PORT = "8000"
