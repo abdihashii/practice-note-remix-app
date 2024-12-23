@@ -7,7 +7,7 @@ services:
     healthCheckPath: /health
     dockerfilePath: Dockerfile # Path relative to rootDir
     docker:
-      context: . # Context relative to rootDir
+      context: ../.. # Changed to point to root of monorepo
     envVars:
       - key: NODE_ENV
         value: production
@@ -15,12 +15,12 @@ services:
         value: 10000
       - key: DATABASE_URL
         sync: false # This will be set manually in the dashboard
-    preDeployCommand: bun run db:migrate && bun run db:push # Run migrations before deployment
+    preDeployCommand: bun run db:migrate && bun run db:push
     buildFilter:
       paths:
-        - ./** # All files in server directory
-        - ../../packages/types/** # Shared types
+        - apps/server/** # Changed to absolute path from monorepo root
+        - packages/types/** # Changed to absolute path from monorepo root
       ignoredPaths:
-        - ./**/*.test.ts
-        - ./**/*.spec.ts
-        - ./**/README.md
+        - apps/server/**/*.test.ts
+        - apps/server/**/*.spec.ts
+        - apps/server/**/README.md
