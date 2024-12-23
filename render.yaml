@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: api
+    env: docker
+    rootDir: apps/server
+    region: oregon # Change this to your preferred region
+    healthCheckPath: /health
+    dockerfilePath: ./apps/server/Dockerfile # Path to Dockerfile
+    docker:
+      context: ./apps/server # Build context directory
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DATABASE_URL
+        sync: false # This will be set manually in the dashboard
+    preDeployCommand: bun run db:migrate && bun run db:push # Run migrations before deployment
+    buildFilter:
+      paths:
+        - apps/server/**/*
+        - packages/types/**/* # Include shared types
+      ignoredPaths:
+        - apps/server/**/*.test.ts
+        - apps/server/**/*.spec.ts
+        - apps/server/README.md
