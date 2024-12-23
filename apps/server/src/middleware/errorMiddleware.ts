@@ -4,7 +4,16 @@ import { HTTPException } from "hono/http-exception";
 import type { MiddlewareHandler } from "hono/types";
 
 // Local imports
-import { SecurityErrorType, type CustomEnv, type ErrorResponse } from "@/types";
+import type { CustomEnv } from "@/types";
+import {
+  SecurityErrorType,
+  type AuthenticationError,
+  type AuthorizationError,
+  type ErrorResponse,
+  type ResourceError,
+  type TokenError,
+  type ValidationError,
+} from "@/types/error-types";
 
 // Security event logger
 export class SecurityLogger {
@@ -45,7 +54,13 @@ function createErrorResponse(
   message: string,
   code: number,
   context: Context,
-  details?: Record<string, unknown>
+  options?: {
+    details?: Record<string, unknown>;
+    validationErrors?: ValidationError[];
+    resourceError?: ResourceError;
+    authError?: AuthenticationError | AuthorizationError;
+    tokenError?: TokenError;
+  }
 ): ErrorResponse {
   const response: ErrorResponse = {
     error: {
@@ -57,8 +72,14 @@ function createErrorResponse(
     },
   };
 
-  if (details) {
-    response.error.details = details;
+  if (options) {
+    const { details, validationErrors, resourceError, authError, tokenError } =
+      options;
+    if (details) response.error.details = details;
+    if (validationErrors) response.error.validationErrors = validationErrors;
+    if (resourceError) response.error.resourceError = resourceError;
+    if (authError) response.error.authError = authError;
+    if (tokenError) response.error.tokenError = tokenError;
   }
 
   return response;
@@ -76,49 +97,25 @@ export const errorHandler: MiddlewareHandler<CustomEnv> = async (c, next) => {
 
     if (error instanceof HTTPException) {
       // Handle Hono HTTP exceptions
-      const type =
-        error.status === 403
-          ? SecurityErrorType.AUTHORIZATION
-          : SecurityErrorType.SECURITY_POLICY;
-
+      const type = mapHttpStatusToErrorType(error.status);
       statusCode = error.status;
       errorResponse = createErrorResponse(type, error.message, statusCode, c);
-
       SecurityLogger.log(c, type, error.message);
     } else if (error instanceof Error) {
-      // Handle other known errors
-      let type = SecurityErrorType.SECURITY_POLICY;
-
-      // Categorize common security-related errors
-      if (error.message.includes("token")) {
-        type = SecurityErrorType.INVALID_TOKEN;
-        statusCode = 401;
-      } else if (
-        error.message.includes("permission") ||
-        error.message.includes("unauthorized")
-      ) {
-        type = SecurityErrorType.AUTHORIZATION;
-        statusCode = 403;
-      } else if (error.message.includes("csrf")) {
-        type = SecurityErrorType.CSRF;
-        statusCode = 403;
-      }
-
+      const { type, status, details } = categorizeError(error);
+      statusCode = status;
       errorResponse = createErrorResponse(
         type,
         error.message,
-        statusCode,
+        status,
         c,
-        process.env.NODE_ENV === "development"
-          ? { stack: error.stack }
-          : undefined
+        details
       );
-
-      SecurityLogger.log(c, type, error.message);
+      SecurityLogger.log(c, type, error.message, details);
     } else {
       // Handle unknown errors
       errorResponse = createErrorResponse(
-        SecurityErrorType.SECURITY_POLICY,
+        SecurityErrorType.SERVER_ERROR,
         "An unexpected error occurred",
         statusCode,
         c
@@ -126,7 +123,7 @@ export const errorHandler: MiddlewareHandler<CustomEnv> = async (c, next) => {
 
       SecurityLogger.log(
         c,
-        SecurityErrorType.SECURITY_POLICY,
+        SecurityErrorType.SERVER_ERROR,
         "Unknown error type encountered",
         { error: String(error) }
       );
@@ -140,6 +137,147 @@ export const errorHandler: MiddlewareHandler<CustomEnv> = async (c, next) => {
   }
 };
 
+// Map HTTP status codes to error types
+function mapHttpStatusToErrorType(status: number): SecurityErrorType {
+  switch (status) {
+    case 400:
+      return SecurityErrorType.INVALID_INPUT;
+    case 401:
+      return SecurityErrorType.AUTHENTICATION;
+    case 403:
+      return SecurityErrorType.AUTHORIZATION;
+    case 404:
+      return SecurityErrorType.RESOURCE_NOT_FOUND;
+    case 409:
+      return SecurityErrorType.RESOURCE_CONFLICT;
+    case 422:
+      return SecurityErrorType.VALIDATION;
+    default:
+      return SecurityErrorType.SERVER_ERROR;
+  }
+}
+
+// Categorize errors and extract relevant details
+function categorizeError(error: Error): {
+  type: SecurityErrorType;
+  status: number;
+  details?: {
+    details?: Record<string, unknown>;
+    validationErrors?: ValidationError[];
+    resourceError?: ResourceError;
+    authError?: AuthenticationError | AuthorizationError;
+    tokenError?: TokenError;
+  };
+} {
+  const message = error.message.toLowerCase();
+
+  // Token-related errors
+  if (message.includes("token")) {
+    if (message.includes("expired")) {
+      return {
+        type: SecurityErrorType.TOKEN_EXPIRED,
+        status: 401,
+        details: {
+          tokenError: {
+            tokenType: message.includes("refresh") ? "refresh" : "access",
+            reason: "Token has expired",
+          },
+        },
+      };
+    }
+    if (message.includes("invalid")) {
+      return {
+        type: SecurityErrorType.INVALID_TOKEN,
+        status: 401,
+        details: {
+          tokenError: {
+            tokenType: message.includes("refresh") ? "refresh" : "access",
+            reason: "Token is invalid",
+          },
+        },
+      };
+    }
+  }
+
+  // Authentication errors
+  if (message.includes("credentials")) {
+    return {
+      type: SecurityErrorType.INVALID_CREDENTIALS,
+      status: 401,
+      details: {
+        authError: {
+          reason: "Invalid credentials provided",
+        },
+      },
+    };
+  }
+
+  // Authorization errors
+  if (message.includes("permission") || message.includes("unauthorized")) {
+    return {
+      type: SecurityErrorType.INSUFFICIENT_PERMISSIONS,
+      status: 403,
+      details: {
+        authError: {
+          reason: "Insufficient permissions for this operation",
+        },
+      },
+    };
+  }
+
+  // CSRF errors
+  if (message.includes("csrf")) {
+    return {
+      type: message.includes("missing")
+        ? SecurityErrorType.MISSING_CSRF_TOKEN
+        : SecurityErrorType.INVALID_CSRF_TOKEN,
+      status: 403,
+    };
+  }
+
+  // Validation errors
+  if (message.includes("validation") || message.includes("invalid")) {
+    return {
+      type: SecurityErrorType.VALIDATION,
+      status: 422,
+      details: {
+        validationErrors: [
+          {
+            field: "unknown",
+            message: error.message,
+            code: "VALIDATION_ERROR",
+          },
+        ],
+      },
+    };
+  }
+
+  // Resource errors
+  if (message.includes("not found")) {
+    return {
+      type: SecurityErrorType.RESOURCE_NOT_FOUND,
+      status: 404,
+      details: {
+        resourceError: {
+          resourceType: "unknown",
+          operation: "read",
+          reason: "Resource not found",
+        },
+      },
+    };
+  }
+
+  // Default to server error
+  return {
+    type: SecurityErrorType.SERVER_ERROR,
+    status: 500,
+    details:
+      process.env.NODE_ENV === "development"
+        ? { details: { stack: error.stack } }
+        : undefined,
+  };
+}
+
 // Authentication error handler
 export function handleAuthError(
   c: Context,
@@ -151,7 +289,12 @@ export function handleAuthError(
     message,
     401,
     c,
-    details
+    {
+      authError: {
+        reason: message,
+      },
+      details,
+    }
   );
 
   SecurityLogger.log(c, SecurityErrorType.AUTHENTICATION, message, details);
@@ -169,7 +312,12 @@ export function handleAuthzError(
     message,
     403,
     c,
-    details
+    {
+      authError: {
+        reason: message,
+      },
+      details,
+    }
   );
 
   SecurityLogger.log(c, SecurityErrorType.AUTHORIZATION, message, details);
@@ -187,7 +335,13 @@ export function handleTokenError(
     message,
     401,
     c,
-    details
+    {
+      tokenError: {
+        tokenType: "access",
+        reason: message,
+      },
+      details,
+    }
   );
 
   SecurityLogger.log(c, SecurityErrorType.INVALID_TOKEN, message, details);
@@ -205,9 +359,53 @@ export function handleCSRFError(
     message,
     403,
     c,
-    details
+    {
+      details,
+    }
   );
 
   SecurityLogger.log(c, SecurityErrorType.CSRF, message, details);
+  return c.json(errorResponse);
+}
+
+// Validation error handler
+export function handleValidationError(
+  c: Context,
+  message: string,
+  validationErrors: ValidationError[]
+) {
+  const errorResponse = createErrorResponse(
+    SecurityErrorType.VALIDATION,
+    message,
+    422,
+    c,
+    {
+      validationErrors,
+    }
+  );
+
+  SecurityLogger.log(c, SecurityErrorType.VALIDATION, message, {
+    validationErrors,
+  });
+  return c.json(errorResponse);
+}
+
+// Resource error handler
+export function handleResourceError(
+  c: Context,
+  message: string,
+  resourceError: ResourceError
+) {
+  const errorResponse = createErrorResponse(
+    SecurityErrorType.RESOURCE,
+    message,
+    404,
+    c,
+    {
+      resourceError,
+    }
+  );
+
+  SecurityLogger.log(c, SecurityErrorType.RESOURCE, message, { resourceError });
   return c.json(errorResponse);
 }
