@@ -1,6 +1,6 @@
-# Welcome to Remix!
+# Notes App Frontend
 
-- 📖 [Remix docs](https://remix.run/docs)
+A Remix-based frontend for the Notes application.
 
 ## Setup
 
@@ -10,6 +10,18 @@ Install dependencies:
 bun install
 ```
 
+## Environment Variables
+
+Copy the example environment file:
+
+```bash
+cp .env.example .env
+```
+
+Required variables:
+
+- `VITE_API_URL`: Backend API URL (default: http://localhost:8000)
+
 ## Development
 
 Run the dev server:
@@ -17,6 +29,8 @@ Run the dev server:
 ```sh
 bun run dev
 ```
+
+The app will be available at [http://localhost:5173](http://localhost:5173)
 
 ## Deployment
 
@@ -32,17 +46,30 @@ Then run the app in production mode:
 bun run start
 ```
 
-Now you'll need to pick a host to deploy it to.
+## Features
 
-### DIY
+- Rich text editor with TipTap
+- Code block support with syntax highlighting
+- Dark mode support
+- Responsive design
+- Real-time preview
 
-If you're familiar with deploying Node applications, the built-in Remix app server is production-ready.
+## Technology Stack
 
-Make sure to deploy the output of `bun run build`
+- [Remix](https://remix.run) for routing and server-side rendering
+- [React Query](https://tanstack.com/query) for data fetching
+- [TipTap](https://tiptap.dev) for rich text editing
+- [Tailwind CSS](https://tailwindcss.com) for styling
+- [Radix UI](https://www.radix-ui.com) for accessible components
 
-- `build/server`
-- `build/client`
+## Build Output
 
-## Styling
+The build process generates:
 
-This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience. You can use whatever css framework you prefer. See the [Vite docs on css](https://vitejs.dev/guide/features.html#css) for more information.
+- `build/server`: Server-side code
+- `build/client`: Client-side assets
+
+For more information:
+
+- [Remix docs](https://remix.run/docs)
+- [Vite docs](https://vitejs.dev/guide)
