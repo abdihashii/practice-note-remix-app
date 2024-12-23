@@ -5,9 +5,9 @@ services:
     rootDir: apps/server
     region: oregon # Change this to your preferred region
     healthCheckPath: /health
-    dockerfilePath: ./apps/server/Dockerfile # Path to Dockerfile
+    dockerfilePath: Dockerfile # Path relative to rootDir
     docker:
-      context: ./apps/server # Build context directory
+      context: . # Context relative to rootDir
     envVars:
       - key: NODE_ENV
         value: production
@@ -18,9 +18,9 @@ services:
     preDeployCommand: bun run db:migrate && bun run db:push # Run migrations before deployment
     buildFilter:
       paths:
-        - apps/server/**/*
-        - packages/types/**/* # Include shared types
+        - /**/* # All files in rootDir
+        - ../../packages/types/**/* # Shared types relative to rootDir
       ignoredPaths:
-        - apps/server/**/*.test.ts
-        - apps/server/**/*.spec.ts
-        - apps/server/README.md
+        - /**/*.test.ts
+        - /**/*.spec.ts
+        - /**/README.md
