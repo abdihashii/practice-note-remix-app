@@ -1,36 +1,11 @@
 // Third-party imports
 import { eq } from "drizzle-orm";
-import { csrf } from "hono/csrf";
 import { verify } from "hono/jwt";
-import { secureHeaders } from "hono/secure-headers";
 import type { MiddlewareHandler } from "hono/types";
 
 // Local imports
 import { usersTable } from "@/db/schema";
 import type { CustomEnv } from "@/types";
-
-// CSRF protection middleware configuration
-// This helps prevent Cross-Site Request Forgery attacks by requiring a token
-// The token must be included in requests that modify data (POST, PUT, DELETE)
-export const csrfMiddleware = csrf({
-  origin: process.env["APP_URL"], // Only allow requests from our frontend
-});
-
-// Security headers middleware configuration
-// These HTTP headers help protect against common web vulnerabilities
-export const securityHeadersMiddleware = secureHeaders({
-  contentSecurityPolicy: {
-    defaultSrc: ["'self'"], // Only allow resources from same origin
-    scriptSrc: ["'self'"], // Only allow scripts from same origin
-    styleSrc: ["'self'"], // Only allow styles from same origin
-    imgSrc: ["'self'", "data:", "blob:"], // Allow images from same origin + data/blob URLs
-    connectSrc: ["'self'", "ws:", "wss:"], // Allow WebSocket connections
-  },
-  xFrameOptions: "DENY", // Prevent site from being embedded in iframes
-  xContentTypeOptions: "nosniff", // Prevent MIME type sniffing
-  referrerPolicy: "strict-origin-when-cross-origin", // Control referrer information
-  strictTransportSecurity: "max-age=31536000; includeSubDomains", // Require HTTPS
-});
 
 interface CustomJWTPayload {
   userId: string;

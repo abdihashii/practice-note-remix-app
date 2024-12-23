@@ -1,14 +1,13 @@
 // Third-party imports
 import { Hono } from "hono";
-import { cors } from "hono/cors";
 import type { MiddlewareHandler } from "hono/types";
 
 // Local imports
 import { dbConnect } from "@/db";
 import {
-  csrfMiddleware,
-  securityHeadersMiddleware,
-} from "@/middleware/authMiddleware";
+  corsMiddleware,
+  securityMiddleware,
+} from "@/middleware/securityMiddleware";
 import { authRoutes } from "@/routes/authRoutes";
 import { noteRoutes } from "@/routes/noteRoutes";
 import { searchRoutes } from "@/routes/searchRoutes";
@@ -35,17 +34,12 @@ validateEnvironment();
 const app = new Hono<CustomEnv>();
 
 // Apply CORS middleware
-app.use(
-  "*",
-  cors({
-    origin: process.env["APP_URL"] ?? "*",
-    allowMethods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowHeaders: ["Content-Type", "Authorization", "X-CSRF-Token"],
-    exposeHeaders: ["Content-Length", "X-Requested-With", "X-CSRF-Token"],
-    credentials: true,
-    maxAge: 600,
-  })
-);
+app.use("*", corsMiddleware);
+
+// Apply all security middleware
+securityMiddleware.forEach((middleware) => {
+  app.use("*", middleware);
+});
 
 console.log("Initializing server...");
 const db = await dbConnect();
@@ -86,12 +80,6 @@ app.route("/search", searchRoutes);
 
 // Add basic health check
 app.get("/health", (c) => c.json({ status: "ok" }));
-
-// Add CSRF protection middleware
-app.use("*", csrfMiddleware);
-
-// Add security headers middleware
-app.use("*", securityHeadersMiddleware);
 
 // Use Bun's serve instead of node-server
 export default {
