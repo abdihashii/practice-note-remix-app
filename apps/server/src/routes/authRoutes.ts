@@ -292,6 +292,17 @@ authRoutes.post("/refresh", async (c) => {
       return c.json({ error: "Refresh token expired" }, 401);
     }
 
+    const oldToken = user.refreshToken;
+    if (oldToken && oldToken === refreshToken) {
+      // Invalidate the old token first
+      await db
+        .update(usersTable)
+        .set({ refreshToken: null })
+        .where(eq(usersTable.id, user.id));
+    } else {
+      return c.json({ error: "Invalid refresh token" }, 401);
+    }
+
     // Generate new tokens
     const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
       await generateTokens(user.id);
@@ -328,7 +339,7 @@ authRoutes.post("/logout", async (c) => {
     const db = c.get("db");
     const { refreshToken } = await c.req.json<{ refreshToken: string }>();
 
-    // Clear refresh token from user
+    // Clear refresh token and invalidate all current sessions
     await db
       .update(usersTable)
       .set({
