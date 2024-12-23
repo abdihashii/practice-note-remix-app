@@ -2,21 +2,93 @@
 
 ## Setup
 
-### Option 1: Local with Docker (recommended)
+### Development Setup
 
-1. `bun install`: Install dependencies
-2. `bun run db:generate`: Generate the database schema using Drizzle Kit
-3. `docker compose up --build`: Build and start both the database container and the server
+1. Install dependencies:
 
-### Option 2: Local without Docker
+```bash
+bun install
+```
 
-1. `bun install`: Install dependencies
-2. `bun run db:generate`: Generate the database schema using Drizzle Kit
-3. `bun run db:push`: Push the database schema to the database
-4. `bun run dev`: Runs migrations script, pushes the schema to the database, and starts the server in watch mode
+2. Start PostgreSQL:
 
-### Run Drizzle Kit Studio
+```bash
+bun run postgres:up
+```
 
-Drizzle Kit Studio is a visual tool for interacting with your database.
+3. Generate database schema (if needed):
 
-1. `bunx drizzle-kit studio`: Run Drizzle Kit Studio
+```bash
+bun run db:generate
+```
+
+4. Start development server:
+
+```bash
+bun run dev
+```
+
+This will:
+
+- Run migrations
+- Push schema changes
+- Start server in watch mode
+
+### Database Management
+
+#### Drizzle Kit Studio
+
+Drizzle Kit Studio is a visual tool for interacting with your database:
+
+```bash
+bunx drizzle-kit studio
+```
+
+#### Common Commands
+
+Generate migrations:
+
+```bash
+bun run db:generate
+```
+
+Push schema changes:
+
+```bash
+bun run db:push
+```
+
+Run migrations:
+
+```bash
+bun run db:migrate
+```
+
+### Clean Up
+
+Stop PostgreSQL:
+
+```bash
+bun run postgres:down
+```
+
+Remove dependencies:
+
+```bash
+bun run clean
+```
+
+## Environment Variables
+
+Copy the example environment file:
+
+```bash
+cp .env.example .env
+```
+
+Required variables:
+
+- `DATABASE_URL`: PostgreSQL connection string
+- `PORT`: Server port (default: 8000)
+- `HOST`: Server host (default: 0.0.0.0)
+- `FRONTEND_URL`: Frontend URL for CORS (production only)
