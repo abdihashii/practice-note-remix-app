@@ -5,7 +5,8 @@ services:
     rootDir: apps/server
     region: oregon # Change this to your preferred region
     healthCheckPath: /health
-    dockerfilePath: Dockerfile # Path relative to rootDir
+    dockerfilePath: ../../Dockerfile # Path relative to rootDir
+    buildCommand: docker build -t api ../../ # Build from monorepo root
     envVars:
       - key: NODE_ENV
         value: production
@@ -22,6 +23,3 @@ services:
         - apps/server/**/*.test.ts
         - apps/server/**/*.spec.ts
         - apps/server/**/README.md
-
-docker:
-  context: ../.. # Changed to point to root of monorepo
