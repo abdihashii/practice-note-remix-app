@@ -1,20 +1,8 @@
-import { drizzle } from 'drizzle-orm/postgres-js';
-import postgres from 'postgres';
+import { drizzle } from 'drizzle-orm/neon-http';
+import { neon } from '@neondatabase/serverless';
+import { config } from 'dotenv';
 
-import dotenv from 'dotenv';
+config({ path: '.dev.vars' });
 
-const isProduction = process.env.NODE_ENV === 'production';
-
-dotenv.config({
-	path: isProduction ? '.dev.vars' : '.env',
-});
-
-const connectionString = process.env.DATABASE_URL;
-
-// Configure postgres client for Supabase with Cloudflare Workers
-const client = postgres(connectionString!, {
-	ssl: 'require',
-	prepare: false,
-});
-
-export const db = drizzle(client);
+const sql = neon(process.env.DATABASE_URL!);
+export const db = drizzle({ client: sql });

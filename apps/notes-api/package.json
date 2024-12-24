@@ -9,7 +9,7 @@
 		"test": "vitest",
 		"cf-typegen": "wrangler types",
 		"db:generate": "drizzle-kit generate",
-		"db:migrate": "bun run src/db/migrate.ts"
+		"db:migrate": "drizzle-kit migrate"
 	},
 	"devDependencies": {
 		"@cloudflare/vitest-pool-workers": "^0.5.2",
@@ -21,8 +21,8 @@
 		"wrangler": "^3.99.0"
 	},
 	"dependencies": {
+		"@neondatabase/serverless": "^0.10.4",
 		"drizzle-orm": "^0.38.2",
-		"hono": "^4.6.14",
-		"postgres": "^3.4.5"
+		"hono": "^4.6.14"
 	}
 }
