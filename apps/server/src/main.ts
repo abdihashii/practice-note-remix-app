@@ -16,7 +16,10 @@ const isProd = process.env.NODE_ENV === "production";
 const app = new Hono<CustomEnv>();
 
 // Add basic health check before any database operations
-app.get("/health", (c) => c.json({ status: "ok" }));
+app.get("/health", (c) => {
+  console.log("Health check received");
+  return c.json({ status: "ok", timestamp: new Date().toISOString() });
+});
 
 app.use(
   "*",
