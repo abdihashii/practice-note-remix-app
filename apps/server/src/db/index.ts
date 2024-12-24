@@ -5,20 +5,28 @@ import { notesTable } from "./schema";
 
 dotenv.config();
 
-const databaseUrl =
-  process.env.DATABASE_URL ||
-  "postgres://myuser:mypassword@postgres:5432/mydatabase";
+const databaseUrl = process.env.DATABASE_URL;
+if (!databaseUrl) {
+  throw new Error("DATABASE_URL is required");
+}
 
 export async function dbConnect() {
-  if (!databaseUrl) {
-    throw new Error("DATABASE_URL is not set");
+  console.log("Attempting database connection...");
+  try {
+    const client = new Client({
+      connectionString: databaseUrl,
+      ssl:
+        process.env.NODE_ENV === "production"
+          ? { rejectUnauthorized: false }
+          : false,
+    });
+
+    await client.connect();
+    console.log("Database connected successfully");
+
+    return drizzle(client, { schema: { notesTable } });
+  } catch (error) {
+    console.error("Database connection error:", error);
+    throw error;
   }
-
-  const client = new Client({
-    connectionString: databaseUrl,
-  });
-
-  await client.connect();
-
-  return drizzle(client, { schema: { notesTable } });
 }

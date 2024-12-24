@@ -60,14 +60,27 @@ echo "Waiting for database..."
 retries=${DATABASE_CONNECTION_RETRIES:-5}
 delay=${DATABASE_CONNECTION_RETRY_DELAY:-5}
 
-until pg_isready -U ${DB_USER:-postgres} -h ${DB_HOST:-localhost} || [ $retries -eq 0 ]; do
-    echo "Waiting for database... $((retries)) remaining attempts..."
-    retries=$((retries-1))
-    sleep $delay
-done
+# Use DATABASE_URL for connection check if available
+if [ -n "$DATABASE_URL" ]; then
+    until PGPASSWORD=$DB_PASSWORD pg_isready -d $DATABASE_URL || [ $retries -eq 0 ]; do
+        echo "Waiting for database... $((retries)) remaining attempts..."
+        retries=$((retries-1))
+        sleep $delay
+    done
+else
+    # Fallback to individual parameters
+    until pg_isready -U ${DB_USER:-postgres} -h ${DB_HOST:-localhost} || [ $retries -eq 0 ]; do
+        echo "Waiting for database... $((retries)) remaining attempts..."
+        retries=$((retries-1))
+        sleep $delay
+    done
+fi
 
 if [ $retries -eq 0 ]; then
     echo "Error: Could not connect to database"
+    echo "Database URL: ${DATABASE_URL:-not set}"
+    echo "Database Host: ${DB_HOST:-not set}"
+    echo "Database User: ${DB_USER:-not set}"
     exit 1
 fi
 
@@ -91,8 +104,13 @@ WORKDIR /app/apps/server
 
 # Health check for container orchestration
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-    CMD pg_isready -U ${DB_USER:-postgres} -h ${DB_HOST:-localhost} && \
-        curl -f http://localhost:8000/health || exit 1
+    CMD if [ -n "$DATABASE_URL" ]; then \
+        PGPASSWORD=$DB_PASSWORD pg_isready -d $DATABASE_URL && \
+        curl -f http://localhost:8000/health || exit 1; \
+    else \
+        pg_isready -U ${DB_USER:-postgres} -h ${DB_HOST:-localhost} && \
+        curl -f http://localhost:8000/health || exit 1; \
+    fi
 
 # Expose port for the Hono server
 EXPOSE 8000
