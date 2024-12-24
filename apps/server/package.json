@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "clean": "rm -rf node_modules",
-    "build": "bun build ./src/main.ts --target bun --outdir dist",
+    "build": "bun build ./src/main.ts --target bun --outdir dist --sourcemap",
     "start": "bun run db:migrate && bun run src/main.ts",
     "dev": "bun run db:migrate && bun run db:push && bun --watch src/main.ts",
     "db:generate": "drizzle-kit generate",

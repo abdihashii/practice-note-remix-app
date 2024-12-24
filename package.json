@@ -23,7 +23,7 @@
     "start:client": "bun run --cwd apps/client start",
     "start:server": "bun run --cwd apps/server start",
     "setup": "chmod +x scripts/startup.sh && ./scripts/startup.sh",
-    "postinstall": "chmod +x scripts/startup.sh"
+    "postinstall": "[ -f scripts/startup.sh ] && chmod +x scripts/startup.sh || true"
   },
   "devDependencies": {
     "typescript": "^5.7.2"
