@@ -43,6 +43,43 @@ RUN rm -rf node_modules && \
     bun install --production --no-cache && \
     rm -rf ~/.bun/install/cache
 
+# Set production environment
+ENV NODE_ENV=production
+ENV PORT=8000
+ENV HOST=0.0.0.0
+ENV DRIZZLE_OUT=./drizzle
+ENV DATABASE_CONNECTION_RETRIES=5
+ENV DATABASE_CONNECTION_RETRY_DELAY=5
+
+# Create a script to handle startup
+COPY <<-"EOF" /app/apps/server/start.sh
+#!/bin/sh
+set -e
+
+echo "Waiting for database..."
+retries=${DATABASE_CONNECTION_RETRIES:-5}
+delay=${DATABASE_CONNECTION_RETRY_DELAY:-5}
+
+until pg_isready -U ${DB_USER:-postgres} -h ${DB_HOST:-localhost} || [ $retries -eq 0 ]; do
+    echo "Waiting for database... $((retries)) remaining attempts..."
+    retries=$((retries-1))
+    sleep $delay
+done
+
+if [ $retries -eq 0 ]; then
+    echo "Error: Could not connect to database"
+    exit 1
+fi
+
+echo "Running database migrations..."
+bun run db:migrate
+
+echo "Starting server..."
+exec bun run src/main.ts
+EOF
+
+RUN chmod +x /app/apps/server/start.sh
+
 # Ensure proper permissions
 RUN chown -R appuser:appgroup /app
 
@@ -52,12 +89,6 @@ USER appuser
 # Set working directory to server folder
 WORKDIR /app/apps/server
 
-# Set production environment
-ENV NODE_ENV=production
-ENV PORT=8000
-ENV HOST=0.0.0.0
-ENV DRIZZLE_OUT=./drizzle
-
 # Health check for container orchestration
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
     CMD pg_isready -U ${DB_USER:-postgres} -h ${DB_HOST:-localhost} && \
@@ -66,13 +97,5 @@ HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
 # Expose port for the Hono server
 EXPOSE 8000
 
-# Start the application using the script from package.json
-CMD ["sh", "-c", "\
-    echo 'Waiting for database...' && \
-    until pg_isready -U ${DB_USER:-postgres} -h ${DB_HOST:-localhost}; do \
-      sleep 1; \
-    done && \
-    echo 'Database is ready!' && \
-    bun run db:migrate && \
-    bun run start \
-"] 
+# Start the application using the script
+CMD ["/app/apps/server/start.sh"] 
