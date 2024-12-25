@@ -55,3 +55,13 @@ noteRoutes.put('/:id', async (c) => {
 
 	return c.json(updated[0]);
 });
+
+// Delete a note
+noteRoutes.delete('/:id', async (c) => {
+	const db = c.get('db');
+	const id = c.req.param('id');
+
+	await db.delete(notesTable).where(eq(notesTable.id, id));
+
+	return c.json({ message: `Note ${id} deleted` });
+});
