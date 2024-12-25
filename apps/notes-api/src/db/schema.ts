@@ -1,11 +1,4 @@
-import { boolean, doublePrecision, pgTable, serial, text, timestamp, uuid, varchar } from 'drizzle-orm/pg-core';
-
-export const products = pgTable('products', {
-	id: serial('id').primaryKey(),
-	name: text('name'),
-	description: text('description'),
-	price: doublePrecision('price'),
-});
+import { boolean, pgTable, text, timestamp, uuid, varchar } from 'drizzle-orm/pg-core';
 
 export const notesTable = pgTable('notes', {
 	id: uuid('id').primaryKey().defaultRandom(),
