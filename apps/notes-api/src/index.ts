@@ -1,23 +1,24 @@
-import { neon } from '@neondatabase/serverless';
-import { drizzle } from 'drizzle-orm/neon-http';
 import { Hono } from 'hono';
 
 import { products } from './db/schema';
+import { dbMiddleware } from './middleware/dbMiddleware';
+import { Env, Variables } from './types';
 
-export type Env = {
-	DATABASE_URL: string;
-};
+// Create app with both Bindings and Variables types
+const app = new Hono<{ Bindings: Env; Variables: Variables }>();
 
-const app = new Hono<{ Bindings: Env }>();
+// Health check
+app.get('/health', (c) => c.json({ status: 'ok', timestamp: new Date().toISOString() }));
 
+// Test endpoint
 app.get('/', (c) => c.text('Hello World!'));
 
-app.get('/health', (c) => c.json({ status: 'ok', timestamp: new Date().toISOString() }));
+// Inject the db into the context for all routes
+app.use('*', dbMiddleware);
 
 // Get all products
 app.get('/products', async (c) => {
-	const sql = neon(c.env.DATABASE_URL);
-	const db = drizzle(sql);
+	const db = c.get('db');
 	const allProducts = await db.select().from(products);
 
 	return c.json(allProducts);
