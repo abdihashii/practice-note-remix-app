@@ -26,11 +26,16 @@ searchRoutes.get('/', async (c) => {
 		}
 
 		const offset = (page - 1) * limit;
-		const normalizedSearchQuery = searchQuery ? searchQuery.trim().toLowerCase() : '';
+		const normalizedSearchQuery = searchQuery
+			? searchQuery.trim().toLowerCase()
+			: '';
 		const searchCondition =
 			normalizedSearchQuery === ''
 				? undefined
-				: or(ilike(notesTable.title, `%${normalizedSearchQuery}%`), ilike(notesTable.content, `%${normalizedSearchQuery}%`));
+				: or(
+						ilike(notesTable.title, `%${normalizedSearchQuery}%`),
+						ilike(notesTable.content, `%${normalizedSearchQuery}%`),
+					);
 
 		const totalCount = await db
 			.select({ count: sql`count(*)` })

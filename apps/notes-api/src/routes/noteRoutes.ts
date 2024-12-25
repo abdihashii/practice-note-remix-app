@@ -12,7 +12,10 @@ export const noteRoutes = new Hono<{ Bindings: Env; Variables: Variables }>();
 noteRoutes.get('/', async (c) => {
 	const db = c.get('db');
 
-	const notes = await db.select().from(notesTable).orderBy(desc(notesTable.updatedAt));
+	const notes = await db
+		.select()
+		.from(notesTable)
+		.orderBy(desc(notesTable.updatedAt));
 
 	return c.json(notes);
 });
@@ -49,7 +52,11 @@ noteRoutes.put('/:id', async (c) => {
 		updatedAt: new Date(), // Pass Date object directly instead of ISO string
 	};
 
-	const updated = await db.update(notesTable).set(updatedNote).where(eq(notesTable.id, id)).returning();
+	const updated = await db
+		.update(notesTable)
+		.set(updatedNote)
+		.where(eq(notesTable.id, id))
+		.returning();
 
 	if (!updated.length) {
 		return c.json({ message: `Note ${id} not found` }, 404);
@@ -74,7 +81,10 @@ noteRoutes.patch('/:id/favorite', async (c) => {
 	const id = c.req.param('id');
 
 	// Get current note to toggle its favorite status
-	const currentNote = await db.select().from(notesTable).where(eq(notesTable.id, id));
+	const currentNote = await db
+		.select()
+		.from(notesTable)
+		.where(eq(notesTable.id, id));
 
 	if (!currentNote.length) {
 		return c.json({ error: 'Note not found' }, 404);
