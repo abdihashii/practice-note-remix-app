@@ -20,9 +20,9 @@ searchRoutes.get('/', async (c) => {
 			return c.json({ error: 'Invalid pagination parameters' }, 400);
 		}
 
-		// Add input validation
-		if (searchQuery && searchQuery.length < 1) {
-			return c.json({ error: 'Search query must be at least 1 character long' }, 400);
+		// Validate and sanitize search query
+		if (searchQuery && typeof searchQuery !== 'string') {
+			return c.json({ error: 'Search query must be a string' }, 400);
 		}
 
 		const offset = (page - 1) * limit;
