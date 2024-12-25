@@ -2,7 +2,7 @@
 import { Link } from "@remix-run/react";
 
 // First party components
-import DarkModeToggleButton from "~/components/common/DarkModeToggleButton";
+import DarkModeToggleButton from "../DarkModeToggleButton";
 
 const Header = () => {
   return (

@@ -1,8 +1,8 @@
 // Third party components
-import { Toaster } from "~/components/ui/toaster";
+import { Toaster } from "../../ui/toaster";
 
 // First party components
-import Header from "~/components/common/layout/Header";
+import Header from "./Header";
 
 interface ProtectedLayoutProps {
   children: React.ReactNode;
