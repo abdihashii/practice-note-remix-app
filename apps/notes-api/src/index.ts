@@ -6,6 +6,7 @@ import { cors } from 'hono/cors';
 // Local imports
 import { dbMiddleware } from './middleware/dbMiddleware';
 import { noteRoutes } from './routes/noteRoutes';
+import { searchRoutes } from './routes/searchRoutes';
 import { Env, Variables } from './types';
 
 const isProd = process.env.NODE_ENV === 'production';
@@ -71,9 +72,11 @@ const api = new Hono<{ Bindings: Env; Variables: Variables }>();
 
 // Inject database connection into context
 api.use('/notes/*', dbMiddleware);
+api.use('/search/*', dbMiddleware);
 
 // Mount API routes
 api.route('/notes', noteRoutes);
+api.route('/search', searchRoutes);
 
 // Mount versioned API under /api/v1
 app.route('/api/v1', api);
