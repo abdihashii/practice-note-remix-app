@@ -11,7 +11,6 @@ const sessionStorage = createCookieSessionStorage({
     httpOnly: true,
     sameSite: "lax",
     secrets: ["s3cr3t"],
-    // secure: process.env.NODE_ENV === "production",
     // Set domain and secure only if in production
     ...(isProduction
       ? {
