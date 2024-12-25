@@ -1,12 +1,19 @@
 /**
- * This is intended to be a basic starting point for linting in your app.
- * It relies on recommended configs out of the box for simplicity, but you can
- * and should modify this configuration to best suit your team's needs.
+ * ESLint configuration for the Remix frontend application (apps/frontend)
+ *
+ * Key features:
+ * - React & TypeScript support
+ * - Path alias support (~ -> ./app)
+ * - A11y rules enabled
+ * - Import rules for better module resolution
+ *
+ * Note: This config is specific to the frontend app and doesn't affect
+ * other apps in the monorepo.
  */
 
 /** @type {import('eslint').Linter.Config} */
 module.exports = {
-  root: true,
+  root: true, // Prevent ESLint from looking for configs in parent folders
   parserOptions: {
     ecmaVersion: "latest",
     sourceType: "module",
@@ -15,54 +22,66 @@ module.exports = {
     },
   },
   env: {
-    browser: true,
-    commonjs: true,
-    es6: true,
+    browser: true, // Enable browser globals
+    commonjs: true, // Enable CommonJS globals
+    es6: true, // Enable ES6 globals
   },
+  // Don't ignore files in .server and .client directories
   ignorePatterns: ["!**/.server", "!**/.client"],
 
-  // Base config
+  // Base config - will be extended by overrides
   extends: ["eslint:recommended"],
 
   overrides: [
-    // React
+    // React-specific rules
+    // Applies to both JS and TS files that may contain React code
     {
       files: ["**/*.{js,jsx,ts,tsx}"],
       plugins: ["react", "jsx-a11y"],
       extends: [
         "plugin:react/recommended",
-        "plugin:react/jsx-runtime",
+        "plugin:react/jsx-runtime", // For React 17+ new JSX transform
         "plugin:react-hooks/recommended",
         "plugin:jsx-a11y/recommended",
       ],
       settings: {
         react: {
-          version: "detect",
+          version: "detect", // Auto-detect React version
         },
+        // Special handling for Remix form components
         formComponents: ["Form"],
+        // Special handling for routing components
         linkComponents: [
           { name: "Link", linkAttribute: "to" },
           { name: "NavLink", linkAttribute: "to" },
         ],
+        // Configure import resolver for path aliases
         "import/resolver": {
-          typescript: {},
+          typescript: {}, // Use TypeScript's path resolution
+          alias: {
+            map: [["~", "./app"]], // Map ~ to ./app directory
+            extensions: [".ts", ".tsx", ".js", ".jsx", ".json"],
+          },
         },
       },
     },
 
-    // Typescript
+    // TypeScript-specific rules
+    // Additional rules that only apply to TypeScript files
     {
       files: ["**/*.{ts,tsx}"],
       plugins: ["@typescript-eslint", "import"],
       parser: "@typescript-eslint/parser",
       settings: {
-        "import/internal-regex": "^~/",
+        "import/internal-regex": "^~/", // Treat imports starting with ~ as internal
         "import/resolver": {
-          node: {
-            extensions: [".ts", ".tsx"],
-          },
           typescript: {
             alwaysTryTypes: true,
+            project: "./tsconfig.json", // Point to the TypeScript config
+          },
+          alias: {
+            map: [["~", "./app"]], // Same alias config as above
+            extensions: [".ts", ".tsx", ".js", ".jsx", ".json"],
           },
         },
       },
@@ -73,7 +92,8 @@ module.exports = {
       ],
     },
 
-    // Node
+    // Node-specific rules
+    // Only applies to this ESLint config file itself
     {
       files: [".eslintrc.cjs"],
       env: {
