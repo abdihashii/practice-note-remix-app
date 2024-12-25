@@ -1,4 +1,4 @@
-import { doublePrecision, pgTable, serial, text } from 'drizzle-orm/pg-core';
+import { boolean, doublePrecision, pgTable, serial, text, timestamp, uuid, varchar } from 'drizzle-orm/pg-core';
 
 export const products = pgTable('products', {
 	id: serial('id').primaryKey(),
@@ -6,3 +6,16 @@ export const products = pgTable('products', {
 	description: text('description'),
 	price: doublePrecision('price'),
 });
+
+export const notesTable = pgTable('notes', {
+	id: uuid('id').primaryKey().defaultRandom(),
+	title: varchar('title', { length: 255 }).notNull(),
+	content: text('content'),
+	createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+	updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
+	favorite: boolean('favorite').default(false),
+});
+
+// You can add type inference helpers if needed
+export type Note = typeof notesTable.$inferSelect;
+export type NewNote = typeof notesTable.$inferInsert;
