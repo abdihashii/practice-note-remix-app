@@ -7,6 +7,7 @@ import {
   ScrollRestoration,
 } from "@remix-run/react";
 
+// Styles
 import "./tailwind.css";
 
 export const links: LinksFunction = () => [
