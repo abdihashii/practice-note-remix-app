@@ -65,3 +65,28 @@ noteRoutes.delete('/:id', async (c) => {
 
 	return c.json({ message: `Note ${id} deleted` });
 });
+
+// Toggle favorite status
+noteRoutes.patch('/:id/favorite', async (c) => {
+	const db = c.get('db');
+	const id = c.req.param('id');
+
+	// Get current note to toggle its favorite status
+	const currentNote = await db.select().from(notesTable).where(eq(notesTable.id, id));
+
+	if (!currentNote.length) {
+		return c.json({ error: 'Note not found' }, 404);
+	}
+
+	// Toggle the favorite status
+	const updatedNote = await db
+		.update(notesTable)
+		.set({
+			favorite: !currentNote[0].favorite,
+			updatedAt: new Date(),
+		})
+		.where(eq(notesTable.id, id))
+		.returning();
+
+	return c.json(updatedNote[0]);
+});
