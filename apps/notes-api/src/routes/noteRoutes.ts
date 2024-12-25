@@ -35,3 +35,23 @@ noteRoutes.post('/', async (c) => {
 
 	return c.json(createdNote);
 });
+
+// Update a note
+noteRoutes.put('/:id', async (c) => {
+	const db = c.get('db');
+	const id = c.req.param('id');
+	const note = await c.req.json();
+
+	const updatedNote = {
+		...note,
+		updatedAt: new Date(), // Pass Date object directly instead of ISO string
+	};
+
+	const updated = await db.update(notesTable).set(updatedNote).where(eq(notesTable.id, id)).returning();
+
+	if (!updated.length) {
+		return c.json({ message: `Note ${id} not found` }, 404);
+	}
+
+	return c.json(updated[0]);
+});
