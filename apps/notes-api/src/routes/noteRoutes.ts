@@ -1,6 +1,8 @@
+// Third-party imports
 import { desc, eq } from 'drizzle-orm';
 import { Hono } from 'hono';
 
+// Local imports
 import { notesTable } from '../db/schema';
 import { Variables } from '../types';
 
