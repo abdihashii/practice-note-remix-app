@@ -1,8 +1,9 @@
-import { desc, eq } from 'drizzle-orm';
+// Third-party imports
 import { Hono } from 'hono';
 
-import { notesTable } from './db/schema';
+// Local imports
 import { dbMiddleware } from './middleware/dbMiddleware';
+import { noteRoutes } from './routes/noteRoutes';
 import { Env, Variables } from './types';
 
 // Create app with both Bindings and Variables types
@@ -14,37 +15,10 @@ app.get('/health', (c) => c.json({ status: 'ok', timestamp: new Date().toISOStri
 // Test endpoint
 app.get('/', (c) => c.text('Hello World!'));
 
-// Inject the db into the context for all routes
-app.use('*', dbMiddleware);
+// Inject the db into the context for all routes that need it
+app.use('/notes/*', dbMiddleware);
 
-// Get all notes
-app.get('/notes', async (c) => {
-	const db = c.get('db');
-
-	const notes = await db.select().from(notesTable).orderBy(desc(notesTable.updatedAt));
-
-	return c.json(notes);
-});
-
-// Get a note by id
-app.get('/notes/:id', async (c) => {
-	const db = c.get('db');
-	const id = c.req.param('id');
-
-	const note = await db.select().from(notesTable).where(eq(notesTable.id, id));
-
-	return c.json(note[0]);
-});
-
-// Create a new note
-app.post('/notes', async (c) => {
-	const db = c.get('db');
-	const note = await c.req.json();
-
-	const newNote = await db.insert(notesTable).values(note).returning();
-	const createdNote = newNote[0];
-
-	return c.json(createdNote);
-});
+// Mount note routes
+app.route('/notes', noteRoutes);
 
 export default app;
