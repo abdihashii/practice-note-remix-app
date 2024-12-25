@@ -21,7 +21,7 @@
     "build:client": "bun run --cwd apps/client build",
     "build:server": "bun run --cwd apps/server build",
     "build:types": "bun run --cwd packages/types build",
-    "build:client:prod": "bun run build:types && bun run build:client",
+    "build:client-prod": "bun run build:types && bun run build:client",
     "start:client": "bun run --cwd apps/client start",
     "start:server": "bun run --cwd apps/server start",
     "setup": "chmod +x scripts/startup.sh && ./scripts/startup.sh",
