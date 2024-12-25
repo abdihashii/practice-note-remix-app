@@ -46,12 +46,18 @@ export default function NotesIndex() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const {
-    data: notes,
+    data: notesData,
     isLoading: isNotesLoading,
     isError: isNotesError,
   } = useQuery({
     queryKey: ["notes", q],
-    queryFn: () => (q ? searchNotes(q) : getNotes()),
+    queryFn: async () => {
+      if (q) {
+        const searchData = await searchNotes(q);
+        return searchData.searchResults;
+      }
+      return getNotes();
+    },
     refetchOnWindowFocus: false,
     staleTime: 1000 * 60 * 60 * 3, // stale time means that the data is considered fresh for 3 hours
     gcTime: 1000 * 60 * 60 * 24 * 3, // garbage collect after 3 days
@@ -63,10 +69,6 @@ export default function NotesIndex() {
       queryClient.invalidateQueries({ queryKey: ["notes"] });
     },
   });
-
-  const handleFloatingActionClick = () => {
-    setOpenCreateNoteDialog(true);
-  };
 
   const handleCreateNote = async (note: CreateNoteDto) => {
     createNoteMutation.mutate(note);
@@ -133,14 +135,15 @@ export default function NotesIndex() {
               Oops! Something went wrong
             </h2>
             <p className="mb-4 text-gray-600 dark:text-gray-400">
-              We're having trouble loading your notes. Please try again later.
+              We&apos;re having trouble loading your notes. Please try again
+              later.
             </p>
             <Button onClick={() => navigate(".", { replace: true })}>
               Refresh Page
             </Button>
           </div>
-        ) : notes && notes.length > 0 ? (
-          renderNoteGrid(notes, false)
+        ) : notesData && notesData.length > 0 ? (
+          renderNoteGrid(notesData, false)
         ) : (
           <p className="py-10 text-center text-gray-600 dark:text-gray-400">
             {q
