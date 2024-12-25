@@ -1,6 +1,7 @@
+import { desc, eq } from 'drizzle-orm';
 import { Hono } from 'hono';
 
-import { products } from './db/schema';
+import { notesTable } from './db/schema';
 import { dbMiddleware } from './middleware/dbMiddleware';
 import { Env, Variables } from './types';
 
@@ -16,12 +17,34 @@ app.get('/', (c) => c.text('Hello World!'));
 // Inject the db into the context for all routes
 app.use('*', dbMiddleware);
 
-// Get all products
-app.get('/products', async (c) => {
+// Get all notes
+app.get('/notes', async (c) => {
 	const db = c.get('db');
-	const allProducts = await db.select().from(products);
 
-	return c.json(allProducts);
+	const notes = await db.select().from(notesTable).orderBy(desc(notesTable.updatedAt));
+
+	return c.json(notes);
+});
+
+// Get a note by id
+app.get('/notes/:id', async (c) => {
+	const db = c.get('db');
+	const id = c.req.param('id');
+
+	const note = await db.select().from(notesTable).where(eq(notesTable.id, id));
+
+	return c.json(note[0]);
+});
+
+// Create a new note
+app.post('/notes', async (c) => {
+	const db = c.get('db');
+	const note = await c.req.json();
+
+	const newNote = await db.insert(notesTable).values(note).returning();
+	const createdNote = newNote[0];
+
+	return c.json(createdNote);
 });
 
 export default app;
