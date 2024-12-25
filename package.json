@@ -17,6 +17,7 @@
     "dev": "bun run --cwd apps/server dev & bun run --cwd apps/client dev",
     "dev:client": "bun run --cwd apps/client dev",
     "dev:server": "bun run --cwd apps/server dev",
+    "dev:worker-server": "bun run --cwd apps/notes-api dev",
     "build:client": "bun run --cwd apps/client build",
     "build:server": "bun run --cwd apps/server build",
     "build:types": "bun run --cwd packages/types build",
