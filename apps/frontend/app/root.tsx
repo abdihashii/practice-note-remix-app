@@ -12,7 +12,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 // Theme imports
-import clsx from "clsx";
+import { clsx } from "clsx";
 import {
   PreventFlashOnWrongTheme,
   ThemeProvider,
@@ -21,7 +21,7 @@ import {
 import { themeSessionResolver } from "./sessions.server";
 
 // Components
-import ProtectedLayout from "~/components/common/layout/ProtectedLayout";
+import ProtectedLayout from "./components/common/layout/ProtectedLayout";
 
 // Styles
 import "./tailwind.css";
