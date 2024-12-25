@@ -1,4 +1,5 @@
 // Third-party imports
+import { neon } from '@neondatabase/serverless';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 
@@ -25,13 +26,45 @@ app.use(
 	}),
 );
 
-// Health check
+// Basic health check
 app.get('/health', (c) =>
 	c.json({
 		status: 'ok',
 		timestamp: new Date().toISOString(),
 	}),
 );
+
+// Database health check
+app.get('/health/db', async (c) => {
+	try {
+		const client = neon(c.env.DATABASE_URL);
+
+		// Try to execute a simple query
+		const result = await client`SELECT 1`;
+
+		return c.json({
+			status: 'ok',
+			timestamp: new Date().toISOString(),
+			database: {
+				connected: true,
+				message: 'Database connection successful',
+			},
+		});
+	} catch (error) {
+		return c.json(
+			{
+				status: 'error',
+				timestamp: new Date().toISOString(),
+				database: {
+					connected: false,
+					message: 'Database connection failed',
+					error: error instanceof Error ? error.message : 'Unknown error',
+				},
+			},
+			503,
+		); // Service Unavailable
+	}
+});
 
 // Initialize API router with versioning
 const api = new Hono<{ Bindings: Env; Variables: Variables }>();
