@@ -5,10 +5,11 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev",
-    "clean": "rm -rf .sst .next node_modules",
+    "clean": "rm -rf .sst .next build dist node_modules",
     "lint": "next lint",
     "start": "next start",
-    "sst-deploy": "npx sst deploy --stage production"
+    "sst-deploy": "npx sst deploy --stage production",
+    "typecheck": "tsc"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
