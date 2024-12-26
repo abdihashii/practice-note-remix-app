@@ -5,12 +5,19 @@ applications:
       phases:
         preBuild:
           commands:
-            # First navigate to frontend directory
+            # Install root dependencies first
+            - cd ../../
+            - npm install
+            # Then navigate to frontend and install its dependencies
             - cd apps/frontend
-            # Then install dependencies
             - npm install
         build:
           commands:
+            # Build shared packages if needed
+            - cd ../../
+            - npm run build:types
+            # Build the frontend
+            - cd apps/frontend
             - npm run build
       artifacts:
         baseDirectory: .next
@@ -18,4 +25,6 @@ applications:
           - "**/*"
       cache:
         paths:
+          # Cache both root and frontend node_modules
+          - ../../node_modules/**/*
           - node_modules/**/*
