@@ -1,25 +1,21 @@
-// Third party libraries
-import { Theme, useTheme } from "remix-themes";
+"use client";
 
-// Third party components
+// Third-party imports
 import { MoonIcon, SunIcon } from "lucide-react";
+import { useTheme } from "next-themes";
 
-// First party components
+// First-party imports
 import { Button } from "@/components/ui/button";
 
 export default function DarkModeToggleButton() {
-  const [theme, setTheme] = useTheme();
-
-  const toggleTheme = () => {
-    setTheme(theme === Theme.LIGHT ? Theme.DARK : Theme.LIGHT);
-  };
+  const { theme, setTheme } = useTheme();
 
   return (
     <div className="flex items-center space-x-2 sm:space-x-4">
       <Button
         variant="ghost"
         size="icon"
-        onClick={toggleTheme}
+        onClick={() => setTheme(theme === "light" ? "dark" : "light")}
         className="h-8 w-8 rounded-full hover:bg-foreground/10 sm:h-9 sm:w-9"
         aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
       >

@@ -2,7 +2,7 @@
 import Link from "next/link";
 
 // First party components
-// import DarkModeToggleButton from "@/components/common/DarkModeToggleButton";
+import DarkModeToggleButton from "@/components/common/DarkModeToggleButton";
 
 const Header = () => {
   return (
@@ -16,7 +16,7 @@ const Header = () => {
             My Notes
           </Link>
 
-          {/* <DarkModeToggleButton /> */}
+          <DarkModeToggleButton />
         </div>
       </div>
     </header>
