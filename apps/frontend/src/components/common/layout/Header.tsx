@@ -1,8 +1,8 @@
 // First party components
-import { Link } from "@remix-run/react";
+import Link from "next/link";
 
 // First party components
-import DarkModeToggleButton from "@/components/common/DarkModeToggleButton";
+// import DarkModeToggleButton from "@/components/common/DarkModeToggleButton";
 
 const Header = () => {
   return (
@@ -10,13 +10,13 @@ const Header = () => {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-14 items-center justify-between sm:h-16 md:h-20">
           <Link
-            to="/notes"
+            href="/notes"
             className="truncate text-lg font-bold text-foreground hover:text-foreground/80 sm:text-xl md:text-2xl"
           >
             My Notes
           </Link>
 
-          <DarkModeToggleButton />
+          {/* <DarkModeToggleButton /> */}
         </div>
       </div>
     </header>
