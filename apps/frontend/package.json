@@ -6,7 +6,7 @@
     "build": "next build",
     "dev": "next dev",
     "dev:sst": "npx sst dev",
-    "clean": "rm -rf .sst .next build dist node_modules",
+    "clean": "rm -rf .sst .next build dist node_modules .open-next",
     "lint": "next lint",
     "start": "next start",
     "typecheck": "tsc"
@@ -49,7 +49,6 @@
     "eslint": "^9",
     "eslint-config-next": "15.1.2",
     "postcss": "^8",
-    "tailwindcss": "^3.4.1",
-    "typescript": "^5.7.2"
+    "tailwindcss": "^3.4.1"
   }
 }

@@ -12,7 +12,18 @@ const rmCommand = isWindows ? "rmdir" : "rm";
 const rmArgs = isWindows ? ["/s", "/q"] : ["-rf"];
 
 // Common directories to clean
-const dirsToRemove = ["node_modules", "dist", "build", ".cache"];
+const dirsToRemove = [
+  "node_modules",
+  "dist",
+  "build",
+  ".cache",
+  // Add Next.js specific directories
+  ".next",
+  ".open-next",
+  ".sst",
+  // Add Wrangler specific directories
+  ".wrangler",
+];
 
 try {
   // Clean root directory first

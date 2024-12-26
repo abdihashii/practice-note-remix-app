@@ -1,14 +1,14 @@
 "use client";
 
 // React and Next
-import { usePathname } from "next/navigation";
+// import { usePathname } from "next/navigation";
 
 // Third-party imports
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 // First-party imports
-import ProtectedLayout from "@/components/common/layout/ProtectedLayout";
+// import ProtectedLayout from "@/components/common/layout/ProtectedLayout";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -23,17 +23,13 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const pathname = usePathname();
+  // const pathname = usePathname();
 
-  const isProtectedRoute = !pathname.startsWith("/");
+  // const isProtectedRoute = !pathname.startsWith("/");
 
   return (
     <QueryClientProvider client={queryClient}>
-      {isProtectedRoute ? (
-        <ProtectedLayout>{children}</ProtectedLayout>
-      ) : (
-        children
-      )}
+      {children}
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );
