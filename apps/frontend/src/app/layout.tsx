@@ -7,6 +7,7 @@ import ClientRootLayout from "@/components/common/layout/ClientRootLayout";
 
 // Global styles
 import "./globals.css";
+import { ThemeProvider } from "@/providers/ThemeProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,7 +34,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ClientRootLayout>{children}</ClientRootLayout>
+        <ThemeProvider>
+          <ClientRootLayout>{children}</ClientRootLayout>
+        </ThemeProvider>
       </body>
     </html>
   );
