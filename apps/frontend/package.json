@@ -5,7 +5,6 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev",
-    "dev:sst": "npx sst dev",
     "clean": "rm -rf .sst .next build dist node_modules .open-next",
     "lint": "next lint",
     "start": "next start",
