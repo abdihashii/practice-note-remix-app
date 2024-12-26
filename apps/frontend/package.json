@@ -8,7 +8,6 @@
     "clean": "rm -rf .sst .next build dist node_modules",
     "lint": "next lint",
     "start": "next start",
-    "sst-deploy": "npx sst deploy --stage production",
     "typecheck": "tsc"
   },
   "dependencies": {
