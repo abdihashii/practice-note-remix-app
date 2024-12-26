@@ -8,16 +8,15 @@ applications:
             # Install root dependencies first, ignoring scripts
             - cd ../../
             - npm install --ignore-scripts
-            # Then navigate to frontend and install its dependencies
-            - cd apps/frontend
+            # Build the types package
+            - cd packages/types
+            - npm run build
+            # Navigate to frontend and install its dependencies
+            - cd ../../apps/frontend
             - npm install
         build:
           commands:
-            # Build shared packages if needed
-            - cd ../../
-            - npm run build:types
             # Build the frontend
-            - cd apps/frontend
             - npm run build
       artifacts:
         baseDirectory: .next
