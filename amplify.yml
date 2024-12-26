@@ -6,9 +6,9 @@ applications:
         preBuild:
           commands:
             # Install dependencies from the root first
-            - npm ci
+            - npm install
             # Then install frontend dependencies
-            - cd apps/frontend && npm ci
+            - cd apps/frontend && npm install
         build:
           commands:
             # Make sure we're in the frontend directory
