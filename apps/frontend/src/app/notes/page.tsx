@@ -3,6 +3,8 @@ import { Metadata } from "next";
 import { Suspense } from "react";
 
 // First-party imports
+import { getNotes } from "@/app/api/notes";
+import { searchNotes } from "@/app/api/search";
 import ProtectedLayout from "@/components/common/layout/ProtectedLayout";
 import SearchBar from "@/components/common/SearchBar";
 import { SearchBarFallback } from "@/components/common/SearchBarFallback";
@@ -21,6 +23,11 @@ export default async function NotesPage({
 }) {
   const query = (await searchParams)["q"] ?? "";
 
+  // Fetch initial data on server
+  const initialData = query
+    ? (await searchNotes(query)).searchResults
+    : ((await getNotes()) ?? []);
+
   return (
     <ProtectedLayout>
       <div className="relative flex-grow space-y-4">
@@ -30,7 +37,10 @@ export default async function NotesPage({
           </Suspense>
         </div>
         <Suspense fallback={<NotesLoadingSkeleton />}>
-          <NotesClientPage initialQuery={query} />
+          <NotesClientPage
+            initialQuery={query}
+            initialData={initialData} // Pass initial data
+          />
         </Suspense>
       </div>
     </ProtectedLayout>

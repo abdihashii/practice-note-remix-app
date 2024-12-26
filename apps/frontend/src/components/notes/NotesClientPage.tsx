@@ -21,10 +21,12 @@ import { cn } from "@/lib/utils";
 
 interface NotesClientPageProps {
   initialQuery: string;
+  initialData: Note[];
 }
 
 export default function NotesClientPage({
   initialQuery,
+  initialData,
 }: NotesClientPageProps) {
   const [openCreateNoteDialog, setOpenCreateNoteDialog] = useState(false);
 
@@ -34,8 +36,8 @@ export default function NotesClientPage({
 
   const {
     data: notesData,
-    isLoading: isNotesLoading,
-    isError: isNotesError,
+    isLoading,
+    isError,
   } = useQuery({
     queryKey: ["notes", initialQuery],
     queryFn: async () => {
@@ -45,6 +47,7 @@ export default function NotesClientPage({
       }
       return getNotes();
     },
+    initialData,
     refetchOnWindowFocus: false,
     staleTime: 1000 * 60 * 60 * 3, // stale time means that the data is considered fresh for 3 hours
     gcTime: 1000 * 60 * 60 * 24 * 3, // garbage collect after 3 days
@@ -84,9 +87,9 @@ export default function NotesClientPage({
         <AddNoteButton />
       </div>
 
-      {isNotesLoading ? (
+      {isLoading ? (
         <NotesLoadingSkeleton />
-      ) : isNotesError ? (
+      ) : isError ? (
         <div className="py-10 text-center">
           <h2 className="mb-2 text-2xl font-semibold text-gray-900 dark:text-gray-100">
             Oops! Something went wrong
