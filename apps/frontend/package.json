@@ -5,8 +5,10 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev",
+    "clean": "rm -rf .sst .next node_modules",
     "lint": "next lint",
-    "start": "next start"
+    "start": "next start",
+    "sst-deploy": "npx sst deploy --stage production"
   },
   "dependencies": {
     "next": "15.1.2",
