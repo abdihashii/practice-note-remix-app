@@ -1,19 +1,19 @@
-// Remix and React
+// React and Next
 import { Metadata } from "next";
 
 // First-party imports
 import ProtectedLayout from "@/components/common/layout/ProtectedLayout";
-import NotesClientPage from "@/components/notes/NotesClientPage";
+import AddNoteClientPage from "@/components/notes/AddNoteClientPage";
 
 export const metadata: Metadata = {
-  title: "Your Notes | Notes App",
-  description: "Your Notes",
+  title: "Add a Note | Notes App",
+  description: "Add a new note",
 };
 
-export default function NotesPage() {
+export default function AddNotePage() {
   return (
     <ProtectedLayout>
-      <NotesClientPage />
+      <AddNoteClientPage />
     </ProtectedLayout>
   );
 }
