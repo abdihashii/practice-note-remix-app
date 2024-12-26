@@ -1,0 +1,17 @@
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - cd apps/frontend
+        - npm install
+    build:
+      commands:
+        - npm run build
+  artifacts:
+    baseDirectory: apps/frontend/.next
+    files:
+      - "**/*"
+  cache:
+    paths:
+      - apps/frontend/node_modules/**/*
