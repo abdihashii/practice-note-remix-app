@@ -1,7 +1,7 @@
 // Third party libraries
 import type { CreateNoteDto, Note, UpdateNoteDto } from "@notes-app/types";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_URL = process.env["NEXT_PUBLIC_API_URL"];
 
 export const getNotes = async (): Promise<Note[] | null> => {
   try {

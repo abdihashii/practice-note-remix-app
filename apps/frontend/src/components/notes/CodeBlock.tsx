@@ -18,7 +18,9 @@ import { NodeViewContent, NodeViewProps, NodeViewWrapper } from "@tiptap/react";
 import { LANGUAGES } from "@/lib/language-utils";
 
 const CodeBlockComponent = ({ node, updateAttributes }: NodeViewProps) => {
-  const [language, setLanguage] = useState(node.attrs.language || "javascript");
+  const [language, setLanguage] = useState(
+    node.attrs["language"] || "javascript"
+  );
 
   const handleLanguageChange = (newLanguage: string) => {
     setLanguage(newLanguage);

@@ -28,6 +28,8 @@
     "postinstall": "[ -f scripts/startup.sh ] && chmod +x scripts/startup.sh || true"
   },
   "devDependencies": {
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2",
     "typescript": "^5.7.2"
   }
 }

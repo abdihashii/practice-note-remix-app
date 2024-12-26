@@ -18,7 +18,7 @@ const queryClient = new QueryClient({
   },
 });
 
-export default function RootLayout({
+export default function ClientRootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;

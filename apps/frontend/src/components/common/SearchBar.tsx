@@ -1,71 +1,48 @@
-// React
-import { FormEvent, useEffect, useRef } from "react";
+"use client";
+
+// Remix and React
+import { useRouter } from "next/navigation";
+import { FormEvent, useTransition } from "react";
 
 // Third-party imports
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { XIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-const SearchBar = ({
-  searchQuery,
-  setSearchQuery,
-  onSearch,
-}: {
-  searchQuery: string;
-  setSearchQuery: (searchQuery: string) => void;
-  onSearch: (searchQuery: string) => void;
-}) => {
-  const inputRef = useRef<HTMLInputElement>(null);
+interface SearchBarProps {
+  defaultQuery: string;
+}
 
-  // Effect to focus the input when user hits the '/' key
-  useEffect(() => {
-    const handleKeyPress = (e: KeyboardEvent) => {
-      if (e.key === "/" && document.activeElement !== inputRef.current) {
-        e.preventDefault();
-        inputRef.current?.focus();
+export default function SearchBar({ defaultQuery }: SearchBarProps) {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const value = formData.get("q") as string;
+
+    // Start a transition to update the URL with the search query
+    // This is used to prevent the page from being reloaded
+    // The transition will be reverted if the user navigates away from the page
+    startTransition(() => {
+      const params = new URLSearchParams();
+      if (value) {
+        params.set("q", value);
       }
-    };
-
-    document.addEventListener("keydown", handleKeyPress);
-
-    // Cleanup the event listener when the component unmounts
-    return () => {
-      document.removeEventListener("keydown", handleKeyPress);
-    };
-  }, []);
-
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    onSearch(searchQuery);
+      router.push(`/notes${value ? `?${params.toString()}` : ""}`);
+    });
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="relative flex h-full w-full items-center gap-2"
-    >
+    <form onSubmit={handleSubmit} className="w-full max-w-xs">
       <Input
-        ref={inputRef}
+        type="search"
         name="q"
-        placeholder="Type / to search notes"
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        className="h-full"
-        autoComplete="off"
+        placeholder="Search notes..."
+        className={cn(isPending && "opacity-50")}
+        defaultValue={defaultQuery}
+        disabled={isPending}
       />
-
-      {/* Clear search button */}
-      <Button
-        type="button"
-        variant="outline"
-        size="icon"
-        onClick={() => setSearchQuery("")} // Clear the search query
-        className="absolute right-2.5 top-2.5 h-7 w-7 text-muted-foreground"
-      >
-        <XIcon className="h-4 w-4" />
-      </Button>
     </form>
   );
-};
-
-export default SearchBar;
+}
