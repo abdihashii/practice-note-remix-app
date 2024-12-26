@@ -5,9 +5,9 @@ applications:
       phases:
         preBuild:
           commands:
-            # Install root dependencies first
+            # Install root dependencies first, ignoring scripts
             - cd ../../
-            - npm install
+            - npm install --ignore-scripts
             # Then navigate to frontend and install its dependencies
             - cd apps/frontend
             - npm install
