@@ -6,7 +6,7 @@ applications:
           commands:
             # Install all dependencies from root
             - cd ../..
-            - npm install
+            - npm install --ignore-scripts
             # Build shared types
             - npm run build --workspace=@notes/types
             # Return to frontend directory
