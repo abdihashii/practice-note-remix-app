@@ -1,0 +1,27 @@
+version: 1
+applications:
+  - frontend:
+      phases:
+        preBuild:
+          commands:
+            # Install all dependencies from root
+            - cd ../..
+            - npm install
+            # Build shared types
+            - npm run build --workspace=@notes/types
+            # Return to frontend directory
+            - cd apps/frontend
+        build:
+          commands:
+            - npm run build
+      artifacts:
+        baseDirectory: .next
+        files:
+          - "**/*"
+      cache:
+        paths:
+          - .next/cache/**/*
+          - node_modules/**/*
+          - ../../node_modules/**/*
+          - ../../packages/types/node_modules/**/*
+    appRoot: apps/frontend
