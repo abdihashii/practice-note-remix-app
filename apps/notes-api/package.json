@@ -6,6 +6,7 @@
 		"deploy": "wrangler deploy",
 		"dev": "wrangler dev",
 		"start": "wrangler dev",
+		"clean": "rm -rf .wrangler node_modules dist build",
 		"test": "vitest",
 		"cf-typegen": "wrangler types",
 		"db:generate": "drizzle-kit generate",
