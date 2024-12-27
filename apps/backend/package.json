@@ -24,7 +24,7 @@
 	},
 	"dependencies": {
 		"@neondatabase/serverless": "^0.10.4",
-		"drizzle-orm": "^0.38.2",
+		"drizzle-orm": "^0.38.3",
 		"hono": "^4.6.14"
 	}
 }
