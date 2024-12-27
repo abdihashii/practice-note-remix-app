@@ -4,6 +4,8 @@
 	"private": true,
 	"scripts": {
 		"dev": "bun run src/local.ts",
+		"build": "bun build ./src/server.ts --outdir ./dist",
+		"start": "bun ./dist/server.js",
 		"worker:deploy": "wrangler deploy",
 		"worker:dev": "wrangler dev",
 		"worker:start": "wrangler dev",
