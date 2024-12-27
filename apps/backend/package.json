@@ -3,9 +3,10 @@
 	"version": "0.0.0",
 	"private": true,
 	"scripts": {
-		"deploy": "wrangler deploy",
-		"dev": "wrangler dev",
-		"start": "wrangler dev",
+		"dev": "bun run src/local.ts",
+		"worker:deploy": "wrangler deploy",
+		"worker:dev": "wrangler dev",
+		"worker:start": "wrangler dev",
 		"clean": "rm -rf .wrangler node_modules dist build",
 		"test": "vitest",
 		"cf-typegen": "wrangler types",

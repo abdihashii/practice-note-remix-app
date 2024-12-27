@@ -8,8 +8,7 @@ import { dbMiddleware } from './middleware/dbMiddleware';
 import { noteRoutes } from './routes/noteRoutes';
 import { searchRoutes } from './routes/searchRoutes';
 import { Env, Variables } from './types';
-
-const isProd = process.env.NODE_ENV === 'production';
+import { getEnv, validateEnv } from './utils/env';
 
 // Initialize Hono app with type definitions
 const app = new Hono<{ Bindings: Env; Variables: Variables }>();
@@ -19,14 +18,17 @@ app.use(
 	'*',
 	cors({
 		origin: (origin) => {
-			// In development, allow localhost URLs
+			const env = getEnv();
+			const isProd = env.NODE_ENV === 'production';
+
+			// In development, allow all origins
 			if (!isProd) {
 				return origin;
 			}
 
 			// In production, check against allowed domains
 			const allowedOrigins = [
-				process.env.FRONTEND_URL,
+				env.FRONTEND_URL,
 				// Add any additional production domains here
 			].filter(Boolean) as string[];
 
@@ -51,7 +53,10 @@ app.get('/health', (c) =>
 // Database health check
 app.get('/health/db', async (c) => {
 	try {
-		const client = neon(c.env.DATABASE_URL);
+		const env = getEnv(c.env);
+		validateEnv(env);
+
+		const client = neon(env.DATABASE_URL);
 
 		// Try to execute a simple query
 		const result = await client`SELECT 1`;
@@ -76,7 +81,7 @@ app.get('/health/db', async (c) => {
 				},
 			},
 			503,
-		); // Service Unavailable
+		);
 	}
 });
 
