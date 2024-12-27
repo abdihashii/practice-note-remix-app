@@ -18,9 +18,20 @@ const app = new Hono<{ Bindings: Env; Variables: Variables }>();
 app.use(
 	'*',
 	cors({
-		origin: isProd
-			? [process.env['FRONTEND_URL']!]
-			: ['http://localhost:5173', 'http://localhost:3000'],
+		origin: (origin) => {
+			// In development, allow localhost URLs
+			if (!isProd) {
+				return origin;
+			}
+
+			// In production, check against allowed domains
+			const allowedOrigins = [
+				process.env.FRONTEND_URL,
+				// Add any additional production domains here
+			].filter(Boolean) as string[];
+
+			return allowedOrigins.includes(origin) ? origin : allowedOrigins[0];
+		},
 		allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
 		allowHeaders: ['Content-Type'],
 		exposeHeaders: ['Content-Length', 'X-Requested-With'],
