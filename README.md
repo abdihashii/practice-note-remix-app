@@ -123,10 +123,7 @@ bunx drizzle-kit studio
 Remove all build artifacts and dependencies:
 
 ```bash
-bun run clean:root
-bun run clean:frontend
-bun run clean:backend
-bun run clean:types
+bun run clean
 ```
 
 ## Production Deployment

@@ -10,10 +10,15 @@
     "clean:backend": "bun run --cwd apps/backend clean",
     "clean:frontend": "bun run --cwd apps/frontend clean",
     "clean:types": "bun run --cwd packages/types clean",
-    "dev": "bun run --cwd apps/backend dev & bun run --cwd apps/frontend dev",
+    "clean": "bun run clean:root && bun run clean:backend && bun run clean:frontend && bun run clean:types",
+    "dev": "bun run dev:backend & bun run dev:frontend",
     "dev:frontend": "bun run --cwd apps/frontend dev",
-    "dev:backend": "bun run --cwd apps/backend dev",
-    "build:types": "bun run --cwd packages/types build"
+    "dev:backend": "bun run --cwd apps/backend worker:dev",
+    "build:types": "bun run --cwd packages/types build",
+    "deploy:backend": "bun run --cwd apps/backend worker:deploy",
+    "db:generate": "bun run --cwd apps/backend db:generate",
+    "db:migrate": "bun run --cwd apps/backend db:migrate",
+    "test": "bun run --cwd apps/backend test"
   },
   "devDependencies": {
     "@types/bun": "^1.1.14",
