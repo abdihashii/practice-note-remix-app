@@ -6,19 +6,14 @@
     "packages/*"
   ],
   "scripts": {
-    "clean": "bun run clean:workspaces",
-    "clean:workspaces": "bun ./scripts/clean-workspaces.ts",
-    "clean:install": "bun run clean:workspaces && bun install",
-    "clean:backend": "bun run --cwd apps/notes-api clean",
+    "clean:root": "rm -rf node_modules",
+    "clean:backend": "bun run --cwd apps/backend clean",
     "clean:frontend": "bun run --cwd apps/frontend clean",
     "clean:types": "bun run --cwd packages/types clean",
-    "postgres:up": "bun run --cwd apps/server postgres:up",
-    "postgres:down": "bun run --cwd apps/server postgres:down",
-    "dev": "bun run --cwd apps/server dev & bun run --cwd apps/frontend dev",
+    "dev": "bun run --cwd apps/backend dev & bun run --cwd apps/frontend dev",
     "dev:frontend": "bun run --cwd apps/frontend dev",
-    "dev:backend": "bun run --cwd apps/notes-api dev",
-    "build:types": "bun run --cwd packages/types build",
-    "setup": "chmod +x scripts/startup.sh && ./scripts/startup.sh"
+    "dev:backend": "bun run --cwd apps/backend dev",
+    "build:types": "bun run --cwd packages/types build"
   },
   "devDependencies": {
     "@types/react": "^19.0.2",

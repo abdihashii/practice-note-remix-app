@@ -1,11 +1,11 @@
 {
-  "name": "frontend",
+  "name": "@notes-app/frontend",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "build": "next build",
     "dev": "next dev",
-    "clean": "rm -rf .sst .next build dist node_modules .open-next",
+    "clean": "rm -rf .next build dist node_modules",
     "lint": "next lint",
     "start": "next start",
     "typecheck": "tsc"
