@@ -22,28 +22,6 @@ notes-app/
 
 ## Quick Start
 
-### Option 1: Interactive Setup (Recommended)
-
-Run the interactive setup script:
-
-```bash
-bun run setup
-```
-
-This will guide you through:
-
-- Installing dependencies
-- Setting up environment files
-- Building shared packages
-- Choosing your development configuration:
-  1. Full stack (Frontend + Backend)
-  2. Frontend only
-  3. Backend only
-
-Each option will set up PostgreSQL in a container and start the appropriate services.
-
-### Option 2: Manual Setup
-
 1. Install dependencies:
 
 ```bash
@@ -65,10 +43,7 @@ bun run build:types
 4. Optional: generate migrations (if drizzle folder is empty)
 
 ```bash
-# Navigate to server directory
-cd apps/server
-
-# Generate migrations
+# Generate migrations from root
 bun run db:generate
 ```
 
@@ -105,16 +80,13 @@ bun run dev:server
 
 ```bash
 # Generate migrations
-bun run --cwd apps/server db:generate
+bun run db:generate
 
 # Run migrations
-bun run --cwd apps/server db:migrate
-
-# Push schema changes
-bun run --cwd apps/server db:push
+bun run db:migrate
 
 # Run Drizzle Studio (DB GUI)
-cd apps/server
+cd apps/backend
 bunx drizzle-kit studio
 ```
 
