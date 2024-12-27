@@ -6,28 +6,18 @@
     "packages/*"
   ],
   "scripts": {
-    "clean": "bun run clean:workspaces",
-    "clean:workspaces": "bun ./scripts/clean-workspaces.ts",
-    "clean:install": "bun run clean:workspaces && bun install",
-    "clean:server": "bun run --cwd apps/server clean",
-    "clean:client": "bun run --cwd apps/client clean",
+    "clean:root": "rm -rf node_modules",
+    "clean:backend": "bun run --cwd apps/backend clean",
+    "clean:frontend": "bun run --cwd apps/frontend clean",
     "clean:types": "bun run --cwd packages/types clean",
-    "postgres:up": "bun run --cwd apps/server postgres:up",
-    "postgres:down": "bun run --cwd apps/server postgres:down",
-    "dev": "bun run --cwd apps/server dev & bun run --cwd apps/client dev",
-    "dev:client": "bun run --cwd apps/client dev",
-    "dev:server": "bun run --cwd apps/server dev",
-    "dev:worker-server": "bun run --cwd apps/notes-api dev",
-    "build:client": "bun run --cwd apps/client build",
-    "build:server": "bun run --cwd apps/server build",
-    "build:types": "bun run --cwd packages/types build",
-    "build:client-prod": "bun run build:types && bun run build:client",
-    "start:client": "bun run --cwd apps/client start",
-    "start:server": "bun run --cwd apps/server start",
-    "setup": "chmod +x scripts/startup.sh && ./scripts/startup.sh",
-    "postinstall": "[ -f scripts/startup.sh ] && chmod +x scripts/startup.sh || true"
+    "dev": "bun run --cwd apps/backend dev & bun run --cwd apps/frontend dev",
+    "dev:frontend": "bun run --cwd apps/frontend dev",
+    "dev:backend": "bun run --cwd apps/backend dev",
+    "build:types": "bun run --cwd packages/types build"
   },
   "devDependencies": {
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2",
     "typescript": "^5.7.2"
   }
 }

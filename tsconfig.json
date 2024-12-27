@@ -12,7 +12,6 @@
     // Modules
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
-    "verbatimModuleSyntax": true,
     "resolveJsonModule": true,
 
     // JavaScript Support
@@ -34,12 +33,14 @@
     "noFallthroughCasesInSwitch": true,
     "useUnknownInCatchVariables": true,
     "noPropertyAccessFromIndexSignature": true,
-    "noUncheckedIndexedAccess": true,
 
     // Interop Constraints
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+
+    // Remove verbatimModuleSyntax from root config
+    "verbatimModuleSyntax": false
   },
   "exclude": ["**/node_modules", "**/dist", "**/build"]
 }
