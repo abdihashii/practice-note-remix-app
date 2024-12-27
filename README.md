@@ -1,22 +1,23 @@
 # Notes App Monorepo
 
-A full-stack notes application with a React frontend and Bun/Hono backend.
+A full-stack notes application with a React frontend and Cloudflare Workers backend.
 
 ## Prerequisites
 
-- [Bun](https://bun.sh) (for both client and server)
+- [Bun](https://bun.sh) (for development)
 - [Node.js](https://nodejs.org/) 18+ (recommended)
-- [Docker](https://www.docker.com/) (for PostgreSQL database)
+- [Cloudflare Account](https://dash.cloudflare.com/sign-up) (for backend deployment)
+- [Neon Database Account](https://neon.tech) (for PostgreSQL)
 
 ## Project Structure
 
 ```bash
 notes-app/
 ├── apps/
-│ ├── client/ # Remix frontend
-│ └── server/ # Bun/Hono backend
+│ ├── frontend/    # Next.js frontend
+│ └── backend/     # Cloudflare Workers backend (Hono + Drizzle)
 └── packages/
-  └── types/ # Shared TypeScript types
+  └── types/       # Shared TypeScript types
 ```
 
 ## Quick Start
@@ -51,7 +52,8 @@ bun install
 
 2. Set up environment variables:
 
-- Copy `.env.example` to `.env` in both `apps/server` and `apps/client`
+- Copy `.env.example` to `.env` in both `apps/backend` and `apps/frontend`
+- For backend, also create `.dev.vars` for Cloudflare Workers development
 - Update variables as needed
 
 3. Build shared packages:
@@ -74,37 +76,26 @@ bun run db:generate
 
 ### Option 1: Full Stack Development (Recommended)
 
-Run both the client and server in development mode:
+Run both the frontend and backend in development mode:
 
 ```bash
-# Start PostgreSQL container in detached mode
-bun run postgres:up
-
-# Start both frontend and backend
 bun run dev
-
-# In a new terminal, ensure the server is running with a health check
-curl http://localhost:8000/health
 ```
 
-- Client: [http://localhost:5173](http://localhost:5173)
-- Server: [http://localhost:8000](http://localhost:8000)
+- Frontend: [http://localhost:3000](http://localhost:3000)
+- Backend: [http://localhost:8787](http://localhost:8787)
 
 ### Option 2: Individual Apps
 
-#### Client Only
+#### Frontend Only
 
 ```bash
-bun run dev:client
+bun run dev:frontend
 ```
 
-#### Server Only
+#### Backend Only
 
 ```bash
-# Start PostgreSQL container in detached mode
-bun run postgres:up
-
-# Start hono server
 bun run dev:server
 ```
 
@@ -115,6 +106,9 @@ bun run dev:server
 ```bash
 # Generate migrations
 bun run --cwd apps/server db:generate
+
+# Run migrations
+bun run --cwd apps/server db:migrate
 
 # Push schema changes
 bun run --cwd apps/server db:push
@@ -129,34 +123,37 @@ bunx drizzle-kit studio
 Remove all build artifacts and dependencies:
 
 ```bash
-bun run clean
-```
-
-Stop PostgreSQL container:
-
-```bash
-bun run postgres:down
+bun run clean:root
+bun run clean:frontend
+bun run clean:backend
+bun run clean:types
 ```
 
 ## Production Deployment
 
-### Build
+### Frontend
+
+Deploy the Next.js frontend to your preferred hosting platform.
+
+### Backend
+
+1. Authenticate with Cloudflare:
 
 ```bash
-# Build all packages
-bun run build:types
-bun run build:server
-bun run build:client
+npx wrangler login
 ```
 
-### Start Production Server
+2. Set up production environment variables:
 
 ```bash
-# Start the server
-NODE_ENV=production bun run start:server
+npx wrangler secret put DATABASE_URL
+npx wrangler secret put FRONTEND_URL
+```
 
-# Start the client
-NODE_ENV=production bun run start:client
+3. Deploy to Cloudflare Workers:
+
+```bash
+bun run --cwd apps/backend worker:deploy
 ```
 
 ### Environment Variables
@@ -164,15 +161,17 @@ NODE_ENV=production bun run start:client
 Make sure to set these in your production environment:
 
 ```env
-NODE_ENV=production
-DATABASE_URL=your_production_db_url
-FRONTEND_URL=https://your-frontend-domain.com
+# Frontend (.env)
+NEXT_PUBLIC_API_URL=your_workers_url
+
+# Backend (Cloudflare Workers secrets)
+DATABASE_URL=your_neon_db_url
+FRONTEND_URL=your_frontend_url
 ```
 
 ## Additional Notes
 
-- PostgreSQL runs in a Docker container for development
-- The server uses Bun for fast performance and modern JavaScript features
-- Hot Module Reloading (HMR) is available for both client and server
-- The client is built with Remix and includes a rich text editor
+- The backend is deployed to Cloudflare Workers for global edge computing
+- Database runs on Neon's serverless PostgreSQL platform
+- The frontend is built with Next.js for optimal performance
 - TypeScript is used throughout the project for type safety
