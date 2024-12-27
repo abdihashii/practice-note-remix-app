@@ -1,29 +1,18 @@
 type EnvVars = {
 	DATABASE_URL: string;
-	NODE_ENV?: string;
-	FRONTEND_URL?: string;
+	NODE_ENV: string;
+	FRONTEND_URL: string;
 };
 
 /**
- * Gets environment variables from either context bindings (Cloudflare Workers)
- * or process.env (local development)
- * @param contextEnv - Environment bindings from Cloudflare Workers context
- * @returns Combined environment variables
+ * Gets environment variables from process.env
+ * @returns Environment variables
  */
-export function getEnv(contextEnv?: EnvVars): EnvVars {
-	// If we're in a Cloudflare Worker environment, use the context env
-	if (contextEnv) {
-		return {
-			...contextEnv,
-			NODE_ENV: contextEnv.NODE_ENV || 'production',
-		};
-	}
-
-	// Otherwise, we're in a local environment, use process.env
+export function getEnv(): EnvVars {
 	return {
 		DATABASE_URL: process.env.DATABASE_URL!,
-		NODE_ENV: process.env.NODE_ENV || 'development',
-		FRONTEND_URL: process.env.FRONTEND_URL,
+		NODE_ENV: process.env.NODE_ENV!,
+		FRONTEND_URL: process.env.FRONTEND_URL!,
 	};
 }
 
@@ -33,7 +22,7 @@ export function getEnv(contextEnv?: EnvVars): EnvVars {
  * @throws Error if any required variables are missing
  */
 export function validateEnv(env: EnvVars): void {
-	const required = ['DATABASE_URL'];
+	const required = ['DATABASE_URL', 'NODE_ENV', 'FRONTEND_URL'];
 	const missing = required.filter((key) => !env[key as keyof EnvVars]);
 
 	if (missing.length > 0) {

@@ -7,11 +7,11 @@ import { cors } from 'hono/cors';
 import { dbMiddleware } from './middleware/dbMiddleware';
 import { noteRoutes } from './routes/noteRoutes';
 import { searchRoutes } from './routes/searchRoutes';
-import { Env, Variables } from './types';
+import { Variables } from './types';
 import { getEnv, validateEnv } from './utils/env';
 
 // Initialize Hono app with type definitions
-const app = new Hono<{ Bindings: Env; Variables: Variables }>();
+const app = new Hono<{ Variables: Variables }>();
 
 // Configure global CORS middleware
 app.use(
@@ -21,8 +21,12 @@ app.use(
 			const env = getEnv();
 			const isProd = env.NODE_ENV === 'production';
 
+			console.log(isProd ? 'production' : 'not production');
+
 			// In development, allow all origins
 			if (!isProd) {
+				console.log('development');
+				console.log('origin', origin);
 				return origin;
 			}
 
@@ -31,6 +35,8 @@ app.use(
 				env.FRONTEND_URL,
 				// Add any additional production domains here
 			].filter(Boolean) as string[];
+
+			console.log('allowedOrigins', allowedOrigins);
 
 			return allowedOrigins.includes(origin) ? origin : allowedOrigins[0];
 		},
@@ -53,7 +59,7 @@ app.get('/health', (c) =>
 // Database health check
 app.get('/health/db', async (c) => {
 	try {
-		const env = getEnv(c.env);
+		const env = getEnv();
 		validateEnv(env);
 
 		const client = neon(env.DATABASE_URL);
@@ -86,7 +92,7 @@ app.get('/health/db', async (c) => {
 });
 
 // Initialize API router with versioning
-const api = new Hono<{ Bindings: Env; Variables: Variables }>();
+const api = new Hono<{ Variables: Variables }>();
 
 // Inject database connection into context
 api.use('/notes/*', dbMiddleware);
