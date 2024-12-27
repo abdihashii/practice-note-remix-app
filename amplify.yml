@@ -1,24 +1,23 @@
 version: 1
-applications:
-  - frontend:
-      appRoot: "apps/frontend"
-      phases:
-        preBuild:
-          commands:
-            # Build shared types first
-            - cd ../../packages/types
-            - npm install
-            - npm run build
-            # Return to frontend and install dependencies
-            - cd ../../apps/frontend
-            - npm install
-        build:
-          commands:
-            - npm run build
-      artifacts:
-        baseDirectory: build
-        files:
-          - "**/*"
-      cache:
-        paths:
-          - node_modules/**/*
+frontend:
+  appRoot: apps/frontend
+  phases:
+    preBuild:
+      commands:
+        # Build shared types first
+        - cd ../../packages/types
+        - npm install
+        - npm run build
+        # Return to frontend and install dependencies
+        - cd ../../apps/frontend
+        - npm install
+    build:
+      commands:
+        - npm run build
+  artifacts:
+    baseDirectory: build
+    files:
+      - "**/*"
+  cache:
+    paths:
+      - node_modules/**/*
