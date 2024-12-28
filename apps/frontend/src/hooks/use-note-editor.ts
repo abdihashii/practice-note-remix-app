@@ -33,6 +33,7 @@ export default function useNoteEditor({
   const { toast } = useToast();
 
   const editor = useEditor({
+    immediatelyRender: false,
     extensions: [
       StarterKit.configure({
         heading: {
