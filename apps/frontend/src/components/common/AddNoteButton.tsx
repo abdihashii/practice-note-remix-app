@@ -7,13 +7,13 @@ import { Button } from "@/components/ui/button";
 
 export default function AddNoteButton() {
   return (
-    <Link href="/notes/add" className="h-full font-medium">
+    <Link href="/notes/add">
       <Button
         size="sm"
-        className="flex h-full items-center justify-center gap-2 px-4"
+        className="flex items-center gap-2 whitespace-nowrap transition-all duration-200 hover:gap-3"
       >
         <PlusIcon className="h-4 w-4" />
-        <span>Add Note</span>
+        <span>New Note</span>
       </Button>
     </Link>
   );

@@ -9,11 +9,11 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { CreateNoteDto, Note } from "@notes-app/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { PlusIcon } from "lucide-react";
 
 // First-party imports
 import { createNote, getNotes } from "@/app/api/notes";
 import { searchNotes } from "@/app/api/search";
-import AddNoteButton from "@/components/common/AddNoteButton";
 import { CreateNoteDialogForm } from "@/components/notes/CreateNoteDialogForm";
 import NoteCard from "@/components/notes/NoteCard";
 import { NotesLoadingSkeleton } from "@/components/notes/NotesLoadingSkeleton";
@@ -83,10 +83,6 @@ export default function NotesClientPage({
 
   return (
     <div className="relative flex-grow space-y-4">
-      <div className="flex h-12 items-center justify-between gap-4">
-        <AddNoteButton />
-      </div>
-
       {isLoading ? (
         <NotesLoadingSkeleton />
       ) : isError ? (
@@ -103,11 +99,24 @@ export default function NotesClientPage({
       ) : notesData && notesData.length > 0 ? (
         renderNotes(notesData)
       ) : (
-        <p className="py-10 text-center text-gray-600 dark:text-gray-400">
-          {initialQuery
-            ? "No results found. Try a different search term."
-            : "No notes yet. Create one!"}
-        </p>
+        <div className="flex flex-col items-center justify-center py-10 text-center">
+          <p className="mb-6 text-gray-600 dark:text-gray-400">
+            {initialQuery
+              ? "No results found. Try a different search term."
+              : "No notes yet. Create one!"}
+          </p>
+          {!initialQuery && (
+            <Link href="/notes/add">
+              <Button
+                size="lg"
+                className="flex items-center gap-2 whitespace-nowrap transition-all duration-200 hover:gap-3"
+              >
+                <PlusIcon className="h-5 w-5" />
+                <span>Create Your First Note</span>
+              </Button>
+            </Link>
+          )}
+        </div>
       )}
 
       <CreateNoteDialogForm

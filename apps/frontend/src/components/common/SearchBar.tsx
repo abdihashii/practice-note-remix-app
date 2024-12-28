@@ -7,6 +7,7 @@ import { FormEvent, useTransition } from "react";
 // Third-party imports
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { Search } from "lucide-react";
 
 interface SearchBarProps {
   defaultQuery: string;
@@ -34,12 +35,17 @@ export default function SearchBar({ defaultQuery }: SearchBarProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="w-full max-w-xs">
+    <form onSubmit={handleSubmit} className="w-full relative">
+      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
       <Input
         type="search"
         name="q"
         placeholder="Search notes..."
-        className={cn(isPending && "opacity-50")}
+        className={cn(
+          "pl-9 transition-all duration-200",
+          isPending && "opacity-50",
+          "focus:ring-2 focus:ring-offset-2 focus:ring-ring focus:ring-offset-background"
+        )}
         defaultValue={defaultQuery}
         disabled={isPending}
       />
