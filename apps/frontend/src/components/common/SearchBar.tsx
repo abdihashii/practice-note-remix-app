@@ -2,12 +2,12 @@
 
 // Remix and React
 import { useRouter } from "next/navigation";
-import { FormEvent, useEffect, useRef } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 
 // Third-party imports
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { Search, Command } from "lucide-react";
+import { ChevronUp, Command, Search } from "lucide-react";
 
 interface SearchBarProps {
   defaultQuery: string;
@@ -16,6 +16,12 @@ interface SearchBarProps {
 export default function SearchBar({ defaultQuery }: SearchBarProps) {
   const router = useRouter();
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const [isMac, setIsMac] = useState(false);
+
+  useEffect(() => {
+    // Check if user is on macOS
+    setIsMac(navigator.platform.toLowerCase().includes("mac"));
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -56,7 +62,11 @@ export default function SearchBar({ defaultQuery }: SearchBarProps) {
         defaultValue={defaultQuery}
       />
       <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 rounded border bg-muted px-1.5 py-0.5">
-        <Command className="h-3 w-3 text-muted-foreground/70" />
+        {isMac ? (
+          <Command className="h-3 w-3 text-muted-foreground/70" />
+        ) : (
+          <ChevronUp className="h-3 w-3 text-muted-foreground/70" />
+        )}
         <span className="text-xs font-medium text-muted-foreground/70">K</span>
       </div>
     </form>
