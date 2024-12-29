@@ -21,12 +21,8 @@ app.use(
 			const env = getEnv();
 			const isProd = env.NODE_ENV === 'production';
 
-			console.log(isProd ? 'production' : 'not production');
-
 			// In development, allow all origins
 			if (!isProd) {
-				console.log('development');
-				console.log('origin', origin);
 				return origin;
 			}
 
@@ -35,8 +31,6 @@ app.use(
 				env.FRONTEND_URL,
 				// Add any additional production domains here
 			].filter(Boolean) as string[];
-
-			console.log('allowedOrigins', allowedOrigins);
 
 			return allowedOrigins.includes(origin) ? origin : allowedOrigins[0];
 		},
