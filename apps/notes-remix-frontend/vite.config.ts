@@ -23,6 +23,9 @@ export default defineConfig(({ isSsrBuild }) => ({
     noExternal: true,
     resolve: {
       conditions: ["workerd", "browser"],
+      alias: {
+        "@/*": "./app/*",
+      },
     },
     optimizeDeps: {
       include: [

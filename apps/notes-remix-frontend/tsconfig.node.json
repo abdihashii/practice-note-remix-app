@@ -3,6 +3,10 @@
   "include": ["tailwind.config.ts", "vite.config.ts"],
   "compilerOptions": {
     "composite": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./app/*"]
+    },
     "strict": true,
     "types": ["node"],
     "lib": ["ES2022"],
