@@ -9,6 +9,7 @@
     "typecheck": "react-router typegen && tsc"
   },
   "dependencies": {
+    "@radix-ui/react-slot": "^1.1.1",
     "@react-router/node": "^7.1.1",
     "@react-router/serve": "^7.1.1",
     "class-variance-authority": "^0.7.1",
