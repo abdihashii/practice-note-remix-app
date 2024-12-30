@@ -1,3 +1,4 @@
+import { Link } from "react-router";
 import type { Route } from "./+types/home";
 
 export function meta({}: Route.MetaArgs) {
@@ -12,5 +13,10 @@ export function loader({ context }: Route.LoaderArgs) {
 }
 
 export default function Home({ loaderData }: Route.ComponentProps) {
-  return <div>Hello World</div>;
+  return (
+    <div>
+      <h1>Home</h1>
+      <Link to="/notes">Notes</Link>
+    </div>
+  );
 }
