@@ -1,5 +1,5 @@
 workers_dev = true
-name = "my-worker"
-compatibility_date = "2024-11-18"
+name = "notes-frontend"
+compatibility_date = "2024-12-29"
 main = "./build/server/index.js"
 assets = { directory = "./build/client/" }
