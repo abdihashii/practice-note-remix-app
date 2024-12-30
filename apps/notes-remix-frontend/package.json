@@ -6,9 +6,16 @@
     "build": "react-router build",
     "dev": "react-router dev",
     "start": "wrangler dev",
+    "deploy": "wrangler deploy",
     "typecheck": "react-router typegen && tsc"
   },
   "dependencies": {
+    "@radix-ui/react-alert-dialog": "^1.1.4",
+    "@radix-ui/react-dialog": "^1.1.4",
+    "@radix-ui/react-label": "^2.1.1",
+    "@radix-ui/react-select": "^2.1.4",
+    "@radix-ui/react-slot": "^1.1.1",
+    "@radix-ui/react-toast": "^1.2.4",
     "@react-router/node": "^7.1.1",
     "@react-router/serve": "^7.1.1",
     "class-variance-authority": "^0.7.1",
