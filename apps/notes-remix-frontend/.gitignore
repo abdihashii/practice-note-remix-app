@@ -8,3 +8,6 @@
 # Cloudflare
 .mf
 .wrangler
+
+# React Router v7 type generation
+.react-router/

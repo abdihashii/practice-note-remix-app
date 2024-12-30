@@ -1,18 +1,31 @@
 {
-  "files": [],
-  "references": [
-    { "path": "./tsconfig.node.json" },
-    { "path": "./tsconfig.cloudflare.json" }
-  ],
   "compilerOptions": {
+    // Language and Environment
+    "target": "ES2022",
+    "lib": ["DOM", "DOM.Iterable", "ES2022"],
+    "jsx": "react-jsx",
+
+    // Modules
+    "module": "ES2022",
+    "moduleResolution": "bundler",
     "baseUrl": ".",
     "paths": {
       "@/*": ["./app/*"]
     },
-    "checkJs": true,
-    "verbatimModuleSyntax": true,
-    "skipLibCheck": true,
+
+    // JavaScript Support
+    "allowJs": true,
+    "resolveJsonModule": true,
+
+    // Interop Constraints
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+
+    // Type Checking
     "strict": true,
     "noEmit": true
-  }
+  },
+  "include": ["remix.env.d.ts", "**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules"]
 }
