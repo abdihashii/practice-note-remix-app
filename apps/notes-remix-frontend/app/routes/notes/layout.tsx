@@ -1,32 +1,20 @@
-import { Link, Outlet } from "react-router";
+// React
+import { Outlet } from "react-router";
+
+// Third-party imports
+import { Toaster } from "@/components/ui/toaster";
+import Header from "@/components/layout/Header";
 
 export default function NotesLayout() {
   return (
-    <>
-      <header className="border-b">
-        <nav className="flex items-center justify-between max-w-7xl mx-auto p-4">
-          <h1 className="text-xl font-bold">Notes</h1>
-          <ul className="flex gap-4">
-            <li>
-              <Link
-                to="/notes"
-                className="text-foreground/80 hover:text-foreground"
-              >
-                All Notes
-              </Link>
-            </li>
-            <li>
-              <Link to="/" className="text-foreground/80 hover:text-foreground">
-                Home
-              </Link>
-            </li>
-          </ul>
-        </nav>
-      </header>
-
-      <main className="max-w-7xl mx-auto p-4">
-        <Outlet />
+    <div className="flex min-h-screen flex-col">
+      <Header />
+      <main className="flex flex-grow flex-col">
+        <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 py-6 sm:px-6 lg:px-8">
+          <Outlet />
+        </div>
       </main>
-    </>
+      <Toaster />
+    </div>
   );
 }
