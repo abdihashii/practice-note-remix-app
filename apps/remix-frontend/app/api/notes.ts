@@ -1,29 +1,19 @@
 // Third party libraries
-import type { CreateNoteDto, Note, UpdateNoteDto } from "@notes-app/types";
+import type {
+  CreateNoteDto,
+  Note,
+  PaginatedResponse,
+  PaginationParams,
+  UpdateNoteDto,
+} from "@notes-app/types";
 
 // Local imports
 import { API_URL } from "~/lib/constants";
 
-export interface GetNotesParams {
-  page?: number;
-  limit?: number;
-}
-
-interface GetNotesResponse {
-  error: string | null;
-  results: Note[];
-  pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-  };
-}
-
 export const getNotes = async ({
   page = 1,
   limit = 10,
-}: GetNotesParams = {}) => {
+}: PaginationParams = {}) => {
   const params = new URLSearchParams({
     page: page.toString(),
     limit: limit.toString(),
@@ -51,7 +41,7 @@ export const getNotes = async ({
   }
 
   // Handle paginated response
-  const { error, results, pagination } = data as GetNotesResponse;
+  const { error, results, pagination } = data as PaginatedResponse<Note>;
 
   if (error) {
     throw new Error(error);

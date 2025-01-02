@@ -1,9 +1,10 @@
 // Third-party imports
+import type { SaveButtonState } from "@notes-app/types";
 import { CheckIcon, Loader2Icon, SaveIcon, XIcon } from "lucide-react";
 import { Button } from "~/components/ui/button";
 
 interface SaveNoteButtonProps {
-  saveButtonState: "default" | "loading" | "success" | "failure";
+  saveButtonState: SaveButtonState;
   handleSave: () => void;
   newNote?: boolean;
 }

@@ -2,6 +2,7 @@
 import { useState } from "react";
 
 // Third-party imports
+import type { SaveButtonState } from "@notes-app/types";
 import { Extension } from "@tiptap/core";
 import Blockquote from "@tiptap/extension-blockquote";
 import Bold from "@tiptap/extension-bold";
@@ -18,7 +19,6 @@ import { useToast } from "~/hooks/use-toast";
 import { createNote, updateNote } from "~/api/notes";
 import CodeBlock from "~/components/notes-editor/CodeBlock";
 import { lowlight } from "~/lib/lowlight-utils";
-import type { SaveButtonState } from "~/types";
 
 const EDITOR_MIN_HEIGHT = 500;
 
