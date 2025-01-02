@@ -1,11 +1,18 @@
+// React
+import { Link } from "react-router";
+
 // Third-party imports
 import { useQuery } from "@tanstack/react-query";
+import { Loader2Icon } from "lucide-react";
+
+// First-party imports
+import { getNotes } from "~/api/notes";
 import AddNoteButton from "~/components/common/AddNoteButton";
 import SearchBar from "~/components/common/SearchBar";
-import { getNotes } from "~/api/notes";
+import NoteCard from "~/components/notes/NoteCard";
 
 export default function NotesPage() {
-  const { data, isLoading, error } = useQuery({
+  const { data, isPending, error } = useQuery({
     queryKey: ["notes"],
     queryFn: () => getNotes(),
   });
@@ -18,9 +25,29 @@ export default function NotesPage() {
         </div>
         <AddNoteButton />
       </div>
-      {isLoading && <div>Loading...</div>}
-      {error && <div>Error: {error.message}</div>}
-      {/* {data && <div>Data: {JSON.stringify(data)}</div>} */}
+
+      {isPending && (
+        <div className="flex flex-col items-center justify-center py-8 text-gray-500 gap-2">
+          <Loader2Icon className="h-6 w-6 animate-spin" />
+          Loading notes
+        </div>
+      )}
+
+      {error && (
+        <div className="rounded-md bg-red-50 p-4 text-red-700">
+          Error: {error.message}
+        </div>
+      )}
+
+      {data && (
+        <div className="space-y-4">
+          {data.map((note) => (
+            <Link to={`/notes/${note.id}`} key={note.id}>
+              <NoteCard note={note} />
+            </Link>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
