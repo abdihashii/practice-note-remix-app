@@ -95,6 +95,28 @@ Make sure to deploy the output of `npm run build`
 
 This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience. You can use whatever CSS framework you prefer.
 
+## Remix Frontend
+
+## Environment Configuration
+
+The application uses environment variables for configuration. These are managed through `app/config/env.ts` for type safety and validation.
+
+### Required Environment Variables
+
+- `VITE_API_URL`: The URL of the backend API (e.g., `http://localhost:8787/api/v1`)
+
+### Setup
+
+1. Copy `.env.example` to `.env`:
+
+   ```bash
+   cp .env.example .env
+   ```
+
+2. Update the values in `.env` according to your environment.
+
+Note: The application uses Vite's built-in environment handling. All custom environment variables must be prefixed with `VITE_`.
+
 ---
 
 Built with ❤️ using React Router.
