@@ -1,5 +1,5 @@
 // Third-party imports
-import { desc, eq } from 'drizzle-orm';
+import { desc, eq, sql } from 'drizzle-orm';
 import { Hono } from 'hono';
 
 // Local imports
@@ -11,13 +11,40 @@ export const noteRoutes = new Hono<{ Bindings: Env; Variables: Variables }>();
 // Get all notes
 noteRoutes.get('/', async (c) => {
 	const db = c.get('db');
+	const page = parseInt(c.req.query('page') ?? '1');
+	const limit = parseInt(c.req.query('limit') ?? '10');
 
+	// Validate pagination params
+	if (isNaN(page) || page < 1 || isNaN(limit) || limit < 1 || limit > 100) {
+		return c.json({ error: 'Invalid pagination parameters' }, 400);
+	}
+
+	const offset = (page - 1) * limit;
+
+	// Get total count
+	const totalCount = await db
+		.select({ count: sql`count(*)` })
+		.from(notesTable)
+		.then((result) => Number(result[0].count));
+
+	// Get paginated notes
 	const notes = await db
 		.select()
 		.from(notesTable)
-		.orderBy(desc(notesTable.updatedAt));
+		.orderBy(desc(notesTable.updatedAt))
+		.limit(limit)
+		.offset(offset);
 
-	return c.json(notes);
+	return c.json({
+		error: null,
+		results: notes,
+		pagination: {
+			page,
+			limit,
+			total: totalCount,
+			totalPages: Math.ceil(totalCount / limit),
+		},
+	});
 });
 
 // Get a note by id
