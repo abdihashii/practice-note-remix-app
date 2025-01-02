@@ -2,8 +2,8 @@
 import { Outlet } from "react-router";
 
 // Third-party imports
-// import { Toaster } from "~/components/ui/toaster";
 import Header from "~/components/layout/Header";
+import { Toaster } from "~/components/ui/toaster";
 
 export default function NotesLayout() {
   return (
@@ -14,7 +14,7 @@ export default function NotesLayout() {
           <Outlet />
         </div>
       </main>
-      {/* <Toaster /> */}
+      <Toaster />
     </div>
   );
 }
