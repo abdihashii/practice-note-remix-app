@@ -12,6 +12,7 @@ export default [
     layout("./routes/notes/layout.tsx", [
       index("./routes/notes/index.tsx"),
       route(":id", "./routes/notes/note.tsx"),
+      route("/add", "./routes/notes/add-note.tsx"),
     ]),
   ]),
 ] satisfies RouteConfig;
