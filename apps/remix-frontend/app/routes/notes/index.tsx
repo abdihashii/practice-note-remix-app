@@ -23,7 +23,7 @@ import NoteCard from "~/components/notes/NoteCard";
 import { cn } from "~/lib/utils";
 import { NotesLoadingSkeleton } from "./NotesLoadingSkeleton";
 
-const ITEMS_PER_PAGE = 3;
+const ITEMS_PER_PAGE = 10;
 
 export default function NotesPage() {
   const [searchParams] = useSearchParams();
@@ -46,7 +46,7 @@ export default function NotesPage() {
   });
 
   const renderPagination = () => {
-    if (!data?.pagination || data.pagination.totalPages <= 1) return null;
+    if (!data?.pagination) return null;
 
     const { page, totalPages } = data.pagination;
     const maxVisiblePages = 5;
