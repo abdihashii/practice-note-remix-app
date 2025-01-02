@@ -6,10 +6,11 @@
     "packages/*"
   ],
   "scripts": {
-    "clean": "bun run clean:root && bun run clean:backend && bun run clean:frontend && bun run clean:types",
+    "clean": "bun run clean:root && bun run clean:backend && bun run clean:frontend && bun run clean:remix-frontend && bun run clean:types",
     "clean:root": "rm -rf node_modules",
     "clean:backend": "bun run --cwd apps/backend clean",
     "clean:frontend": "bun run --cwd apps/frontend clean",
+    "clean:remix-frontend": "bun run --cwd apps/remix-frontend clean",
     "clean:types": "bun run --cwd packages/types clean",
     "dev": "bun run dev:backend & bun run dev:frontend",
     "dev:frontend": "bun run --cwd apps/frontend dev",
