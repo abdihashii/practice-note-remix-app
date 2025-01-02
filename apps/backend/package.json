@@ -10,7 +10,8 @@
 		"test": "vitest",
 		"cf-typegen": "wrangler types",
 		"db:generate": "drizzle-kit generate",
-		"db:migrate": "drizzle-kit migrate"
+		"db:migrate": "drizzle-kit migrate",
+		"db:seed": "psql $DATABASE_URL -f drizzle/seed.sql"
 	},
 	"devDependencies": {
 		"@cloudflare/vitest-pool-workers": "^0.5.2",
@@ -23,6 +24,7 @@
 	},
 	"dependencies": {
 		"@neondatabase/serverless": "^0.10.4",
+		"argon2": "^0.41.1",
 		"drizzle-orm": "^0.38.3",
 		"hono": "^4.6.14"
 	}
