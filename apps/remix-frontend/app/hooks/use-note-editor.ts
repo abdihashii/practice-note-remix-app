@@ -22,15 +22,17 @@ import { lowlight } from "~/lib/lowlight-utils";
 
 const EDITOR_MIN_HEIGHT = 500;
 
+interface UseNoteEditorProps {
+  initialContent: string;
+  noteId?: string;
+  newNote?: boolean;
+}
+
 export default function useNoteEditor({
   initialContent,
   noteId,
   newNote = false,
-}: {
-  initialContent: string;
-  noteId?: string;
-  newNote?: boolean;
-}) {
+}: UseNoteEditorProps) {
   const [editorHeight, setEditorHeight] = useState(EDITOR_MIN_HEIGHT);
   const [saveButtonState, setSaveButtonState] =
     useState<SaveButtonState>("default");
