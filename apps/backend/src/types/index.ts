@@ -1,4 +1,4 @@
-import { drizzle } from 'drizzle-orm/neon-http';
+import { drizzle } from 'drizzle-orm/node-postgres';
 
 export type Variables = {
 	db: ReturnType<typeof drizzle>;

@@ -1,9 +1,10 @@
 // Third-party imports
-import { neon } from '@neondatabase/serverless';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 
 // Local imports
+import { dbConnect } from './db';
+import { notesTable } from './db/schema';
 import { dbMiddleware } from './middleware/dbMiddleware';
 import { noteRoutes } from './routes/noteRoutes';
 import { searchRoutes } from './routes/searchRoutes';
@@ -56,10 +57,10 @@ app.get('/health/db', async (c) => {
 		const env = getEnv();
 		validateEnv(env);
 
-		const client = neon(env.DATABASE_URL);
+		const client = await dbConnect();
 
 		// Try to execute a simple query
-		const result = await client`SELECT 1`;
+		const result = await client.select().from(notesTable).limit(1);
 
 		return c.json({
 			status: 'ok',

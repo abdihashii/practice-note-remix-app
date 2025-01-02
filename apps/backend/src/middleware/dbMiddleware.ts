@@ -1,5 +1,4 @@
-import { neon } from '@neondatabase/serverless';
-import { drizzle } from 'drizzle-orm/neon-http';
+import { dbConnect } from '../db';
 import { MiddlewareHandler } from 'hono';
 
 import { Variables } from '../types';
@@ -9,11 +8,11 @@ import { getEnv, validateEnv } from '../utils/env';
 export const dbMiddleware: MiddlewareHandler<{
 	Variables: Variables;
 }> = async (c, next) => {
-	const env = getEnv();
-	validateEnv(env);
-
-	const sql = neon(env.DATABASE_URL);
-	const db = drizzle(sql);
-	c.set('db', db);
-	await next();
+	try {
+		const db = await dbConnect();
+		c.set('db', db);
+		await next();
+	} catch (error) {
+		return c.json({ error: 'Failed to connect to database' }, 500);
+	}
 };
