@@ -1,23 +1,29 @@
 // React
-import { Link } from "react-router";
+import { Link, useSearchParams } from "react-router";
 
 // Third-party imports
 import { useQuery } from "@tanstack/react-query";
-import { Loader2Icon } from "lucide-react";
 
 // First-party imports
+import type { Note } from "@notes-app/types";
 import { getNotes } from "~/api/notes";
+import { searchNotes } from "~/api/search";
 import AddNoteButton from "~/components/common/AddNoteButton";
 import SearchBar from "~/components/common/SearchBar";
 import NoteCard from "~/components/notes/NoteCard";
-import type { Note } from "@notes-app/types";
 import { cn } from "~/lib/utils";
 import { NotesLoadingSkeleton } from "./NotesLoadingSkeleton";
 
 export default function NotesPage() {
+  const [searchParams] = useSearchParams();
+  const searchQuery = searchParams.get("q") ?? "";
+
   const { data, isPending, error } = useQuery({
-    queryKey: ["notes"],
-    queryFn: () => getNotes(),
+    queryKey: ["notes", searchQuery],
+    queryFn: () =>
+      searchQuery
+        ? searchNotes(searchQuery).then((data) => data.searchResults)
+        : getNotes(),
   });
 
   const renderNotes = (notes: Note[]) => (
@@ -41,7 +47,7 @@ export default function NotesPage() {
     <div className="relative flex-grow space-y-4">
       <div className="flex items-center justify-between gap-4 pb-4">
         <div className="flex-1">
-          <SearchBar defaultQuery={""} />
+          <SearchBar defaultQuery={searchQuery} />
         </div>
         <AddNoteButton />
       </div>
@@ -54,7 +60,13 @@ export default function NotesPage() {
         </div>
       )}
 
-      {data && data.length > 0 && renderNotes(data)}
+      {data && data.length > 0 ? (
+        renderNotes(data)
+      ) : (
+        <div className="text-center text-gray-500">
+          {searchQuery ? "No notes found matching your search" : "No notes yet"}
+        </div>
+      )}
     </div>
   );
 }
