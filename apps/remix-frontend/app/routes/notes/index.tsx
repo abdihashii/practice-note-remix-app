@@ -10,12 +10,32 @@ import { getNotes } from "~/api/notes";
 import AddNoteButton from "~/components/common/AddNoteButton";
 import SearchBar from "~/components/common/SearchBar";
 import NoteCard from "~/components/notes/NoteCard";
+import type { Note } from "@notes-app/types";
+import { cn } from "~/lib/utils";
+import { NotesLoadingSkeleton } from "./NotesLoadingSkeleton";
 
 export default function NotesPage() {
   const { data, isPending, error } = useQuery({
     queryKey: ["notes"],
     queryFn: () => getNotes(),
   });
+
+  const renderNotes = (notes: Note[]) => (
+    <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+      {notes.map((note) => (
+        <Link
+          to={`/notes/${note.id}`}
+          key={note.id}
+          className={cn(
+            "group h-full transition-all duration-200 ease-in-out",
+            "hover:-translate-y-0.5"
+          )}
+        >
+          <NoteCard note={note} />
+        </Link>
+      ))}
+    </div>
+  );
 
   return (
     <div className="relative flex-grow space-y-4">
@@ -26,12 +46,7 @@ export default function NotesPage() {
         <AddNoteButton />
       </div>
 
-      {isPending && (
-        <div className="flex flex-col items-center justify-center py-8 text-gray-500 gap-2">
-          <Loader2Icon className="h-6 w-6 animate-spin" />
-          Loading notes
-        </div>
-      )}
+      {isPending && <NotesLoadingSkeleton />}
 
       {error && (
         <div className="rounded-md bg-red-50 p-4 text-red-700">
@@ -39,15 +54,7 @@ export default function NotesPage() {
         </div>
       )}
 
-      {data && (
-        <div className="space-y-4">
-          {data.map((note) => (
-            <Link to={`/notes/${note.id}`} key={note.id}>
-              <NoteCard note={note} />
-            </Link>
-          ))}
-        </div>
-      )}
+      {data && data.length > 0 && renderNotes(data)}
     </div>
   );
 }
