@@ -42,6 +42,7 @@ This will start a local development server that mimics the Cloudflare Workers en
 ```env
 DATABASE_URL="your_database_url"
 FRONTEND_URL="http://localhost:3000"
+JWT_SECRET="your_jwt_secret"
 ```
 
 ### Deployment
@@ -70,6 +71,7 @@ bun run worker:deploy
 - `DATABASE_URL` (required): Connection string for the Neon PostgreSQL database
 - `NODE_ENV`: Environment mode (`development` or `production`)
 - `FRONTEND_URL`: URL of the frontend application for CORS configuration
+- `JWT_SECRET`: Secret key for JWT token generation
 
 ## Available Scripts
 

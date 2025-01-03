@@ -16,12 +16,6 @@ import { Pool } from 'pg';
 // Local imports
 import * as schema from './schema';
 
-// Export a function that takes env as a parameter
-// export function createDb(env: any) {
-// 	const sql = neon(env.DATABASE_URL);
-// 	return drizzle({ client: sql });
-// }
-
 const databaseUrl = process.env.DATABASE_URL;
 
 export async function dbConnect() {

@@ -11,6 +11,7 @@
 		"cf-typegen": "wrangler types",
 		"db:generate": "drizzle-kit generate",
 		"db:migrate": "drizzle-kit migrate",
+		"db:push": "drizzle-kit push",
 		"db:seed": "psql $DATABASE_URL -f drizzle/seed.sql"
 	},
 	"devDependencies": {
@@ -24,7 +25,6 @@
 		"wrangler": "^3.99.0"
 	},
 	"dependencies": {
-		"@neondatabase/serverless": "^0.10.4",
 		"argon2": "^0.41.1",
 		"drizzle-orm": "^0.38.3",
 		"hono": "^4.6.14",

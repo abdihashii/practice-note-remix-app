@@ -1,47 +1,44 @@
 // Third-party imports
 import { Hono } from 'hono';
-import { cors } from 'hono/cors';
 
 // Local imports
 import { dbConnect } from './db';
 import { notesTable } from './db/schema';
 import { dbMiddleware } from './middleware/dbMiddleware';
+import { errorHandler } from './middleware/errorMiddleware';
+import {
+	corsMiddleware,
+	securityMiddleware,
+} from './middleware/securityMiddleware';
 import { noteRoutes } from './routes/noteRoutes';
 import { searchRoutes } from './routes/searchRoutes';
-import { Variables } from './types';
+import { authRoutes } from './routes/authRoutes';
+import { CustomEnv } from './types';
 import { getEnv, validateEnv } from './utils/env';
 
 // Initialize Hono app with type definitions
-const app = new Hono<{ Variables: Variables }>();
+const app = new Hono<CustomEnv>();
 
-// Configure global CORS middleware
-app.use(
-	'*',
-	cors({
-		origin: (origin) => {
-			const env = getEnv();
-			const isProd = env.NODE_ENV === 'production';
+// Apply error handler first to catch all errors
+app.use('*', errorHandler);
 
-			// In development, allow all origins
-			if (!isProd) {
-				return origin;
-			}
+// Apply CORS middleware
+app.use('*', corsMiddleware);
 
-			// In production, check against allowed domains
-			const allowedOrigins = [
-				env.FRONTEND_URL,
-				// Add any additional production domains here
-			].filter(Boolean) as string[];
+// Apply all security middleware
+securityMiddleware.forEach((middleware) => {
+	app.use('*', middleware);
+});
 
-			return allowedOrigins.includes(origin) ? origin : allowedOrigins[0];
-		},
-		allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-		allowHeaders: ['Content-Type'],
-		exposeHeaders: ['Content-Length', 'X-Requested-With'],
-		credentials: true,
-		maxAge: 600,
-	}),
-);
+// Add request logging
+app.use('*', async (c, next) => {
+	console.log(`${c.req.method} ${c.req.url}`);
+	try {
+		await next();
+	} catch (err) {
+		throw err; // Let error handler middleware handle it
+	}
+});
 
 // Basic health check
 app.get('/health', (c) =>
@@ -87,15 +84,15 @@ app.get('/health/db', async (c) => {
 });
 
 // Initialize API router with versioning
-const api = new Hono<{ Variables: Variables }>();
+const api = new Hono<CustomEnv>();
 
-// Inject database connection into context
-api.use('/notes/*', dbMiddleware);
-api.use('/search/*', dbMiddleware);
+// Apply database middleware to all API routes
+api.use('*', dbMiddleware);
 
 // Mount API routes
 api.route('/notes', noteRoutes);
 api.route('/search', searchRoutes);
+api.route('/auth', authRoutes);
 
 // Mount versioned API under /api/v1
 app.route('/api/v1', api);
