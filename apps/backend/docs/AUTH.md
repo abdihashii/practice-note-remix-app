@@ -23,12 +23,33 @@ POST /api/v1/auth/register
   "refreshToken": "eyJhbG...",
   "user": {
     "id": "user_id",
-    "email": "user@example.com"
+    "email": "user@example.com",
+    "emailVerified": false
   }
 }
 ```
 
-### 2. Login
+### 2. Email Verification (Planned)
+
+After registration, users will need to verify their email:
+
+```typescript
+// 1. User receives email with verification token
+GET /api/v1/auth/verify-email?token=verification_token
+
+// Response on success
+{
+  "message": "Email verified successfully"
+}
+
+// 2. Resend verification email if needed
+POST /api/v1/auth/resend-verification
+{
+  "email": "user@example.com"
+}
+```
+
+### 3. Login
 
 ```typescript
 POST /api/v1/auth/login
@@ -43,12 +64,13 @@ POST /api/v1/auth/login
   "refreshToken": "eyJhbG...",
   "user": {
     "id": "user_id",
-    "email": "user@example.com"
+    "email": "user@example.com",
+    "emailVerified": true
   }
 }
 ```
 
-### 3. Token Refresh
+### 4. Token Refresh
 
 When the access token expires, use the refresh token to get a new pair:
 
@@ -65,7 +87,7 @@ POST /api/v1/auth/refresh
 }
 ```
 
-### 4. Logout
+### 5. Logout
 
 Invalidates both access and refresh tokens:
 
