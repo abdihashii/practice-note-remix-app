@@ -6,12 +6,16 @@ This document outlines the planned improvements and enhancements for the backend
 
 These improvements can be implemented quickly with minimal architectural changes.
 
-### Why?
+### Critical Security Improvements ⚡
 
-- Protect against API abuse and DoS attacks
-- Ensure API stability under load
-- Maintain backward compatibility while evolving the API
-- Prevent resource exhaustion from large payloads
+- [ ] Add security headers to all responses
+  - _Why_: Prevent common web vulnerabilities
+  - _Effort_: Low (1 hour)
+  - _Impact_: Critical
+- [ ] Implement generic error messages for auth/token responses
+  - _Why_: Prevent information leakage
+  - _Effort_: Low (1-2 hours)
+  - _Impact_: Critical
 
 ### API Protection & Rate Limiting
 
@@ -32,12 +36,20 @@ These improvements can be implemented quickly with minimal architectural changes
 
 These improvements enhance the API's reliability, maintainability, and developer experience.
 
-### Why?
+### High-Priority Security Enhancements 🔒
 
-- Reduce development errors through better documentation
-- Improve API consistency and reliability
-- Speed up integration for API consumers
-- Reduce support overhead through better error messages
+- [ ] Implement token reuse detection
+  - _Why_: Prevent replay attacks
+  - _Effort_: Medium (4-6 hours)
+  - _Impact_: Critical
+- [ ] Add token context binding
+  - _Why_: Make stolen tokens harder to reuse
+  - _Effort_: Medium-High (1-2 days)
+  - _Impact_: High
+- [ ] Implement token rotation system
+  - _Why_: Limit token lifetime and reuse potential
+  - _Effort_: High (2-3 days)
+  - _Impact_: High
 
 ### Documentation
 
@@ -61,7 +73,7 @@ These improvements enhance the API's reliability, maintainability, and developer
 - [ ] Add request payload validation
   - _Why_: Prevent invalid data from reaching business logic
 
-**Expected Timeline**: 1 week  
+**Expected Timeline**: 1-2 weeks  
 **Impact**: High  
 **Risk**: Medium
 
@@ -107,13 +119,6 @@ These improvements focus on API performance, scalability, and observability.
 ## Phase 4: Security Enhancements 🔒
 
 These improvements strengthen the API's security posture.
-
-### Why?
-
-- Protect sensitive operations
-- Prevent unauthorized access
-- Enable secure service-to-service communication
-- Maintain audit trail for compliance
 
 ### Security Features
 
