@@ -4,6 +4,103 @@
 
 This guide explains how authentication (AuthN) and authorization (AuthZ) work in our API. We'll cover the journey of a request from the moment it hits our API to how we ensure secure access to resources.
 
+## Authentication Flow 🔄
+
+Our API implements a standard JWT-based authentication flow with refresh tokens.
+
+### 1. Registration
+
+```typescript
+POST /api/v1/auth/register
+{
+  "email": "user@example.com",
+  "password": "secure_password"
+}
+
+// Response
+{
+  "accessToken": "eyJhbGc...",
+  "refreshToken": "eyJhbG...",
+  "user": {
+    "id": "user_id",
+    "email": "user@example.com"
+  }
+}
+```
+
+### 2. Login
+
+```typescript
+POST /api/v1/auth/login
+{
+  "email": "user@example.com",
+  "password": "secure_password"
+}
+
+// Response (same as registration)
+{
+  "accessToken": "eyJhbGc...",
+  "refreshToken": "eyJhbG...",
+  "user": {
+    "id": "user_id",
+    "email": "user@example.com"
+  }
+}
+```
+
+### 3. Token Refresh
+
+When the access token expires, use the refresh token to get a new pair:
+
+```typescript
+POST /api/v1/auth/refresh
+{
+  "refreshToken": "eyJhbG..."
+}
+
+// Response
+{
+  "accessToken": "new_token...",
+  "refreshToken": "new_refresh_token..."
+}
+```
+
+### 4. Logout
+
+Invalidates both access and refresh tokens:
+
+```typescript
+POST /api/v1/auth/logout
+Authorization: Bearer eyJhbGc...
+
+// Response
+{
+  "message": "Successfully logged out"
+}
+```
+
+### Token Lifecycle
+
+1. **Access Token**
+
+   - Short-lived (15 minutes)
+   - Used for API requests
+   - Sent in Authorization header
+
+2. **Refresh Token**
+   - Longer-lived (7 days)
+   - Used only for getting new access tokens
+   - One-time use (rotated on refresh)
+   - Invalidated on logout
+
+### Security Measures
+
+- Passwords are hashed using bcrypt
+- Refresh tokens are single-use
+- Token invalidation on logout
+- Rate limiting on auth endpoints (planned)
+- IP-based blocking on multiple failed attempts (planned)
+
 ## The Authentication Journey 🛣️
 
 ### 1. Initial Request
