@@ -15,6 +15,7 @@ import { searchRoutes } from './routes/searchRoutes';
 import { authRoutes } from './routes/authRoutes';
 import { CustomEnv } from './types';
 import { getEnv, validateEnv } from './utils/env';
+import { verifyJWT } from './middleware/authMiddleware';
 
 // Initialize Hono app with type definitions
 const app = new Hono<CustomEnv>();
@@ -89,10 +90,15 @@ const api = new Hono<CustomEnv>();
 // Apply database middleware to all API routes
 api.use('*', dbMiddleware);
 
-// Mount API routes
+// Mount auth routes first (unprotected)
+api.route('/auth', authRoutes);
+
+// Apply JWT verification to all other API routes
+api.use('*', verifyJWT);
+
+// Mount protected API routes
 api.route('/notes', noteRoutes);
 api.route('/search', searchRoutes);
-api.route('/auth', authRoutes);
 
 // Mount versioned API under /api/v1
 app.route('/api/v1', api);
