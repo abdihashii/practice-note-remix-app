@@ -13,7 +13,9 @@ export interface PasswordValidationResult {
   errors: string[];
 }
 
-export function validatePassword(password: string): PasswordValidationResult {
+export function validatePasswordStrength(
+  password: string
+): PasswordValidationResult {
   const errors: string[] = [];
 
   if (password.length < PASSWORD_REQUIREMENTS.minLength) {

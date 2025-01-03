@@ -1,6 +1,6 @@
 // Third-party imports
 import {
-	validatePassword,
+	validatePasswordStrength,
 	type NotificationPreferences,
 	type UserSettings,
 } from '@notes-app/types';
@@ -74,10 +74,6 @@ async function generateTokens(userId: string) {
 	return { accessToken, refreshToken };
 }
 
-function isStrongPassword(password: string): boolean {
-	return validatePassword(password).isValid;
-}
-
 /**
  * Register a new user
  * POST /auth/register
@@ -98,11 +94,11 @@ authRoutes.post('/register', async (c) => {
 			});
 		}
 
-		// Check if password is strong
-		if (!isStrongPassword(data.password)) {
-			const { errors } = validatePassword(data.password);
+		// Validate password strength
+		const passwordValidation = validatePasswordStrength(data.password);
+		if (!passwordValidation.isValid) {
 			return handleAuthError(c, 'Invalid password', {
-				errors,
+				errors: passwordValidation.errors,
 			});
 		}
 
