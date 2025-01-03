@@ -4,9 +4,9 @@ import { Hono } from 'hono';
 
 // Local imports
 import { notesTable } from '../db/schema';
-import { Variables } from '../types';
+import { CustomEnv } from '../types';
 
-export const noteRoutes = new Hono<{ Bindings: Env; Variables: Variables }>();
+export const noteRoutes = new Hono<CustomEnv>();
 
 // Get all notes
 noteRoutes.get('/', async (c) => {
