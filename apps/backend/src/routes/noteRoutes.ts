@@ -3,10 +3,13 @@ import { desc, eq, sql } from 'drizzle-orm';
 import { Hono } from 'hono';
 
 // Local imports
+import type { CreateNoteDto, UpdateNoteDto } from '@notes-app/types';
 import { notesTable } from '../db/schema';
-import { Variables } from '../types';
+import { handleValidationError } from '../middleware/errorMiddleware';
+import { CustomEnv } from '../types';
+import { validateCreateNote, validateUpdateNote } from '../utils/note-utils';
 
-export const noteRoutes = new Hono<{ Bindings: Env; Variables: Variables }>();
+export const noteRoutes = new Hono<CustomEnv>();
 
 // Get all notes
 noteRoutes.get('/', async (c) => {
@@ -60,22 +63,41 @@ noteRoutes.get('/:id', async (c) => {
 // Create a new note
 noteRoutes.post('/', async (c) => {
 	const db = c.get('db');
-	const note = await c.req.json();
+	const noteData = await c.req.json<CreateNoteDto>();
 
-	const newNote = await db.insert(notesTable).values(note).returning();
-	const createdNote = newNote[0];
+	// Validate note data
+	const validationErrors = validateCreateNote(noteData);
+	if (validationErrors.length > 0) {
+		return handleValidationError(c, 'Invalid note data', validationErrors);
+	}
 
-	return c.json(createdNote);
+	const newNote = await db
+		.insert(notesTable)
+		.values({
+			...noteData,
+			userId: c.get('userId'), // Ensure note is associated with current user
+			createdAt: new Date(),
+			updatedAt: new Date(),
+		})
+		.returning();
+
+	return c.json(newNote[0]);
 });
 
 // Update a note
 noteRoutes.put('/:id', async (c) => {
 	const db = c.get('db');
 	const id = c.req.param('id');
-	const note = await c.req.json();
+	const noteData = await c.req.json<UpdateNoteDto>();
+
+	// Validate note data
+	const validationErrors = validateUpdateNote(noteData);
+	if (validationErrors.length > 0) {
+		return handleValidationError(c, 'Invalid note data', validationErrors);
+	}
 
 	const updatedNote = {
-		...note,
+		...noteData,
 		updatedAt: new Date(), // Pass Date object directly instead of ISO string
 	};
 

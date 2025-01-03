@@ -22,6 +22,20 @@
       "when": 1735092130416,
       "tag": "0002_magenta_darkstar",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1735796756785,
+      "tag": "0003_useful_timeslip",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1735878236159,
+      "tag": "0004_sweet_scarecrow",
+      "breakpoints": true
     }
   ]
 }

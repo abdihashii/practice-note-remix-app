@@ -1,5 +1,2 @@
-import { drizzle } from 'drizzle-orm/neon-http';
-
-export type Variables = {
-	db: ReturnType<typeof drizzle>;
-};
+export * from './custom-env-types';
+export * from './error-types';

@@ -1,46 +1,46 @@
 // Third-party imports
-import { neon } from '@neondatabase/serverless';
 import { Hono } from 'hono';
-import { cors } from 'hono/cors';
 
 // Local imports
+import { dbConnect } from './db';
+import { notesTable } from './db/schema';
+import { verifyJWT } from './middleware/authMiddleware';
 import { dbMiddleware } from './middleware/dbMiddleware';
+import { errorHandler } from './middleware/errorMiddleware';
+import {
+	corsMiddleware,
+	securityMiddleware,
+} from './middleware/securityMiddleware';
+import { authRoutes } from './routes/authRoutes';
 import { noteRoutes } from './routes/noteRoutes';
 import { searchRoutes } from './routes/searchRoutes';
-import { Variables } from './types';
+import { CustomEnv } from './types';
 import { getEnv, validateEnv } from './utils/env';
 
 // Initialize Hono app with type definitions
-const app = new Hono<{ Variables: Variables }>();
+const app = new Hono<CustomEnv>();
 
-// Configure global CORS middleware
-app.use(
-	'*',
-	cors({
-		origin: (origin) => {
-			const env = getEnv();
-			const isProd = env.NODE_ENV === 'production';
+// Apply error handler first to catch all errors
+app.use('*', errorHandler);
 
-			// In development, allow all origins
-			if (!isProd) {
-				return origin;
-			}
+// Apply CORS middleware
+app.use('*', corsMiddleware);
 
-			// In production, check against allowed domains
-			const allowedOrigins = [
-				env.FRONTEND_URL,
-				// Add any additional production domains here
-			].filter(Boolean) as string[];
+// Apply all security middleware
+// (i.e. HTTPS, Content-Type, Cookie, Security Headers, and CSRF)
+securityMiddleware.forEach((middleware) => {
+	app.use('*', middleware);
+});
 
-			return allowedOrigins.includes(origin) ? origin : allowedOrigins[0];
-		},
-		allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-		allowHeaders: ['Content-Type'],
-		exposeHeaders: ['Content-Length', 'X-Requested-With'],
-		credentials: true,
-		maxAge: 600,
-	}),
-);
+// Add request logging
+app.use('*', async (c, next) => {
+	console.log(`${c.req.method} ${c.req.url}`);
+	try {
+		await next();
+	} catch (err) {
+		throw err; // Let error handler middleware handle it
+	}
+});
 
 // Basic health check
 app.get('/health', (c) =>
@@ -56,10 +56,10 @@ app.get('/health/db', async (c) => {
 		const env = getEnv();
 		validateEnv(env);
 
-		const client = neon(env.DATABASE_URL);
+		const client = await dbConnect();
 
 		// Try to execute a simple query
-		const result = await client`SELECT 1`;
+		const result = await client.select().from(notesTable).limit(1);
 
 		return c.json({
 			status: 'ok',
@@ -86,13 +86,18 @@ app.get('/health/db', async (c) => {
 });
 
 // Initialize API router with versioning
-const api = new Hono<{ Variables: Variables }>();
+const api = new Hono<CustomEnv>();
 
-// Inject database connection into context
-api.use('/notes/*', dbMiddleware);
-api.use('/search/*', dbMiddleware);
+// Apply database middleware to all API routes
+api.use('*', dbMiddleware);
 
-// Mount API routes
+// Mount auth routes first (unprotected)
+api.route('/auth', authRoutes);
+
+// Apply JWT verification to all other API routes
+api.use('*', verifyJWT);
+
+// Mount protected API routes
 api.route('/notes', noteRoutes);
 api.route('/search', searchRoutes);
 
