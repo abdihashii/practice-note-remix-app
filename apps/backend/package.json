@@ -4,7 +4,7 @@
 	"private": true,
 	"scripts": {
 		"dev": "bun run src/local.ts",
-		"build": "bun build ./src/server.ts --outdir ./dist",
+		"build": "bun build ./src/server.ts --outdir ./dist --target node",
 		"start": "bun ./dist/server.js",
 		"clean": "rm -rf .wrangler node_modules dist build",
 		"test": "vitest",
