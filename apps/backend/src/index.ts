@@ -4,18 +4,18 @@ import { Hono } from 'hono';
 // Local imports
 import { dbConnect } from './db';
 import { notesTable } from './db/schema';
+import { verifyJWT } from './middleware/authMiddleware';
 import { dbMiddleware } from './middleware/dbMiddleware';
 import { errorHandler } from './middleware/errorMiddleware';
 import {
 	corsMiddleware,
 	securityMiddleware,
 } from './middleware/securityMiddleware';
+import { authRoutes } from './routes/authRoutes';
 import { noteRoutes } from './routes/noteRoutes';
 import { searchRoutes } from './routes/searchRoutes';
-import { authRoutes } from './routes/authRoutes';
 import { CustomEnv } from './types';
 import { getEnv, validateEnv } from './utils/env';
-import { verifyJWT } from './middleware/authMiddleware';
 
 // Initialize Hono app with type definitions
 const app = new Hono<CustomEnv>();
