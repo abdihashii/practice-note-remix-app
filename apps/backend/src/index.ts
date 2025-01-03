@@ -27,6 +27,7 @@ app.use('*', errorHandler);
 app.use('*', corsMiddleware);
 
 // Apply all security middleware
+// (i.e. HTTPS, Content-Type, Cookie, Security Headers, and CSRF)
 securityMiddleware.forEach((middleware) => {
 	app.use('*', middleware);
 });
