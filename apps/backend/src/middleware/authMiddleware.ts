@@ -6,6 +6,7 @@ import type { MiddlewareHandler } from 'hono/types';
 // Local imports
 import { usersTable } from '../db/schema';
 import type { CustomEnv } from '../types';
+import { SecurityErrorType } from '../types/error-types';
 import { handleAuthError, handleTokenError } from './errorMiddleware';
 
 interface CustomJWTPayload {
@@ -25,12 +26,12 @@ export const verifyJWT: MiddlewareHandler<CustomEnv> = async (c, next) => {
 	try {
 		const token = c.req.header('Authorization')?.split(' ')[1];
 		if (!token) {
-			return handleAuthError(c, 'No token provided');
+			return handleAuthError(c, 'Authentication required');
 		}
 
 		const secret = process.env['JWT_SECRET'];
 		if (!secret) {
-			throw new Error('JWT_SECRET is not defined');
+			throw new Error('Configuration error');
 		}
 
 		try {
@@ -38,13 +39,17 @@ export const verifyJWT: MiddlewareHandler<CustomEnv> = async (c, next) => {
 			const payload = decoded as unknown as CustomJWTPayload;
 
 			if (!payload.userId) {
-				return handleTokenError(c, 'Invalid token format');
+				return handleTokenError(c, 'Authentication failed', {
+					type: SecurityErrorType.INVALID_TOKEN,
+				});
 			}
 
 			// Check if token is expired
 			const now = Math.floor(Date.now() / 1000);
 			if (payload.exp < now) {
-				return handleTokenError(c, 'Token expired');
+				return handleTokenError(c, 'Authentication failed', {
+					type: SecurityErrorType.TOKEN_EXPIRED,
+				});
 			}
 
 			// Add user ID to request context
@@ -63,8 +68,8 @@ export const verifyJWT: MiddlewareHandler<CustomEnv> = async (c, next) => {
 				);
 
 				if (tokenIssuedAt < invalidationTime) {
-					return handleTokenError(c, 'Token has been invalidated', {
-						invalidatedAt: user.lastTokenInvalidation.toISOString(),
+					return handleTokenError(c, 'Authentication failed', {
+						type: SecurityErrorType.TOKEN_REVOKED,
 					});
 				}
 			}
@@ -72,14 +77,12 @@ export const verifyJWT: MiddlewareHandler<CustomEnv> = async (c, next) => {
 			await next();
 		} catch (err) {
 			console.error('JWT verification error:', err);
-			return handleTokenError(c, 'Invalid token', {
-				error: err instanceof Error ? err.message : String(err),
+			return handleTokenError(c, 'Authentication failed', {
+				type: SecurityErrorType.INVALID_TOKEN,
 			});
 		}
 	} catch (err) {
 		console.error('Auth middleware error:', err);
-		return handleAuthError(c, 'Authentication failed', {
-			error: err instanceof Error ? err.message : String(err),
-		});
+		return handleAuthError(c, 'Authentication failed');
 	}
 };
