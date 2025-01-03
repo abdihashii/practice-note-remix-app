@@ -4,9 +4,9 @@ import { Hono } from 'hono';
 
 // Local imports
 import { notesTable } from '../db/schema';
-import { Env, Variables } from '../types';
+import { CustomEnv } from '../types';
 
-export const searchRoutes = new Hono<{ Bindings: Env; Variables: Variables }>();
+export const searchRoutes = new Hono<CustomEnv>();
 
 searchRoutes.get('/', async (c) => {
 	try {
@@ -35,7 +35,7 @@ searchRoutes.get('/', async (c) => {
 				: or(
 						ilike(notesTable.title, `%${normalizedSearchQuery}%`),
 						ilike(notesTable.content, `%${normalizedSearchQuery}%`),
-					);
+				  );
 
 		const totalCount = await db
 			.select({ count: sql`count(*)` })
