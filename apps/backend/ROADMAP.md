@@ -12,7 +12,7 @@ These improvements can be implemented quickly with minimal architectural changes
   - _Why_: Prevent common web vulnerabilities
   - _Effort_: Low (1 hour)
   - _Impact_: Critical
-- [x] Implement generic error messages for auth/token responses (completed 2024-01-03)
+- [x] Implement generic error messages for auth/token responses (completed 2025-01-01)
   - _Why_: Prevent information leakage
   - _Effort_: Low (1-2 hours)
   - _Impact_: Critical
