@@ -10,6 +10,6 @@ export default defineConfig({
 	schema: './src/db/schema.ts',
 	dialect: 'postgresql',
 	dbCredentials: {
-		url: databaseUrl!,
+		url: 'postgresql://notes-db_owner:ewtTvc6rW8oP@ep-snowy-dawn-a5mcju3z-pooler.us-east-2.aws.neon.tech/notes-db?sslmode=require',
 	},
 });

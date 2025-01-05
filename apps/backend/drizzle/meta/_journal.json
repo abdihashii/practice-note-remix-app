@@ -5,36 +5,22 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1735072366196,
-      "tag": "0000_volatile_shinobi_shaw",
+      "when": 1736106667952,
+      "tag": "0000_stale_millenium_guard",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "7",
-      "when": 1735091857751,
-      "tag": "0001_panoramic_luckman",
+      "when": 1736106899030,
+      "tag": "0001_big_network",
       "breakpoints": true
     },
     {
       "idx": 2,
       "version": "7",
-      "when": 1735092130416,
-      "tag": "0002_magenta_darkstar",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1735796756785,
-      "tag": "0003_useful_timeslip",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1735878236159,
-      "tag": "0004_sweet_scarecrow",
+      "when": 1736107176076,
+      "tag": "0002_outstanding_ben_urich",
       "breakpoints": true
     }
   ]
