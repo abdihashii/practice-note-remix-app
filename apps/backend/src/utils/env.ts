@@ -10,6 +10,7 @@ type EnvVars = {
  * @returns Environment variables
  */
 export function getEnv(): EnvVars {
+	validateEnv();
 	return {
 		DATABASE_URL: process.env.DATABASE_URL!,
 		NODE_ENV: process.env.NODE_ENV!,
@@ -20,16 +21,17 @@ export function getEnv(): EnvVars {
 
 /**
  * Validates that all required environment variables are present
- * @param env - Environment variables to validate
  * @throws Error if any required variables are missing
  */
-export function validateEnv(env: EnvVars): void {
+export function validateEnv(): void {
 	const required = ['DATABASE_URL', 'NODE_ENV', 'FRONTEND_URL', 'JWT_SECRET'];
-	const missing = required.filter((key) => !env[key as keyof EnvVars]);
+	const missing = required.filter((key) => !process.env[key]);
 
 	if (missing.length > 0) {
 		throw new Error(
-			`Missing required environment variables: ${missing.join(', ')}`,
+			`Missing required environment variables: ${missing.join(
+				', ',
+			)}. Please check your .env file.`,
 		);
 	}
 }

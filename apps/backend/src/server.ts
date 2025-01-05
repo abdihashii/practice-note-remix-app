@@ -1,5 +1,17 @@
 // Production server for Render deployment
+import { config } from 'dotenv';
+
+// Load environment variables from .env file
+// Note: In production, these are typically set through the platform's environment variables
+config();
+
 import app from './index';
+import { validateEnv } from './utils/env';
+
+// Validate environment variables before starting server
+console.log('Validating environment variables...');
+validateEnv();
+console.log('Environment variables validated successfully');
 
 const port = parseInt(process.env.PORT || '8787');
 
