@@ -13,6 +13,7 @@
     "clean:types": "bun run --cwd packages/types clean",
     "dev": "bun run dev:backend & bun run dev:remix-frontend",
     "dev:remix-frontend": "bun run --cwd apps/remix-frontend dev",
+    "dev:backend": "bun run --cwd apps/backend dev",
     "build:types": "bun run --cwd packages/types build",
     "db:generate": "bun run --cwd apps/backend db:generate",
     "db:migrate": "bun run --cwd apps/backend db:migrate",
