@@ -2,6 +2,7 @@
 import type { AuthResponse } from "@notes-app/types";
 
 // First-party imports
+import { refreshTokens } from "~/api/auth";
 import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY } from "~/lib/constants";
 
 /**
@@ -85,8 +86,21 @@ export function clearAuthTokens() {
 
 /**
  * Check if user is authenticated by verifying access token presence
- * Works in both client and server environments
+ * Optionally tries to refresh the token if expired
  */
-export function isAuthenticated(request?: Request): boolean {
-  return !!getAccessToken(request);
+export async function isAuthenticated(
+  request?: Request,
+  tryRefresh = true
+): Promise<boolean> {
+  const accessToken = getAccessToken(request);
+
+  if (accessToken) return true;
+
+  // If no access token and refresh is allowed, try refreshing
+  if (tryRefresh && typeof document !== "undefined") {
+    const newTokens = await refreshTokens();
+    return !!newTokens;
+  }
+
+  return false;
 }
