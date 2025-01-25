@@ -8,7 +8,7 @@ import type {
 } from "@notes-app/types";
 
 // Local imports
-import { API_URL } from "~/lib/constants";
+import { apiClient } from "~/lib/api-client";
 
 export const getNotes = async ({
   page = 1,
@@ -19,13 +19,9 @@ export const getNotes = async ({
     limit: limit.toString(),
   });
 
-  const resp = await fetch(`${API_URL}/notes?${params.toString()}`);
-
-  if (!resp.ok) {
-    throw new Error(`Failed to fetch notes: ${resp.status}`);
-  }
-
-  const data = await resp.json();
+  const data = await apiClient<Note[] | PaginatedResponse<Note>>(
+    `/notes?${params.toString()}`
+  );
 
   // Handle array response (non-paginated)
   if (Array.isArray(data)) {
@@ -41,7 +37,7 @@ export const getNotes = async ({
   }
 
   // Handle paginated response
-  const { error, results, pagination } = data as PaginatedResponse<Note>;
+  const { error, results, pagination } = data;
 
   if (error) {
     throw new Error(error);
@@ -53,84 +49,35 @@ export const getNotes = async ({
   };
 };
 
-export const getNoteById = async (id: string): Promise<Note | null> => {
-  try {
-    const response = await fetch(`${API_URL}/notes/${id}`);
-    const data = await response.json();
-    return data as Note;
-  } catch (error) {
-    console.error(error);
-    return null;
-  }
+export const getNoteById = async (id: string): Promise<Note> => {
+  return apiClient<Note>(`/notes/${id}`);
 };
 
-export const createNote = async (note: CreateNoteDto): Promise<Note | null> => {
-  try {
-    const response = await fetch(`${API_URL}/notes`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(note),
-    });
-    const data = await response.json();
-    return data as Note;
-  } catch (error) {
-    console.error(error);
-    return null;
-  }
+export const createNote = async (note: CreateNoteDto): Promise<Note> => {
+  return apiClient<Note>("/notes", {
+    method: "POST",
+    body: JSON.stringify(note),
+  });
 };
 
 export const updateNote = async (
   id: string,
   note: UpdateNoteDto
-): Promise<Note | null> => {
-  try {
-    const response = await fetch(`${API_URL}/notes/${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(note),
-    });
-    const data = await response.json();
-    return data as Note;
-  } catch (error) {
-    console.error(error);
-    return null;
-  }
-};
-
-export const deleteNote = async (id: string): Promise<Note | null> => {
-  try {
-    const response = await fetch(`${API_URL}/notes/${id}`, {
-      method: "DELETE",
-    });
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error(error);
-    return null;
-  }
-};
-
-export const toggleNoteFavorite = async (id: string): Promise<Note | null> => {
-  const response = await fetch(`${API_URL}/notes/${id}/favorite`, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-    },
+): Promise<Note> => {
+  return apiClient<Note>(`/notes/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(note),
   });
+};
 
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
+export const deleteNote = async (id: string): Promise<Note> => {
+  return apiClient<Note>(`/notes/${id}`, {
+    method: "DELETE",
+  });
+};
 
-  const data = await response.json();
-
-  if (!data) {
-    throw new Error("Failed to toggle favorite status");
-  }
-
-  return data as Note;
+export const toggleNoteFavorite = async (id: string): Promise<Note> => {
+  return apiClient<Note>(`/notes/${id}/favorite`, {
+    method: "PATCH",
+  });
 };
