@@ -2,7 +2,7 @@
 import type { Note, PaginatedResponse, SearchParams } from "@notes-app/types";
 
 // Local imports
-import { API_URL } from "~/lib/constants";
+import { apiClient } from "~/lib/api-client";
 
 export const searchNotes = async ({
   query,
@@ -15,21 +15,16 @@ export const searchNotes = async ({
     limit: limit.toString(),
   });
 
-  const resp = await fetch(`${API_URL}/search?${params.toString()}`);
+  const data = await apiClient<PaginatedResponse<Note>>(
+    `/search?${params.toString()}`
+  );
 
-  if (!resp.ok) {
-    throw new Error(`Search failed with status: ${resp.status}`);
-  }
-
-  const { error, results, pagination }: PaginatedResponse<Note> =
-    await resp.json();
-
-  if (error) {
-    throw new Error(error);
+  if (data.error) {
+    throw new Error(data.error);
   }
 
   return {
-    searchResults: results,
-    pagination,
+    searchResults: data.results,
+    pagination: data.pagination,
   };
 };
