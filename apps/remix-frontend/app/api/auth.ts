@@ -1,13 +1,13 @@
 // Third-party imports
-import type { AuthResponse, User } from "@notes-app/types";
+import { SecurityErrorType, type AuthResponse } from "@notes-app/types";
 
 // First-party imports
+import { apiClient } from "~/lib/api-client";
 import {
   clearAuthTokens,
   getRefreshToken,
   storeAuthTokens,
 } from "~/lib/auth-utils";
-import { apiClient } from "~/lib/api-client";
 
 /**
  * Login user with email and password
@@ -20,8 +20,17 @@ export const login = async (
     method: "POST",
     requireAuth: false,
     body: JSON.stringify({ email, password }),
+    handleError: (error) => {
+      if (error.is(SecurityErrorType.INVALID_CREDENTIALS)) {
+        throw new Error("Invalid email or password");
+      }
+      if (error.is(SecurityErrorType.VALIDATION)) {
+        throw new Error(error.getFirstValidationError());
+      }
+    },
   });
 
+  storeAuthTokens(data);
   return data;
 };
 
@@ -39,7 +48,7 @@ export const logout = async (): Promise<void> => {
     });
   } finally {
     // Clear tokens even if server request fails
-    await clearAuthTokens();
+    clearAuthTokens();
   }
 };
 
@@ -54,20 +63,27 @@ export const refreshTokens = async (): Promise<Pick<
   const refreshToken = getRefreshToken();
   if (!refreshToken) return null;
 
-  try {
-    const data = await apiClient<
-      Pick<AuthResponse, "accessToken" | "refreshToken">
-    >("/auth/refresh", {
-      method: "POST",
-      requireAuth: false,
-      body: JSON.stringify({ refreshToken }),
-    });
+  const data = await apiClient<
+    Pick<AuthResponse, "accessToken" | "refreshToken">
+  >("/auth/refresh", {
+    method: "POST",
+    requireAuth: false,
+    body: JSON.stringify({ refreshToken }),
+    handleError: (error) => {
+      if (
+        error.is(
+          SecurityErrorType.TOKEN_EXPIRED,
+          SecurityErrorType.INVALID_TOKEN
+        )
+      ) {
+        clearAuthTokens();
+        return null;
+      }
+    },
+  });
 
+  if (data) {
     storeAuthTokens(data);
-    return data;
-  } catch (error) {
-    console.error("Failed to refresh tokens:", error);
-    await clearAuthTokens();
-    return null;
   }
+  return data;
 };

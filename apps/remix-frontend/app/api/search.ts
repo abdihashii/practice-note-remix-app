@@ -1,9 +1,13 @@
 // Third-party imports
 import type { Note, PaginatedResponse, SearchParams } from "@notes-app/types";
+import { SecurityErrorType } from "@notes-app/types";
 
 // Local imports
 import { apiClient } from "~/lib/api-client";
 
+/**
+ * Search notes with pagination
+ */
 export const searchNotes = async ({
   query,
   page = 1,
@@ -16,12 +20,23 @@ export const searchNotes = async ({
   });
 
   const data = await apiClient<PaginatedResponse<Note>>(
-    `/search?${params.toString()}`
+    `/search?${params.toString()}`,
+    {
+      handleError: (error) => {
+        if (error.is(SecurityErrorType.VALIDATION)) {
+          return {
+            searchResults: [],
+            pagination: {
+              page: 1,
+              limit: 0,
+              total: 0,
+              totalPages: 0,
+            },
+          };
+        }
+      },
+    }
   );
-
-  if (data.error) {
-    throw new Error(data.error);
-  }
 
   return {
     searchResults: data.results,
