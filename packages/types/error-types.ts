@@ -102,7 +102,7 @@ export interface ValidationError {
     max?: number;
     min?: number;
     current?: number;
-    [key: string]: unknown;
+    [key: string]: unknown; // Allow any additional parameters
   };
 }
 
