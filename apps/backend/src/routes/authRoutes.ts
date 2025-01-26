@@ -1,4 +1,5 @@
 // Third-party imports
+import type { AuthResponse, CreateUserDto, User } from '@notes-app/types';
 import {
 	validatePasswordStrength,
 	type NotificationPreferences,
@@ -17,7 +18,6 @@ import {
 	handleCSRFError,
 } from '../middleware/errorMiddleware';
 import type { CustomEnv } from '../types';
-import type { CreateUserDto, User } from '@notes-app/types';
 
 export const authRoutes = new Hono<CustomEnv>();
 
@@ -254,11 +254,13 @@ authRoutes.post('/login', async (c) => {
 			loginCount: (user.loginCount ?? 0) + 1,
 		};
 
-		return c.json({
+		const authResponse: AuthResponse = {
 			user: safeUser,
 			accessToken,
 			refreshToken,
-		});
+		};
+
+		return c.json(authResponse);
 	} catch (error) {
 		if (error instanceof HTTPException && error.status === 403) {
 			return handleCSRFError(c, 'Invalid or missing CSRF token');

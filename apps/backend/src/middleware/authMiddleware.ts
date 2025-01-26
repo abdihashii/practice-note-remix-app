@@ -1,4 +1,5 @@
 // Third-party imports
+import { SecurityErrorType } from '@notes-app/types';
 import { eq } from 'drizzle-orm';
 import { verify } from 'hono/jwt';
 import type { MiddlewareHandler } from 'hono/types';
@@ -6,7 +7,6 @@ import type { MiddlewareHandler } from 'hono/types';
 // Local imports
 import { usersTable } from '../db/schema';
 import type { CustomEnv } from '../types';
-import { SecurityErrorType } from '../types/error-types';
 import { handleAuthError, handleTokenError } from './errorMiddleware';
 
 interface CustomJWTPayload {
@@ -68,8 +68,10 @@ export const verifyJWT: MiddlewareHandler<CustomEnv> = async (c, next) => {
 				);
 
 				if (tokenIssuedAt < invalidationTime) {
-					return handleTokenError(c, 'Authentication failed', {
-						type: SecurityErrorType.TOKEN_REVOKED,
+					return handleTokenError(c, 'Token has been invalidated', {
+						type: SecurityErrorType.INVALID_TOKEN,
+						tokenType: 'access',
+						reason: 'Token was invalidated due to security event',
 					});
 				}
 			}

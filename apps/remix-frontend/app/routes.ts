@@ -8,6 +8,7 @@ import {
 
 export default [
   index("./routes/home.tsx"),
+  route("/login", "./routes/login.tsx"),
   ...prefix("notes", [
     layout("./routes/notes/layout.tsx", [
       index("./routes/notes/index.tsx"),

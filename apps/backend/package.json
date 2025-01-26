@@ -25,6 +25,7 @@
 		"wrangler": "^3.99.0"
 	},
 	"dependencies": {
+		"@notes-app/types": "workspace:*",
 		"argon2": "^0.41.1",
 		"drizzle-orm": "^0.38.3",
 		"hono": "^4.6.14",

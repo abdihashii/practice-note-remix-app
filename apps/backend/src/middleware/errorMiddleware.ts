@@ -1,10 +1,4 @@
 // Third-party imports
-import type { Context } from 'hono';
-import { HTTPException } from 'hono/http-exception';
-import type { MiddlewareHandler } from 'hono/types';
-
-// Local imports
-import type { CustomEnv } from '../types';
 import {
 	SecurityErrorType,
 	type AuthenticationError,
@@ -13,7 +7,13 @@ import {
 	type ResourceError,
 	type TokenError,
 	type ValidationError,
-} from '../types/error-types';
+} from '@notes-app/types';
+import type { Context } from 'hono';
+import { HTTPException } from 'hono/http-exception';
+import type { MiddlewareHandler } from 'hono/types';
+
+// Local imports
+import type { CustomEnv } from '../types';
 
 // Security event logger
 export class SecurityLogger {
