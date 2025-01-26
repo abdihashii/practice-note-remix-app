@@ -1,6 +1,9 @@
 // Third-party imports
-import type { CreateNoteDto, UpdateNoteDto } from '@notes-app/types';
-import type { ValidationError } from '../types/error-types';
+import type {
+	CreateNoteDto,
+	UpdateNoteDto,
+	ValidationError,
+} from '@notes-app/types';
 
 /**
  * Validates note data for both create and update operations
@@ -19,7 +22,7 @@ function validateNoteData(data: Partial<CreateNoteDto>): ValidationError[] {
 			errors.push({
 				field: 'title',
 				message: 'Title must be less than 255 characters',
-				code: 'INVALID_LENGTH',
+				code: 'VALIDATION',
 				params: { max: 255, current: data.title.length },
 			});
 		}
@@ -29,7 +32,7 @@ function validateNoteData(data: Partial<CreateNoteDto>): ValidationError[] {
 		errors.push({
 			field: 'content',
 			message: 'Content must be less than 10000 characters',
-			code: 'INVALID_LENGTH',
+			code: 'VALIDATION',
 			params: { max: 10000, current: data.content.length },
 		});
 	}
