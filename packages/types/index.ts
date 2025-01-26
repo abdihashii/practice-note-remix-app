@@ -1,4 +1,5 @@
 export * from "./environment-types";
+export * from "./error-types";
 export * from "./note-types";
 export * from "./pagination-types";
 export * from "./search-types";
