@@ -6,32 +6,31 @@ WORKDIR /app
 # Install typescript globally for building
 RUN npm install -g pnpm typescript
 
-# Copy package files and configs
-COPY package.json pnpm-lock.yaml tsconfig.json ./
-COPY pnpm-workspace.yaml ./
-COPY packages/types/package.json ./packages/types/
-COPY packages/types ./packages/types
+# Copy root workspace files
+COPY package.json pnpm-lock.yaml tsconfig.json pnpm-workspace.yaml ./
 
-# Install dependencies and build types
+# Copy types package
+COPY packages/types/ ./packages/types/
+
+# Install and build types
 RUN pnpm install --frozen-lockfile && \
     cd packages/types && \
     pnpm build && \
     cd ../.. && \
-    pnpm install --frozen-lockfile # Reinstall to link the built package
+    pnpm install --frozen-lockfile
 
 # Development dependencies stage
 FROM node:20-alpine AS development-dependencies
 WORKDIR /app
 RUN npm install -g pnpm
 
-# Copy package files and built types
-COPY package.json pnpm-lock.yaml ./
-COPY pnpm-workspace.yaml ./
+# Copy workspace files
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/remix-frontend/package.json ./apps/remix-frontend/
 COPY --from=types-builder /app/packages/types ./packages/types
 COPY --from=types-builder /app/node_modules ./node_modules
 
-# Install all dependencies
+# Install dependencies
 RUN pnpm install --frozen-lockfile
 
 # Build stage
@@ -39,7 +38,7 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 RUN npm install -g pnpm
 
-# Copy all source files and dependencies
+# Copy all necessary files
 COPY . .
 COPY --from=development-dependencies /app/node_modules ./node_modules
 COPY --from=development-dependencies /app/packages/types/dist ./packages/types/dist

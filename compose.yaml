@@ -1,8 +1,8 @@
 services:
   frontend:
     build:
-      context: ../.. # Root of monorepo
-      dockerfile: apps/remix-frontend/Dockerfile
+      context: ./
+      dockerfile: Dockerfile
     ports:
       - "3000:3000"
     environment:
