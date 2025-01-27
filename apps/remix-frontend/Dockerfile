@@ -69,5 +69,5 @@ RUN pnpm install --prod --frozen-lockfile
 # Set up the runtime environment
 WORKDIR /app/apps/remix-frontend
 
-EXPOSE 5173
+EXPOSE 3000
 CMD ["pnpm", "start"]

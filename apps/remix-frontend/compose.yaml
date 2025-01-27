@@ -4,22 +4,8 @@ services:
       context: ../.. # Root of monorepo
       dockerfile: apps/remix-frontend/Dockerfile
     ports:
-      - "5173:5173"
+      - "3000:3000"
     environment:
       - NODE_ENV=production
       - VITE_API_URL=${VITE_API_URL}
-    healthcheck:
-      test:
-        [
-          "CMD",
-          "wget",
-          "--no-verbose",
-          "--tries=1",
-          "--spider",
-          "http://localhost:5173/health",
-        ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
     restart: unless-stopped
