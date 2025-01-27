@@ -1,4 +1,26 @@
-.react-router
-build
+# Dependencies
 node_modules
+**/node_modules
+
+# Development files
+.git
+.gitignore
+.env
+.env.*
+!.env.example
+.vscode
+.idea
+*.log
 README.md
+**/README.md
+CONTRIBUTING.md
+**/CONTRIBUTING.md
+
+# Test files
+**/__tests__
+**/*.test.*
+**/*.spec.*
+
+# OS files
+.DS_Store
+Thumbs.db
