@@ -3,6 +3,7 @@ import { SecurityErrorType, type AuthResponse } from "@notes-app/types";
 
 // First-party imports
 import { apiClient } from "~/lib/api-client";
+import { APIError } from "~/lib/api-error";
 import {
   clearAuthTokens,
   getRefreshToken,
@@ -21,12 +22,13 @@ export const login = async (
     requireAuth: false,
     body: JSON.stringify({ email, password }),
     handleError: (error) => {
-      if (error.is(SecurityErrorType.INVALID_CREDENTIALS)) {
-        throw new Error("Invalid email or password");
+      if (!error.data) {
+        throw new Error("Unexpected error response format");
       }
-      if (error.is(SecurityErrorType.VALIDATION)) {
-        throw new Error(error.getFirstValidationError());
-      }
+      // Convert error response to APIError
+      const apiError = new APIError(error.data);
+      console.error("Login failed:", apiError.getTechnicalDetails());
+      throw apiError;
     },
   });
 
