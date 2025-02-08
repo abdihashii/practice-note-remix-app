@@ -298,6 +298,7 @@ export function handleAuthError(
 	);
 
 	SecurityLogger.log(c, SecurityErrorType.AUTHENTICATION, message, details);
+	c.status(401);
 	return c.json(errorResponse);
 }
 
@@ -321,6 +322,7 @@ export function handleAuthzError(
 	);
 
 	SecurityLogger.log(c, SecurityErrorType.AUTHORIZATION, message, details);
+	c.status(403);
 	return c.json(errorResponse);
 }
 
@@ -345,6 +347,7 @@ export function handleTokenError(
 	);
 
 	SecurityLogger.log(c, SecurityErrorType.INVALID_TOKEN, message, details);
+	c.status(401);
 	return c.json(errorResponse);
 }
 
@@ -365,6 +368,7 @@ export function handleCSRFError(
 	);
 
 	SecurityLogger.log(c, SecurityErrorType.CSRF, message, details);
+	c.status(403);
 	return c.json(errorResponse);
 }
 
@@ -387,6 +391,7 @@ export function handleValidationError(
 	SecurityLogger.log(c, SecurityErrorType.VALIDATION, message, {
 		validationErrors,
 	});
+	c.status(422);
 	return c.json(errorResponse);
 }
 
