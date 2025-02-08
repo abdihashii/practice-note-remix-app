@@ -15,6 +15,67 @@ import type { MiddlewareHandler } from 'hono/types';
 // Local imports
 import type { CustomEnv } from '../types';
 
+// =================================================================
+// Main Error Handler Middleware
+// =================================================================
+
+export const errorHandler: MiddlewareHandler<CustomEnv> = async (c, next) => {
+	try {
+		await next();
+	} catch (error) {
+		console.error('Error caught in middleware:', error);
+
+		let errorResponse: ErrorResponse;
+		let statusCode = 500;
+
+		if (error instanceof HTTPException) {
+			// Handle Hono HTTP exceptions
+			const type = mapHttpStatusToErrorType(error.status);
+			statusCode = error.status;
+			errorResponse = createErrorResponse(type, error.message, statusCode, c);
+			SecurityLogger.log(c, type, error.message);
+		} else if (error instanceof Error) {
+			// Handle all standard Error instances (from routes, libraries, or runtime)
+			// and convert them into our standardized error response format
+			const { type, status, details } = categorizeError(error);
+			statusCode = status;
+			errorResponse = createErrorResponse(
+				type,
+				error.message,
+				status,
+				c,
+				details,
+			);
+			SecurityLogger.log(c, type, error.message, details);
+		} else {
+			// Handle unknown errors
+			errorResponse = createErrorResponse(
+				SecurityErrorType.SERVER_ERROR,
+				'An unexpected error occurred',
+				statusCode,
+				c,
+			);
+
+			SecurityLogger.log(
+				c,
+				SecurityErrorType.SERVER_ERROR,
+				'Unknown error type encountered',
+				{ error: String(error) },
+			);
+		}
+
+		// Set security headers for error responses
+		c.header('X-Content-Type-Options', 'nosniff');
+		c.header('X-Frame-Options', 'DENY');
+
+		return c.json(errorResponse);
+	}
+};
+
+// =================================================================
+// Core Error Handling Utilities
+// =================================================================
+
 // Security event logger
 export class SecurityLogger {
 	static log(
@@ -84,60 +145,6 @@ function createErrorResponse(
 
 	return response;
 }
-
-// Error handler middleware
-export const errorHandler: MiddlewareHandler<CustomEnv> = async (c, next) => {
-	try {
-		await next();
-	} catch (error) {
-		console.error('Error caught in middleware:', error);
-
-		let errorResponse: ErrorResponse;
-		let statusCode = 500;
-
-		if (error instanceof HTTPException) {
-			// Handle Hono HTTP exceptions
-			const type = mapHttpStatusToErrorType(error.status);
-			statusCode = error.status;
-			errorResponse = createErrorResponse(type, error.message, statusCode, c);
-			SecurityLogger.log(c, type, error.message);
-		} else if (error instanceof Error) {
-			// Handle all standard Error instances (from routes, libraries, or runtime)
-			// and convert them into our standardized error response format
-			const { type, status, details } = categorizeError(error);
-			statusCode = status;
-			errorResponse = createErrorResponse(
-				type,
-				error.message,
-				status,
-				c,
-				details,
-			);
-			SecurityLogger.log(c, type, error.message, details);
-		} else {
-			// Handle unknown errors
-			errorResponse = createErrorResponse(
-				SecurityErrorType.SERVER_ERROR,
-				'An unexpected error occurred',
-				statusCode,
-				c,
-			);
-
-			SecurityLogger.log(
-				c,
-				SecurityErrorType.SERVER_ERROR,
-				'Unknown error type encountered',
-				{ error: String(error) },
-			);
-		}
-
-		// Set security headers for error responses
-		c.header('X-Content-Type-Options', 'nosniff');
-		c.header('X-Frame-Options', 'DENY');
-
-		return c.json(errorResponse);
-	}
-};
 
 // Map HTTP status codes to error types
 function mapHttpStatusToErrorType(status: number): SecurityErrorType {
@@ -279,6 +286,10 @@ function categorizeError(error: Error): {
 				: undefined,
 	};
 }
+
+// =================================================================
+// Specialized Error Handlers
+// =================================================================
 
 // Authentication error handler
 export function handleAuthError(
