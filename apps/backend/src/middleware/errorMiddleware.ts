@@ -102,6 +102,8 @@ export const errorHandler: MiddlewareHandler<CustomEnv> = async (c, next) => {
 			errorResponse = createErrorResponse(type, error.message, statusCode, c);
 			SecurityLogger.log(c, type, error.message);
 		} else if (error instanceof Error) {
+			// Handle all standard Error instances (from routes, libraries, or runtime)
+			// and convert them into our standardized error response format
 			const { type, status, details } = categorizeError(error);
 			statusCode = status;
 			errorResponse = createErrorResponse(
