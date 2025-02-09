@@ -55,19 +55,34 @@ export const verifyJWT: MiddlewareHandler<CustomEnv> = async (c, next) => {
 			// Add user ID to request context
 			c.set('userId', payload.userId);
 
-			// Check if user's tokens were invalidated
+			// Check if user exists and is active
 			const db = c.get('db');
 			const user = await db.query.usersTable.findFirst({
 				where: eq(usersTable.id, payload.userId),
 			});
 
-			if (user?.lastTokenInvalidation) {
+			if (!user) {
+				console.log('[verifyJWT] User not found:', payload.userId);
+				return handleAuthError(c, 'User not found');
+			}
+
+			if (!user.isActive) {
+				console.log('[verifyJWT] User is not active:', payload.userId);
+				return handleAuthError(c, 'User account is not active');
+			}
+
+			// Check if user's tokens were invalidated
+			if (user.lastTokenInvalidation) {
 				const tokenIssuedAt = payload.iat;
 				const invalidationTime = Math.floor(
 					user.lastTokenInvalidation.getTime() / 1000,
 				);
 
 				if (tokenIssuedAt < invalidationTime) {
+					console.log('[verifyJWT] Token invalidated:', {
+						issuedAt: tokenIssuedAt,
+						invalidatedAt: invalidationTime,
+					});
 					return handleTokenError(c, 'Token has been invalidated', {
 						type: SecurityErrorType.INVALID_TOKEN,
 						tokenType: 'access',
@@ -78,13 +93,13 @@ export const verifyJWT: MiddlewareHandler<CustomEnv> = async (c, next) => {
 
 			await next();
 		} catch (err) {
-			console.error('JWT verification error:', err);
+			console.error('[verifyJWT] JWT verification error:', err);
 			return handleTokenError(c, 'Authentication failed', {
 				type: SecurityErrorType.INVALID_TOKEN,
 			});
 		}
 	} catch (err) {
-		console.error('Auth middleware error:', err);
+		console.error('[verifyJWT] Auth middleware error:', err);
 		return handleAuthError(c, 'Authentication failed');
 	}
 };
