@@ -6,7 +6,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { refreshTokens } from "~/api/auth";
 import { apiClient } from "~/lib/api-client";
 import {
-  clearAuthTokens,
+  clearAuthTokensFallback,
   getAccessToken,
   storeAccessTokenInMemory,
 } from "~/lib/auth-utils";
@@ -49,7 +49,7 @@ async function initAuth(): Promise<AuthState> {
 
       // If user fetch fails, clear the token from memory and try refresh
       // one more time
-      clearAuthTokens();
+      clearAuthTokensFallback();
 
       try {
         const tokens = await refreshTokens();

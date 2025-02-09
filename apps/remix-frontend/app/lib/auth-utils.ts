@@ -25,7 +25,7 @@ export function getAccessToken(): string | null {
 /**
  * Clear auth tokens from memory and cookies
  */
-export function clearAuthTokens() {
+export function clearAuthTokensFallback() {
   // Clear memory access token
   memoryAccessToken = null;
 

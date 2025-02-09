@@ -8,7 +8,10 @@ import {
 // First-party imports
 import { apiClient } from "~/lib/api-client";
 import { APIError } from "~/lib/api-error";
-import { clearAuthTokens, storeAccessTokenInMemory } from "~/lib/auth-utils";
+import {
+  clearAuthTokensFallback,
+  storeAccessTokenInMemory,
+} from "~/lib/auth-utils";
 
 /**
  * Login user with email and password
@@ -51,7 +54,7 @@ export const logout = async (): Promise<void> => {
     // Clear tokens even if server request fails as a fallback to remove any
     // stale tokens. This ensures that the user is logged out even if the server
     // request fails.
-    clearAuthTokens();
+    clearAuthTokensFallback();
   }
 };
 
@@ -74,7 +77,7 @@ export const refreshTokens = async (): Promise<TokenResponse | null> => {
           // Clear tokens even if server request fails as a fallback to remove
           // any stale tokens. This ensures that the user is logged out even if
           // the server request fails.
-          clearAuthTokens();
+          clearAuthTokensFallback();
           return null;
         }
       },
