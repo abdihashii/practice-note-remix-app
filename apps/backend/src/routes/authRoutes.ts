@@ -1,5 +1,10 @@
 // Third-party imports
-import type { AuthResponse, CreateUserDto, User } from '@notes-app/types';
+import type {
+	AuthResponse,
+	CreateUserDto,
+	TokenResponse,
+	User,
+} from '@notes-app/types';
 import {
 	validatePasswordStrength,
 	type NotificationPreferences,
@@ -8,6 +13,7 @@ import {
 import argon2 from 'argon2';
 import { eq } from 'drizzle-orm';
 import { Hono } from 'hono';
+import { getCookie, setCookie } from 'hono/cookie';
 import { HTTPException } from 'hono/http-exception';
 import { sign } from 'hono/jwt';
 
@@ -133,6 +139,18 @@ authRoutes.post('/register', async (c) => {
 			})
 			.where(eq(usersTable.id, user.id));
 
+		// Set refresh token as HTTP-only cookie
+		setCookie(c, 'refreshToken', refreshToken, {
+			httpOnly: true,
+			secure: process.env.NODE_ENV === 'production',
+			sameSite: 'Lax',
+			path: '/',
+			maxAge: 7 * 24 * 60 * 60,
+			...(process.env.NODE_ENV === 'production' && {
+				prefix: 'host',
+			}),
+		});
+
 		// Return safe user object (excluding sensitive data)
 		const safeUser: User = {
 			id: user.id,
@@ -165,11 +183,13 @@ authRoutes.post('/register', async (c) => {
 			loginCount: 1,
 		};
 
-		return c.json({
+		// Return safe user object and access token
+		const authResponse: AuthResponse = {
 			user: safeUser,
 			accessToken,
-			refreshToken,
-		});
+		};
+
+		return c.json(authResponse);
 	} catch (error) {
 		if (error instanceof HTTPException && error.status === 403) {
 			return handleCSRFError(c, 'Invalid or missing CSRF token');
@@ -210,7 +230,7 @@ authRoutes.post('/login', async (c) => {
 		// Generate tokens
 		const { accessToken, refreshToken } = await generateTokens(user.id);
 
-		// Update user login info
+		// Update user login info in database
 		await db
 			.update(usersTable)
 			.set({
@@ -221,6 +241,19 @@ authRoutes.post('/login', async (c) => {
 				lastActivityAt: new Date(),
 			})
 			.where(eq(usersTable.id, user.id));
+
+		// Set refresh token as HTTP-only cookie
+		setCookie(c, 'refreshToken', refreshToken, {
+			httpOnly: true,
+			secure: process.env.NODE_ENV === 'production', // true in production
+			sameSite: 'Lax', // or 'Strict' if not dealing with third-party redirects
+			path: '/',
+			maxAge: 7 * 24 * 60 * 60, // 7 days in seconds
+			// Optional: Use __Host- prefix for additional security in production
+			...(process.env.NODE_ENV === 'production' && {
+				prefix: 'host', // This will prefix the cookie with __Host-
+			}),
+		});
 
 		// Return safe user object
 		const safeUser: User = {
@@ -254,10 +287,10 @@ authRoutes.post('/login', async (c) => {
 			loginCount: (user.loginCount ?? 0) + 1,
 		};
 
+		// Return safe user object and access token
 		const authResponse: AuthResponse = {
 			user: safeUser,
 			accessToken,
-			refreshToken,
 		};
 
 		return c.json(authResponse);
@@ -278,7 +311,13 @@ authRoutes.post('/login', async (c) => {
 authRoutes.post('/refresh', async (c) => {
 	try {
 		const db = c.get('db');
-		const { refreshToken } = await c.req.json<{ refreshToken: string }>();
+		// Get refresh token from cookie
+		const refreshToken = getCookie(c, 'refreshToken');
+
+		// If no refresh token in cookie, return error
+		if (!refreshToken) {
+			return handleAuthError(c, 'No refresh token provided');
+		}
 
 		// Find user with this refresh token
 		const user = await db.query.usersTable.findFirst({
@@ -296,17 +335,6 @@ authRoutes.post('/refresh', async (c) => {
 			});
 		}
 
-		const oldToken = user.refreshToken;
-		if (oldToken && oldToken === refreshToken) {
-			// Invalidate the old token first
-			await db
-				.update(usersTable)
-				.set({ refreshToken: null })
-				.where(eq(usersTable.id, user.id));
-		} else {
-			return handleAuthError(c, 'Invalid refresh token');
-		}
-
 		// Generate new tokens
 		const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
 			await generateTokens(user.id);
@@ -321,10 +349,24 @@ authRoutes.post('/refresh', async (c) => {
 			})
 			.where(eq(usersTable.id, user.id));
 
-		return c.json({
-			accessToken: newAccessToken,
-			refreshToken: newRefreshToken,
+		// Set new refresh token cookie
+		setCookie(c, 'refreshToken', newRefreshToken, {
+			httpOnly: true,
+			secure: process.env.NODE_ENV === 'production', // true in production
+			sameSite: 'Lax', // or 'Strict' if not dealing with third-party redirects
+			path: '/',
+			maxAge: 7 * 24 * 60 * 60, // 7 days in seconds
+			// Optional: Use __Host- prefix for additional security in production
+			...(process.env.NODE_ENV === 'production' && {
+				prefix: 'host', // This will prefix the cookie with __Host-
+			}),
 		});
+
+		const tokenResponse: TokenResponse = {
+			accessToken: newAccessToken,
+		};
+
+		return c.json(tokenResponse);
 	} catch (error) {
 		if (error instanceof HTTPException && error.status === 403) {
 			return handleCSRFError(c, 'Invalid or missing CSRF token');
