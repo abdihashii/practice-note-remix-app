@@ -384,7 +384,13 @@ authRoutes.post('/refresh', async (c) => {
 authRoutes.post('/logout', async (c) => {
 	try {
 		const db = c.get('db');
-		const { refreshToken } = await c.req.json<{ refreshToken: string }>();
+		// Get refresh token from cookie
+		const refreshToken = getCookie(c, 'refreshToken');
+
+		// If no refresh token in cookie, return success (already logged out)
+		if (!refreshToken) {
+			return c.json({ message: 'Logged out successfully' });
+		}
 
 		// Clear refresh token and invalidate all current sessions
 		await db
@@ -396,12 +402,82 @@ authRoutes.post('/logout', async (c) => {
 			})
 			.where(eq(usersTable.refreshToken, refreshToken));
 
+		// Clear the refresh token cookie
+		setCookie(c, 'refreshToken', '', {
+			httpOnly: true,
+			secure: process.env.NODE_ENV === 'production', // true in production
+			sameSite: 'Lax', // or 'Strict' if not dealing with third-party redirects
+			path: '/',
+			maxAge: 0, // Expire immediately
+			...(process.env.NODE_ENV === 'production' && {
+				prefix: 'host', // This will prefix the cookie with __Host-
+			}),
+		});
+
 		return c.json({ message: 'Logged out successfully' });
 	} catch (error) {
 		if (error instanceof HTTPException && error.status === 403) {
 			return handleCSRFError(c, 'Invalid or missing CSRF token');
 		}
 		return handleAuthError(c, 'Logout failed', {
+			error: error instanceof Error ? error.message : String(error),
+		});
+	}
+});
+
+/**
+ * Get current user data
+ * GET /auth/me
+ */
+authRoutes.get('/me', async (c) => {
+	try {
+		const db = c.get('db');
+		const userId = c.get('userId'); // Set by auth middleware
+
+		// Find user
+		const user = await db.query.usersTable.findFirst({
+			where: eq(usersTable.id, userId),
+		});
+
+		if (!user) {
+			return handleAuthError(c, 'User not found');
+		}
+
+		// Return safe user object
+		const safeUser: User = {
+			id: user.id,
+			email: user.email,
+			name: user.name,
+			createdAt: user.createdAt?.toISOString() ?? new Date().toISOString(),
+			updatedAt: user.updatedAt?.toISOString() ?? new Date().toISOString(),
+			emailVerified: user.emailVerified ?? false,
+			isActive: user.isActive ?? true,
+			deletedAt: user.deletedAt?.toISOString() ?? null,
+			settings: (user.settings as UserSettings) ?? {
+				theme: 'system',
+				language: 'en',
+				timezone: 'UTC',
+			},
+			notificationPreferences:
+				(user.notificationPreferences as NotificationPreferences) ?? {
+					email: {
+						enabled: true,
+						digest: 'daily',
+						marketing: false,
+					},
+					push: {
+						enabled: true,
+						alerts: true,
+					},
+				},
+			lastActivityAt: user.lastActivityAt?.toISOString() ?? null,
+			lastSuccessfulLogin: user.lastSuccessfulLogin?.toISOString() ?? null,
+			loginCount: user.loginCount ?? 0,
+		};
+
+		return c.json(safeUser);
+	} catch (error) {
+		return handleAuthError(c, 'Failed to fetch user data', {
 			error: error instanceof Error ? error.message : String(error),
 		});
 	}
