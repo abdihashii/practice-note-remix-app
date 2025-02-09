@@ -34,7 +34,7 @@ export const useAuth = () => {
       // Get the return URL from query params or default to /notes
       const params = new URLSearchParams(window.location.search);
       const returnTo = params.get("returnTo") || "/notes";
-      navigate(returnTo);
+      navigate(returnTo, { replace: true });
     },
     onError: (error) => {
       // Log technical details for debugging
