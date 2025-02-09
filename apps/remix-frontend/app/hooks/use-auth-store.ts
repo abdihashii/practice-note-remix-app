@@ -10,8 +10,7 @@ import {
   getAccessToken,
   storeAccessTokenInMemory,
 } from "~/lib/auth-utils";
-
-const AUTH_QUERY_KEY = ["auth"] as const;
+import { AUTH_QUERY_KEY } from "~/lib/constants";
 
 type AuthState = {
   accessToken: string | null;
