@@ -5,11 +5,9 @@ import type { Route } from "./+types/login";
 
 // Third-party imports
 import { Loader2 } from "lucide-react";
-import { Button } from "~/components/ui/button";
-import { Input } from "~/components/ui/input";
-import { Label } from "~/components/ui/label";
 
 // First-party imports
+import LoginForm from "~/components/auth/LoginForm";
 import { useAuth } from "~/hooks/use-auth";
 
 export function meta({}: Route.MetaArgs) {
@@ -24,8 +22,7 @@ export function meta({}: Route.MetaArgs) {
 
 export default function Login() {
   const navigate = useNavigate();
-  const { loginMutation, loginError, isAuthenticated, isAuthQueryPending } =
-    useAuth();
+  const { isAuthenticated, isAuthQueryPending } = useAuth();
 
   // Redirect to notes if authenticated
   useEffect(() => {
@@ -35,19 +32,6 @@ export default function Login() {
       navigate(returnTo, { replace: true });
     }
   }, [isAuthenticated, navigate]);
-
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    const formData = new FormData(event.currentTarget);
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
-
-    loginMutation.mutate({
-      email,
-      password,
-    });
-  };
 
   // Show nothing while checking auth state or if authenticated
   if (isAuthQueryPending || isAuthenticated) {
@@ -68,36 +52,7 @@ export default function Login() {
           Login to your Notes App account
         </p>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <div className="flex flex-col gap-2 items-start">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              type="email"
-              id="email"
-              name="email"
-              disabled={loginMutation.isPending}
-              required
-            />
-          </div>
-          <div className="flex flex-col gap-2 items-start">
-            <Label htmlFor="password">Password</Label>
-            <Input
-              type="password"
-              id="password"
-              name="password"
-              disabled={loginMutation.isPending}
-              required
-            />
-          </div>
-          <Button type="submit" disabled={loginMutation.isPending}>
-            {loginMutation.isPending ? "Logging in..." : "Login"}
-          </Button>
-          {loginError && (
-            <p className="text-red-500 text-sm mt-2" role="alert">
-              {loginError}
-            </p>
-          )}
-        </form>
+        <LoginForm />
       </div>
     </main>
   );
