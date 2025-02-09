@@ -24,7 +24,8 @@ export function meta({}: Route.MetaArgs) {
 
 export default function Login() {
   const navigate = useNavigate();
-  const { loginMutation, loginError, isAuthenticated, isLoading } = useAuth();
+  const { loginMutation, loginError, isAuthenticated, isAuthQueryPending } =
+    useAuth();
 
   // Redirect to notes if authenticated
   useEffect(() => {
@@ -49,7 +50,7 @@ export default function Login() {
   };
 
   // Show nothing while checking auth state or if authenticated
-  if (isLoading || isAuthenticated) {
+  if (isAuthQueryPending || isAuthenticated) {
     return (
       <main className="flex h-screen w-full items-center justify-center px-4 sm:px-6 lg:px-8">
         <Loader2 className="w-10 h-10 animate-spin" />

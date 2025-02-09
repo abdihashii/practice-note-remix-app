@@ -79,7 +79,7 @@ async function initAuth(): Promise<AuthState> {
 export function useAuthStore() {
   const queryClient = useQueryClient();
 
-  const { data: auth, isLoading } = useQuery({
+  const { data: auth, isPending } = useQuery({
     queryKey: AUTH_QUERY_KEY,
     queryFn: initAuth,
     // Don't refetch on window focus since we manage token refresh separately
@@ -103,7 +103,7 @@ export function useAuthStore() {
   return {
     accessToken: auth?.accessToken ?? null,
     user: auth?.user ?? null,
-    isLoading,
+    isPending,
     setAuth,
     clearAuth,
   };
