@@ -1,8 +1,8 @@
 /**
  * Response type for successful authentication operations.
- * Contains both the user data and the access token.
- * The access token is returned in the response for memory storage.
- * The refresh token is stored in an HTTP-only cookie and not exposed to client JavaScript.
+ * Contains the user data and access token.
+ * The access token is stored in memory.
+ * Note: Refresh tokens are handled via HTTP-only cookies and never exposed to JavaScript.
  */
 export interface AuthResponse {
   user: User;
@@ -11,7 +11,8 @@ export interface AuthResponse {
 
 /**
  * Internal response type for token refresh operations.
- * The refresh token is only stored in HTTP-only cookies and never exposed to client JavaScript.
+ * Returns a new access token for memory storage.
+ * Note: Refresh tokens are handled via HTTP-only cookies and never exposed to JavaScript.
  */
 export interface TokenResponse {
   accessToken: string;
