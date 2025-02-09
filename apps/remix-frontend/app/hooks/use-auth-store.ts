@@ -18,7 +18,6 @@ type AuthState = {
 };
 
 async function initAuth(): Promise<AuthState> {
-  debugger;
   // First try to get existing access token from memory
   let accessToken = getAccessToken();
 
