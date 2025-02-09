@@ -48,7 +48,9 @@ export const logout = async (): Promise<void> => {
       requireAuth: false,
     });
   } finally {
-    // Clear tokens even if server request fails
+    // Clear tokens even if server request fails as a fallback to remove any
+    // stale tokens. This ensures that the user is logged out even if the server
+    // request fails.
     clearAuthTokens();
   }
 };
