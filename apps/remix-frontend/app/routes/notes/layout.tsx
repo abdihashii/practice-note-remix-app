@@ -24,16 +24,14 @@ function RequireAuth({ children }: { children: React.ReactNode }) {
     }
   }, [isAuthQueryPending, isAuthenticated, location.pathname, navigate]);
 
-  if (isAuthQueryPending) {
+  // Show loading spinner during auth check OR when about to redirect
+  // This prevents the page from flashing when the user is redirected to login
+  if (isAuthQueryPending || !isAuthenticated) {
     return (
       <div className="flex h-screen w-full items-center justify-center">
         <Loader2 className="w-10 h-10 animate-spin" />
       </div>
     );
-  }
-
-  if (!isAuthenticated) {
-    return null;
   }
 
   return children;
