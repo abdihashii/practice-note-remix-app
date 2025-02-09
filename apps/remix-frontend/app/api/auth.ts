@@ -1,12 +1,16 @@
 // Third-party imports
-import { SecurityErrorType, type AuthResponse } from "@notes-app/types";
+import {
+  SecurityErrorType,
+  type AuthResponse,
+  type TokenResponse,
+} from "@notes-app/types";
 
 // First-party imports
 import { apiClient } from "~/lib/api-client";
+import { APIError } from "~/lib/api-error";
 import {
-  clearAuthTokens,
-  getRefreshToken,
-  storeAuthTokens,
+  clearAuthTokensFallback,
+  storeAccessTokenInMemory,
 } from "~/lib/auth-utils";
 
 /**
@@ -21,69 +25,73 @@ export const login = async (
     requireAuth: false,
     body: JSON.stringify({ email, password }),
     handleError: (error) => {
-      if (error.is(SecurityErrorType.INVALID_CREDENTIALS)) {
-        throw new Error("Invalid email or password");
+      if (!error.data) {
+        throw new Error("Unexpected error response format");
       }
-      if (error.is(SecurityErrorType.VALIDATION)) {
-        throw new Error(error.getFirstValidationError());
-      }
+      // Convert error response to APIError
+      const apiError = new APIError(error.data);
+      console.error("Login failed:", apiError.getTechnicalDetails());
+      throw apiError;
     },
   });
 
-  storeAuthTokens(data);
+  // Store access token in memory
+  storeAccessTokenInMemory(data);
   return data;
 };
 
 /**
  * Logout user and invalidate tokens
+ * The refresh token cookie will be sent automatically with the request
  */
 export const logout = async (): Promise<void> => {
-  const refreshToken = getRefreshToken();
-  if (!refreshToken) return;
-
   try {
     await apiClient("/auth/logout", {
       method: "POST",
-      body: JSON.stringify({ refreshToken }),
+      requireAuth: false,
     });
   } finally {
-    // Clear tokens even if server request fails
-    clearAuthTokens();
+    // Clear tokens even if server request fails as a fallback to remove any
+    // stale tokens. This ensures that the user is logged out even if the server
+    // request fails.
+    clearAuthTokensFallback();
   }
 };
 
 /**
- * Refresh the access token using the refresh token
- * Returns the new tokens if successful, null if failed
+ * Refresh the access token using the refresh token cookie
+ * Returns the new access token if successful, null if failed
  */
-export const refreshTokens = async (): Promise<Pick<
-  AuthResponse,
-  "accessToken" | "refreshToken"
-> | null> => {
-  const refreshToken = getRefreshToken();
-  if (!refreshToken) return null;
+export const refreshTokens = async (): Promise<TokenResponse | null> => {
+  try {
+    const data = await apiClient<TokenResponse>("/auth/refresh", {
+      method: "POST",
+      requireAuth: false,
+      handleError: (error) => {
+        if (
+          error.is(
+            SecurityErrorType.TOKEN_EXPIRED,
+            SecurityErrorType.INVALID_TOKEN
+          )
+        ) {
+          // Clear tokens even if server request fails as a fallback to remove
+          // any stale tokens. This ensures that the user is logged out even if
+          // the server request fails.
+          clearAuthTokensFallback();
+          return null;
+        }
+      },
+    });
 
-  const data = await apiClient<
-    Pick<AuthResponse, "accessToken" | "refreshToken">
-  >("/auth/refresh", {
-    method: "POST",
-    requireAuth: false,
-    body: JSON.stringify({ refreshToken }),
-    handleError: (error) => {
-      if (
-        error.is(
-          SecurityErrorType.TOKEN_EXPIRED,
-          SecurityErrorType.INVALID_TOKEN
-        )
-      ) {
-        clearAuthTokens();
-        return null;
-      }
-    },
-  });
+    if (!data) {
+      return null;
+    }
 
-  if (data) {
-    storeAuthTokens(data);
+    // Store new access token in memory
+    storeAccessTokenInMemory(data);
+    return data;
+  } catch (error) {
+    console.error("[refreshTokens] Failed to refresh tokens:", error);
+    return null;
   }
-  return data;
 };

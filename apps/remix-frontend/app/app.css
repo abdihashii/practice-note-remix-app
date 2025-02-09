@@ -9,6 +9,8 @@ body {
   @media (prefers-color-scheme: dark) {
     color-scheme: dark;
   }
+
+  min-height: 100vh;
 }
 
 @layer base {

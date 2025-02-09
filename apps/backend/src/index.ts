@@ -20,11 +20,11 @@ import { getEnv, validateEnv } from './utils/env';
 // Initialize Hono app with type definitions
 const app = new Hono<CustomEnv>();
 
-// Apply error handler first to catch all errors
-app.use('*', errorHandler);
-
-// Apply CORS middleware
+// Apply CORS middleware first to handle preflight requests
 app.use('*', corsMiddleware);
+
+// Apply error handler to catch all errors
+app.use('*', errorHandler);
 
 // Apply all security middleware
 // (i.e. HTTPS, Content-Type, Cookie, Security Headers, and CSRF)
@@ -54,7 +54,7 @@ app.get('/health', (c) =>
 app.get('/health/db', async (c) => {
 	try {
 		const env = getEnv();
-		validateEnv(env);
+		validateEnv();
 
 		const client = await dbConnect();
 

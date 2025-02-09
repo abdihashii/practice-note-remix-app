@@ -1,5 +1,10 @@
 // Third-party imports
-import type { AuthResponse, CreateUserDto, User } from '@notes-app/types';
+import type {
+	AuthResponse,
+	CreateUserDto,
+	TokenResponse,
+	User,
+} from '@notes-app/types';
 import {
 	validatePasswordStrength,
 	type NotificationPreferences,
@@ -8,11 +13,13 @@ import {
 import argon2 from 'argon2';
 import { eq } from 'drizzle-orm';
 import { Hono } from 'hono';
+import { getCookie, setCookie } from 'hono/cookie';
 import { HTTPException } from 'hono/http-exception';
 import { sign } from 'hono/jwt';
 
 // Local imports
 import { usersTable } from '../db/schema';
+import { verifyJWT } from '../middleware/authMiddleware';
 import {
 	handleAuthError,
 	handleCSRFError,
@@ -74,11 +81,14 @@ async function generateTokens(userId: string) {
 	return { accessToken, refreshToken };
 }
 
+// Public auth routes (no auth required)
+const publicRoutes = new Hono<CustomEnv>();
+
 /**
  * Register a new user
  * POST /auth/register
  */
-authRoutes.post('/register', async (c) => {
+publicRoutes.post('/register', async (c) => {
 	try {
 		const db = c.get('db');
 		const data = await c.req.json<CreateUserDto>();
@@ -133,6 +143,18 @@ authRoutes.post('/register', async (c) => {
 			})
 			.where(eq(usersTable.id, user.id));
 
+		// Set refresh token as HTTP-only cookie
+		setCookie(c, 'refreshToken', refreshToken, {
+			httpOnly: true,
+			secure: process.env.NODE_ENV === 'production',
+			sameSite: 'Lax',
+			path: '/',
+			maxAge: 7 * 24 * 60 * 60,
+			...(process.env.NODE_ENV === 'production' && {
+				prefix: 'host',
+			}),
+		});
+
 		// Return safe user object (excluding sensitive data)
 		const safeUser: User = {
 			id: user.id,
@@ -165,11 +187,13 @@ authRoutes.post('/register', async (c) => {
 			loginCount: 1,
 		};
 
-		return c.json({
+		// Return safe user object and access token
+		const authResponse: AuthResponse = {
 			user: safeUser,
 			accessToken,
-			refreshToken,
-		});
+		};
+
+		return c.json(authResponse);
 	} catch (error) {
 		if (error instanceof HTTPException && error.status === 403) {
 			return handleCSRFError(c, 'Invalid or missing CSRF token');
@@ -184,7 +208,7 @@ authRoutes.post('/register', async (c) => {
  * Login user
  * POST /auth/login
  */
-authRoutes.post('/login', async (c) => {
+publicRoutes.post('/login', async (c) => {
 	try {
 		const db = c.get('db');
 		const { email, password } = await c.req.json<{
@@ -210,7 +234,7 @@ authRoutes.post('/login', async (c) => {
 		// Generate tokens
 		const { accessToken, refreshToken } = await generateTokens(user.id);
 
-		// Update user login info
+		// Update user login info in database
 		await db
 			.update(usersTable)
 			.set({
@@ -221,6 +245,19 @@ authRoutes.post('/login', async (c) => {
 				lastActivityAt: new Date(),
 			})
 			.where(eq(usersTable.id, user.id));
+
+		// Set refresh token as HTTP-only cookie
+		setCookie(c, 'refreshToken', refreshToken, {
+			httpOnly: true,
+			secure: process.env.NODE_ENV === 'production', // true in production
+			sameSite: 'Lax', // or 'Strict' if not dealing with third-party redirects
+			path: '/',
+			maxAge: 7 * 24 * 60 * 60, // 7 days in seconds
+			// Optional: Use __Host- prefix for additional security in production
+			...(process.env.NODE_ENV === 'production' && {
+				prefix: 'host', // This will prefix the cookie with __Host-
+			}),
+		});
 
 		// Return safe user object
 		const safeUser: User = {
@@ -254,10 +291,10 @@ authRoutes.post('/login', async (c) => {
 			loginCount: (user.loginCount ?? 0) + 1,
 		};
 
+		// Return safe user object and access token
 		const authResponse: AuthResponse = {
 			user: safeUser,
 			accessToken,
-			refreshToken,
 		};
 
 		return c.json(authResponse);
@@ -275,41 +312,50 @@ authRoutes.post('/login', async (c) => {
  * Refresh access token
  * POST /auth/refresh
  */
-authRoutes.post('/refresh', async (c) => {
+publicRoutes.post('/refresh', async (c) => {
 	try {
 		const db = c.get('db');
-		const { refreshToken } = await c.req.json<{ refreshToken: string }>();
+		// Get refresh token from cookie
+		const refreshToken = getCookie(c, 'refreshToken');
+
+		// If no refresh token in cookie, return error
+		if (!refreshToken) {
+			return handleAuthError(c, 'No refresh token provided');
+		}
 
 		// Find user with this refresh token
 		const user = await db.query.usersTable.findFirst({
 			where: eq(usersTable.refreshToken, refreshToken),
 		});
 
-		if (!user || !user.refreshTokenExpiresAt) {
+		if (!user) {
+			console.log('[/refresh] No user found with refresh token');
 			return handleAuthError(c, 'Invalid refresh token');
+		}
+
+		if (!user.refreshTokenExpiresAt) {
+			console.log('[/refresh] Refresh token expiry not set');
+			return handleAuthError(c, 'Invalid refresh token state');
 		}
 
 		// Check if refresh token is expired
 		if (user.refreshTokenExpiresAt < new Date()) {
+			console.log('[/refresh] Token expired:', user.refreshTokenExpiresAt);
 			return handleAuthError(c, 'Refresh token expired', {
 				expiredAt: user.refreshTokenExpiresAt.toISOString(),
 			});
 		}
 
-		const oldToken = user.refreshToken;
-		if (oldToken && oldToken === refreshToken) {
-			// Invalidate the old token first
-			await db
-				.update(usersTable)
-				.set({ refreshToken: null })
-				.where(eq(usersTable.id, user.id));
-		} else {
-			return handleAuthError(c, 'Invalid refresh token');
+		// Check if user is active
+		if (!user.isActive) {
+			console.log('[/refresh] User account is not active');
+			return handleAuthError(c, 'User account is not active');
 		}
 
 		// Generate new tokens
 		const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
 			await generateTokens(user.id);
+		console.log('[/refresh] Generated new tokens');
 
 		// Update user with new refresh token (rotation)
 		await db
@@ -320,12 +366,29 @@ authRoutes.post('/refresh', async (c) => {
 				lastActivityAt: new Date(),
 			})
 			.where(eq(usersTable.id, user.id));
+		console.log('[/refresh] Updated user with new refresh token');
 
-		return c.json({
-			accessToken: newAccessToken,
-			refreshToken: newRefreshToken,
+		// Set new refresh token cookie
+		setCookie(c, 'refreshToken', newRefreshToken, {
+			httpOnly: true,
+			secure: process.env.NODE_ENV === 'production', // true in production
+			sameSite: 'Lax', // or 'Strict' if not dealing with third-party redirects
+			path: '/',
+			maxAge: 7 * 24 * 60 * 60, // 7 days in seconds
+			// Optional: Use __Host- prefix for additional security in production
+			...(process.env.NODE_ENV === 'production' && {
+				prefix: 'host', // This will prefix the cookie with __Host-
+			}),
 		});
+		console.log('[/refresh] Set new refresh token cookie');
+
+		const tokenResponse: TokenResponse = {
+			accessToken: newAccessToken,
+		};
+
+		return c.json(tokenResponse);
 	} catch (error) {
+		console.error('[/refresh] Error:', error);
 		if (error instanceof HTTPException && error.status === 403) {
 			return handleCSRFError(c, 'Invalid or missing CSRF token');
 		}
@@ -339,10 +402,16 @@ authRoutes.post('/refresh', async (c) => {
  * Logout user
  * POST /auth/logout
  */
-authRoutes.post('/logout', async (c) => {
+publicRoutes.post('/logout', async (c) => {
 	try {
 		const db = c.get('db');
-		const { refreshToken } = await c.req.json<{ refreshToken: string }>();
+		// Get refresh token from cookie
+		const refreshToken = getCookie(c, 'refreshToken');
+
+		// If no refresh token in cookie, return success (already logged out)
+		if (!refreshToken) {
+			return c.json({ message: 'Logged out successfully' });
+		}
 
 		// Clear refresh token and invalidate all current sessions
 		await db
@@ -354,6 +423,18 @@ authRoutes.post('/logout', async (c) => {
 			})
 			.where(eq(usersTable.refreshToken, refreshToken));
 
+		// Clear the refresh token cookie
+		setCookie(c, 'refreshToken', '', {
+			httpOnly: true,
+			secure: process.env.NODE_ENV === 'production', // true in production
+			sameSite: 'Lax', // or 'Strict' if not dealing with third-party redirects
+			path: '/',
+			maxAge: 0, // Expire immediately
+			...(process.env.NODE_ENV === 'production' && {
+				prefix: 'host', // This will prefix the cookie with __Host-
+			}),
+		});
+
 		return c.json({ message: 'Logged out successfully' });
 	} catch (error) {
 		if (error instanceof HTTPException && error.status === 403) {
@@ -364,3 +445,75 @@ authRoutes.post('/logout', async (c) => {
 		});
 	}
 });
+
+// Protected auth routes (auth required)
+const protectedRoutes = new Hono<CustomEnv>();
+// Apply auth middleware to all protected auth routes
+protectedRoutes.use('*', verifyJWT);
+
+/**
+ * Get the current user's data
+ * GET /auth/me
+ */
+protectedRoutes.get('/me', async (c) => {
+	try {
+		const db = c.get('db');
+		const userId = c.get('userId'); // Set by auth middleware
+		console.log('[/me] Attempting to fetch user with ID:', userId);
+
+		// Find user
+		const user = await db.query.usersTable.findFirst({
+			where: eq(usersTable.id, userId),
+		});
+		console.log('[/me] User found:', user ? 'yes' : 'no');
+
+		if (!user) {
+			console.log('[/me] User not found in database');
+			return handleAuthError(c, 'User not found');
+		}
+
+		// Return safe user object
+		const safeUser: User = {
+			id: user.id,
+			email: user.email,
+			name: user.name,
+			createdAt: user.createdAt?.toISOString() ?? new Date().toISOString(),
+			updatedAt: user.updatedAt?.toISOString() ?? new Date().toISOString(),
+			emailVerified: user.emailVerified ?? false,
+			isActive: user.isActive ?? true,
+			deletedAt: user.deletedAt?.toISOString() ?? null,
+			settings: (user.settings as UserSettings) ?? {
+				theme: 'system',
+				language: 'en',
+				timezone: 'UTC',
+			},
+			notificationPreferences:
+				(user.notificationPreferences as NotificationPreferences) ?? {
+					email: {
+						enabled: true,
+						digest: 'daily',
+						marketing: false,
+					},
+					push: {
+						enabled: true,
+						alerts: true,
+					},
+				},
+			lastActivityAt: user.lastActivityAt?.toISOString() ?? null,
+			lastSuccessfulLogin: user.lastSuccessfulLogin?.toISOString() ?? null,
+			loginCount: user.loginCount ?? 0,
+		};
+
+		console.log('[/me] Successfully returning user data for:', safeUser.email);
+		return c.json(safeUser);
+	} catch (error) {
+		console.error('[/me] Error fetching user data:', error);
+		return handleAuthError(c, 'Failed to fetch user data', {
+			error: error instanceof Error ? error.message : String(error),
+		});
+	}
+});
+
+// Mount both route groups
+authRoutes.route('', publicRoutes);
+authRoutes.route('', protectedRoutes);

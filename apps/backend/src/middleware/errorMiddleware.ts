@@ -15,8 +15,85 @@ import type { MiddlewareHandler } from 'hono/types';
 // Local imports
 import type { CustomEnv } from '../types';
 
-// Security event logger
+// =================================================================
+// Main Error Handler Middleware
+// =================================================================
+
+/**
+ * Global error handling middleware that catches and processes all errors
+ * Converts various error types into a standardized API error response
+ */
+export const errorHandler: MiddlewareHandler<CustomEnv> = async (c, next) => {
+	try {
+		await next();
+	} catch (error) {
+		console.error('Error caught in middleware:', error);
+
+		let errorResponse: ErrorResponse;
+		let statusCode = 500;
+
+		if (error instanceof HTTPException) {
+			// Handle Hono HTTP exceptions
+			const type = mapHttpStatusToErrorType(error.status);
+			statusCode = error.status;
+			errorResponse = createErrorResponse(type, error.message, statusCode, c);
+			SecurityLogger.log(c, type, error.message);
+		} else if (error instanceof Error) {
+			// Handle all standard Error instances (from routes, libraries, or runtime)
+			// and convert them into our standardized error response format
+			const { type, status, details } = categorizeError(error);
+			statusCode = status;
+			errorResponse = createErrorResponse(
+				type,
+				error.message,
+				status,
+				c,
+				details,
+			);
+			SecurityLogger.log(c, type, error.message, details);
+		} else {
+			// Handle unknown errors
+			errorResponse = createErrorResponse(
+				SecurityErrorType.SERVER_ERROR,
+				'An unexpected error occurred',
+				statusCode,
+				c,
+			);
+
+			SecurityLogger.log(
+				c,
+				SecurityErrorType.SERVER_ERROR,
+				'Unknown error type encountered',
+				{ error: String(error) },
+			);
+		}
+
+		// Set security headers for error responses
+		c.header('X-Content-Type-Options', 'nosniff');
+		c.header('X-Frame-Options', 'DENY');
+
+		return c.json(errorResponse);
+	}
+};
+
+// =================================================================
+// Core Error Handling Utilities
+// =================================================================
+
+/**
+ * Logs security-related events with request context
+ * Prepared for production logging service integration
+ */
 export class SecurityLogger {
+	/**
+	 * Logs security-related events with request context
+	 * Prepared for production logging service integration
+	 *
+	 * @param context - The Hono context object
+	 * @param type - The security error type
+	 * @param message - The error message
+	 * @param details - Additional details about the error
+	 */
 	static log(
 		context: Context,
 		type: SecurityErrorType,
@@ -48,7 +125,16 @@ export class SecurityLogger {
 	}
 }
 
-// Create standardized error response
+/**
+ * Creates a standardized error response object with optional type-specific details
+ *
+ * @param type - The security error type
+ * @param message - The error message
+ * @param code - The HTTP status code
+ * @param context - The Hono context object
+ * @param options - Additional options for the error response
+ * @returns The error response
+ */
 function createErrorResponse(
 	type: SecurityErrorType,
 	message: string,
@@ -85,59 +171,9 @@ function createErrorResponse(
 	return response;
 }
 
-// Error handler middleware
-export const errorHandler: MiddlewareHandler<CustomEnv> = async (c, next) => {
-	try {
-		await next();
-	} catch (error) {
-		console.error('Error caught in middleware:', error);
-
-		let errorResponse: ErrorResponse;
-		let statusCode = 500;
-
-		if (error instanceof HTTPException) {
-			// Handle Hono HTTP exceptions
-			const type = mapHttpStatusToErrorType(error.status);
-			statusCode = error.status;
-			errorResponse = createErrorResponse(type, error.message, statusCode, c);
-			SecurityLogger.log(c, type, error.message);
-		} else if (error instanceof Error) {
-			const { type, status, details } = categorizeError(error);
-			statusCode = status;
-			errorResponse = createErrorResponse(
-				type,
-				error.message,
-				status,
-				c,
-				details,
-			);
-			SecurityLogger.log(c, type, error.message, details);
-		} else {
-			// Handle unknown errors
-			errorResponse = createErrorResponse(
-				SecurityErrorType.SERVER_ERROR,
-				'An unexpected error occurred',
-				statusCode,
-				c,
-			);
-
-			SecurityLogger.log(
-				c,
-				SecurityErrorType.SERVER_ERROR,
-				'Unknown error type encountered',
-				{ error: String(error) },
-			);
-		}
-
-		// Set security headers for error responses
-		c.header('X-Content-Type-Options', 'nosniff');
-		c.header('X-Frame-Options', 'DENY');
-
-		return c.json(errorResponse);
-	}
-};
-
-// Map HTTP status codes to error types
+/**
+ * Maps HTTP status codes to corresponding SecurityErrorType enum values
+ */
 function mapHttpStatusToErrorType(status: number): SecurityErrorType {
 	switch (status) {
 		case 400:
@@ -157,7 +193,13 @@ function mapHttpStatusToErrorType(status: number): SecurityErrorType {
 	}
 }
 
-// Categorize errors and extract relevant details
+/**
+ * Analyzes error messages to determine error type, status code, and additional details
+ * Used for converting standard Error instances into structured API errors
+ *
+ * @param error - The error instance to categorize
+ * @returns The categorized error details
+ */
 function categorizeError(error: Error): {
 	type: SecurityErrorType;
 	status: number;
@@ -278,7 +320,19 @@ function categorizeError(error: Error): {
 	};
 }
 
-// Authentication error handler
+// =================================================================
+// Specialized Error Handlers
+// =================================================================
+
+/**
+ * Handles authentication failures with 401 status code
+ * Used for login failures, invalid credentials, etc.
+ *
+ * @param c - The Hono context object
+ * @param message - The error message from the route handler
+ * @param details - Additional details about the error
+ * @returns The error response
+ */
 export function handleAuthError(
 	c: Context,
 	message: string,
@@ -302,7 +356,15 @@ export function handleAuthError(
 	return c.json(errorResponse);
 }
 
-// Authorization error handler
+/**
+ * Handles authorization failures with 403 status code
+ * Used for permission and access control violations
+ *
+ * @param c - The Hono context object
+ * @param message - The error message from the route handler
+ * @param details - Additional details about the error
+ * @returns The error response
+ */
 export function handleAuthzError(
 	c: Context,
 	message: string,
@@ -326,7 +388,15 @@ export function handleAuthzError(
 	return c.json(errorResponse);
 }
 
-// Token error handler
+/**
+ * Handles JWT and refresh token errors with 401 status code
+ * Used for expired, invalid, or malformed tokens
+ *
+ * @param c - The Hono context object
+ * @param message - The error message from the route handler
+ * @param details - Additional details about the error
+ * @returns The error response
+ */
 export function handleTokenError(
 	c: Context,
 	message: string,
@@ -351,7 +421,15 @@ export function handleTokenError(
 	return c.json(errorResponse);
 }
 
-// CSRF error handler
+/**
+ * Handles CSRF token validation failures with 403 status code
+ * Used when CSRF token is missing or invalid
+ *
+ * @param c - The Hono context object
+ * @param message - The error message from the route handler
+ * @param details - Additional details about the error
+ * @returns The error response
+ */
 export function handleCSRFError(
 	c: Context,
 	message: string,
@@ -372,7 +450,15 @@ export function handleCSRFError(
 	return c.json(errorResponse);
 }
 
-// Validation error handler
+/**
+ * Handles input validation failures with 422 status code
+ * Used for invalid request data with specific validation errors
+ *
+ * @param c - The Hono context object
+ * @param message - The error message from the route handler
+ * @param validationErrors - The validation errors from the route handler
+ * @returns The error response
+ */
 export function handleValidationError(
 	c: Context,
 	message: string,
@@ -395,7 +481,15 @@ export function handleValidationError(
 	return c.json(errorResponse);
 }
 
-// Resource error handler
+/**
+ * Handles resource-related errors with 404 status code
+ * Used when requested resources don't exist or are unavailable
+ *
+ * @param c - The Hono context object
+ * @param message - The error message from the route handler
+ * @param resourceError - The resource error from the route handler
+ * @returns The error response
+ */
 export function handleResourceError(
 	c: Context,
 	message: string,

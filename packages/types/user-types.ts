@@ -1,12 +1,21 @@
 /**
  * Response type for successful authentication operations.
- * Contains both the user data and the JWT tokens needed for API access.
- * The refresh token is used to obtain new access tokens when they expire.
+ * Contains the user data and access token.
+ * The access token is stored in memory.
+ * Note: Refresh tokens are handled via HTTP-only cookies and never exposed to JavaScript.
  */
 export interface AuthResponse {
   user: User;
   accessToken: string;
-  refreshToken: string;
+}
+
+/**
+ * Internal response type for token refresh operations.
+ * Returns a new access token for memory storage.
+ * Note: Refresh tokens are handled via HTTP-only cookies and never exposed to JavaScript.
+ */
+export interface TokenResponse {
+  accessToken: string;
 }
 
 export interface UserSettings {

@@ -115,6 +115,13 @@ export async function apiClient<T = unknown>(
   const response = await fetch(`${API_URL}${endpoint}`, {
     ...options,
     headers,
+    // Always include credentials (cookies) for cross-origin requests
+    // This is secure because:
+    // 1. Backend has strict CORS origin checking
+    // 2. We use HTTP-only cookies for sensitive data
+    // 3. CSRF protection is in place
+    // 4. This client is only used for our backend API
+    credentials: "include",
   });
 
   const data = await response.json();
