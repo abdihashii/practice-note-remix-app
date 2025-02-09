@@ -31,7 +31,13 @@ export const corsMiddleware = cors({
 		return allowedOrigins.includes(origin) ? origin : allowedOrigins[0];
 	},
 	allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-	allowHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token'],
+	allowHeaders: [
+		'Content-Type',
+		'Authorization',
+		'X-CSRF-Token',
+		'credentials',
+		'X-Requested-With',
+	],
 	exposeHeaders: ['Content-Length', 'X-Requested-With', 'X-CSRF-Token'],
 	credentials: true,
 	maxAge: 600,
