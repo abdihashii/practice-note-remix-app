@@ -47,7 +47,8 @@ async function initAuth(): Promise<AuthState> {
     } catch (error) {
       console.error("[initAuth] Failed to fetch user data:", error);
 
-      // If user fetch fails, clear the token and try refresh one more time
+      // If user fetch fails, clear the token from memory and try refresh
+      // one more time
       clearAuthTokens();
 
       try {
