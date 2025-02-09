@@ -1,5 +1,6 @@
 // React
-import { Navigate } from "react-router";
+import { useEffect } from "react";
+import { useNavigate } from "react-router";
 import type { Route } from "./+types/login";
 
 // Third-party imports
@@ -21,7 +22,17 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function Login() {
+  const navigate = useNavigate();
   const { loginMutation, loginError, isAuthenticated, isLoading } = useAuth();
+
+  // Redirect to notes if authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      const params = new URLSearchParams(window.location.search);
+      const returnTo = params.get("returnTo") || "/notes";
+      navigate(returnTo, { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -36,14 +47,9 @@ export default function Login() {
     });
   };
 
-  // Show nothing while checking auth state
-  if (isLoading) {
+  // Show nothing while checking auth state or if authenticated
+  if (isLoading || isAuthenticated) {
     return null;
-  }
-
-  // Redirect if already authenticated
-  if (isAuthenticated) {
-    return <Navigate to="/notes" replace />;
   }
 
   return (
