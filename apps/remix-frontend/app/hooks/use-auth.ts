@@ -4,28 +4,25 @@ import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
 
 // First-party imports
-import { login } from "~/api/auth";
+import { login, logout } from "~/api/auth";
+import { useAuthStore } from "~/hooks/use-auth-store";
 import type { APIError } from "~/lib/api-error";
-import { storeAuthTokens } from "~/lib/auth-utils";
 
 export const useAuth = () => {
   const navigate = useNavigate();
+  const { setAuth, clearAuth, user } = useAuthStore();
 
   const loginMutation = useMutation<
     AuthResponse,
     APIError,
     { email: string; password: string }
   >({
-    mutationKey: ["user"],
+    mutationKey: ["login"],
     mutationFn: (data) => login(data.email, data.password),
     onSuccess: (data) => {
-      // Tokens go to secure cookies
-      storeAuthTokens({
-        refreshToken: data.refreshToken,
-        accessToken: data.accessToken,
-      });
+      // Update auth store with new tokens and user
+      setAuth(data.accessToken, data.user);
 
-      // User data can stay in query cache
       // Get the return URL from query params or default to /notes
       const params = new URLSearchParams(window.location.search);
       const returnTo = params.get("returnTo") || "/notes";
@@ -35,14 +32,23 @@ export const useAuth = () => {
       // Log technical details for debugging
       console.error("Authentication error:", error.getTechnicalDetails());
       // Error message is already user-friendly from APIError
-      // You can use error.getUserMessage() in your UI or loginError from the
-      // mutation hook
+    },
+  });
+
+  const logoutMutation = useMutation({
+    mutationKey: ["logout"],
+    mutationFn: logout,
+    onSuccess: () => {
+      clearAuth();
+      navigate("/login");
     },
   });
 
   return {
-    loginData: loginMutation.data,
+    user,
+    isAuthenticated: !!user,
     loginMutation,
+    logoutMutation,
     // Expose the user-friendly error message
     loginError: loginMutation.error?.getUserMessage(),
   };
