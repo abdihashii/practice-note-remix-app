@@ -4,6 +4,7 @@ import { useNavigate } from "react-router";
 import type { Route } from "./+types/login";
 
 // Third-party imports
+import { Loader2 } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
@@ -49,7 +50,11 @@ export default function Login() {
 
   // Show nothing while checking auth state or if authenticated
   if (isLoading || isAuthenticated) {
-    return null;
+    return (
+      <main className="flex h-screen w-full items-center justify-center px-4 sm:px-6 lg:px-8">
+        <Loader2 className="w-10 h-10 animate-spin" />
+      </main>
+    );
   }
 
   return (
