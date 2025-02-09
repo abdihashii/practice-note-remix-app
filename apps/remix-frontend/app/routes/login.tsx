@@ -1,10 +1,11 @@
 // React
+import { Navigate } from "react-router";
 import type { Route } from "./+types/login";
 
 // Third-party imports
-import { Label } from "~/components/ui/label";
-import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
 
 // First-party imports
 import { useAuth } from "~/hooks/use-auth";
@@ -20,7 +21,7 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function Login() {
-  const { loginMutation, loginError } = useAuth();
+  const { loginMutation, loginError, isAuthenticated, isLoading } = useAuth();
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -35,6 +36,16 @@ export default function Login() {
     });
   };
 
+  // Show nothing while checking auth state
+  if (isLoading) {
+    return null;
+  }
+
+  // Redirect if already authenticated
+  if (isAuthenticated) {
+    return <Navigate to="/notes" replace />;
+  }
+
   return (
     <main className="flex h-screen w-full items-center justify-center px-4 sm:px-6 lg:px-8">
       <div className="text-center">
@@ -48,14 +59,32 @@ export default function Login() {
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="flex flex-col gap-2 items-start">
             <Label htmlFor="email">Email</Label>
-            <Input type="email" id="email" name="email" />
+            <Input
+              type="email"
+              id="email"
+              name="email"
+              disabled={loginMutation.isPending}
+              required
+            />
           </div>
           <div className="flex flex-col gap-2 items-start">
             <Label htmlFor="password">Password</Label>
-            <Input type="password" id="password" name="password" />
+            <Input
+              type="password"
+              id="password"
+              name="password"
+              disabled={loginMutation.isPending}
+              required
+            />
           </div>
-          <Button type="submit">Login</Button>
-          {loginError && <p className="text-red-500">{loginError}</p>}
+          <Button type="submit" disabled={loginMutation.isPending}>
+            {loginMutation.isPending ? "Logging in..." : "Login"}
+          </Button>
+          {loginError && (
+            <p className="text-red-500 text-sm mt-2" role="alert">
+              {loginError}
+            </p>
+          )}
         </form>
       </div>
     </main>
