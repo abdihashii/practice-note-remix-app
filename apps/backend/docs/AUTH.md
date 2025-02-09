@@ -4,6 +4,54 @@
 
 This guide explains how authentication (AuthN) and authorization (AuthZ) work in our API. We'll cover the journey of a request from the moment it hits our API to how we ensure secure access to resources.
 
+## Authentication Flow Diagram
+
+```mermaid
+sequenceDiagram
+    title Authentication Flows
+
+    box Client Side
+    participant User as 🧑 User
+    participant App as 💻 Frontend App
+    end
+
+    box Server Side
+    participant API as 🔒 API Server
+    participant DB as 💾 Database
+    end
+
+    %% Initial Login
+    rect rgba(173, 216, 230, 0.3)
+    Note over User,DB: Login Flow
+    User->>App: Login with email/password
+    App->>API: POST /auth/login
+    API->>DB: Verify credentials
+    DB-->>API: Confirm user
+    API-->>App: Send access token + Set refresh cookie
+    App-->>User: Redirect to app
+    end
+
+    %% Using Protected Resources
+    rect rgba(144, 238, 144, 0.3)
+    Note over User,DB: Using Protected Resources
+    User->>App: Request protected data
+    App->>API: Request with access token
+    API->>API: Verify token
+    API-->>App: Return protected data
+    App-->>User: Show data
+    end
+
+    %% Auto Refresh
+    rect rgba(255, 218, 185, 0.3)
+    Note over User,DB: Auto Token Refresh
+    App->>API: Request with expired token
+    API-->>App: 401 Unauthorized
+    App->>API: POST /auth/refresh
+    Note over App,API: Refresh cookie auto-sent
+    API-->>App: New access token
+    end
+```
+
 ## Authentication Flow 🔄
 
 Our API implements a standard JWT-based authentication flow with refresh tokens.
