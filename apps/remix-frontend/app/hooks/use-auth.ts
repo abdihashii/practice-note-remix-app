@@ -12,7 +12,13 @@ import type { APIError } from "~/lib/api-error";
 
 export const useAuth = () => {
   const navigate = useNavigate();
-  const { setAuth, clearAuth, user, accessToken, isLoading } = useAuthStore();
+  const {
+    setAuth,
+    clearAuth,
+    user,
+    accessToken,
+    isPending: isAuthQueryPending,
+  } = useAuthStore();
 
   const loginMutation = useMutation<
     AuthResponse,
@@ -42,17 +48,18 @@ export const useAuth = () => {
     mutationFn: logout,
     onSuccess: () => {
       clearAuth();
-      navigate("/login");
+      navigate("/login", { replace: true });
     },
   });
 
   return {
     user,
     isAuthenticated: !!user && !!accessToken,
-    isLoading,
+    isAuthQueryPending,
     loginMutation,
-    logoutMutation,
     // Expose the user-friendly error message
     loginError: loginMutation.error?.getUserMessage(),
+    logoutMutation,
+    logoutMutationPending: logoutMutation.isPending,
   };
 };
