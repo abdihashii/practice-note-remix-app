@@ -1,43 +1,38 @@
 // React
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router";
 
 // Third-party imports
+import { Loader2 } from "lucide-react";
 import Header from "~/components/layout/Header";
 import { Toaster } from "~/components/ui/toaster";
 
 // First-party imports
-import { isAuthenticated } from "~/lib/auth-utils";
+import { useAuth } from "~/hooks/use-auth";
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const location = useLocation();
   const navigate = useNavigate();
-  const [authChecked, setAuthChecked] = useState(false);
-  const [isAuthed, setIsAuthed] = useState(false);
+  const { isAuthenticated, isAuthQueryPending } = useAuth();
 
   useEffect(() => {
-    isAuthenticated()
-      .then((authed) => {
-        setIsAuthed(authed);
-        setAuthChecked(true);
-      })
-      .catch(() => {
-        setIsAuthed(false);
-        setAuthChecked(true);
-      });
-  }, []);
-
-  useEffect(() => {
-    if (!isAuthed) {
+    if (!isAuthQueryPending && !isAuthenticated) {
       const params = new URLSearchParams({
         returnTo: location.pathname,
       });
       navigate(`/login?${params.toString()}`, { replace: true });
     }
-  }, [isAuthed, location.pathname, navigate]);
+  }, [isAuthQueryPending, isAuthenticated, location.pathname, navigate]);
 
-  // Don't render anything while checking auth
-  if (!authChecked) {
+  if (isAuthQueryPending) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center">
+        <Loader2 className="w-10 h-10 animate-spin" />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
     return null;
   }
 
