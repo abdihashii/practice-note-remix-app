@@ -28,7 +28,6 @@ function RequireAuth({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    console.log("hello");
     if (!isAuthed) {
       const params = new URLSearchParams({
         returnTo: location.pathname,
