@@ -1,6 +1,12 @@
+// React
+import { useState } from "react";
+
+// First-party imports
 import { useAuth } from "./use-auth";
 
 export default function useLoginForm() {
+  const [showPassword, setShowPassword] = useState(false);
+
   const { loginMutation, loginError, isAuthenticated, isAuthQueryPending } =
     useAuth();
 
@@ -23,5 +29,7 @@ export default function useLoginForm() {
     isAuthenticated,
     isAuthQueryPending,
     handleSubmit,
+    showPassword,
+    setShowPassword,
   };
 }
