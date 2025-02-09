@@ -1,5 +1,9 @@
 // Third-party imports
-import { SecurityErrorType, type AuthResponse } from "@notes-app/types";
+import {
+  SecurityErrorType,
+  type AuthResponse,
+  type TokenResponse,
+} from "@notes-app/types";
 
 // First-party imports
 import { apiClient } from "~/lib/api-client";
@@ -7,7 +11,7 @@ import { APIError } from "~/lib/api-error";
 import {
   clearAuthTokens,
   getRefreshToken,
-  storeAuthTokens,
+  storeAccessTokenInMemory,
 } from "~/lib/auth-utils";
 
 /**
@@ -32,7 +36,8 @@ export const login = async (
     },
   });
 
-  storeAuthTokens(data);
+  // Store access token in memory
+  storeAccessTokenInMemory(data);
   return data;
 };
 
@@ -56,21 +61,15 @@ export const logout = async (): Promise<void> => {
 
 /**
  * Refresh the access token using the refresh token
- * Returns the new tokens if successful, null if failed
+ * Returns the new access token if successful, null if failed
  */
-export const refreshTokens = async (): Promise<Pick<
-  AuthResponse,
-  "accessToken" | "refreshToken"
-> | null> => {
+export const refreshTokens = async (): Promise<TokenResponse | null> => {
   const refreshToken = getRefreshToken();
   if (!refreshToken) return null;
 
-  const data = await apiClient<
-    Pick<AuthResponse, "accessToken" | "refreshToken">
-  >("/auth/refresh", {
+  const data = await apiClient<TokenResponse>("/auth/refresh", {
     method: "POST",
     requireAuth: false,
-    body: JSON.stringify({ refreshToken }),
     handleError: (error) => {
       if (
         error.is(
@@ -85,7 +84,8 @@ export const refreshTokens = async (): Promise<Pick<
   });
 
   if (data) {
-    storeAuthTokens(data);
+    // Store new access token in memory
+    storeAccessTokenInMemory(data);
   }
   return data;
 };
