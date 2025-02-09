@@ -23,13 +23,7 @@ export default function LoginForm() {
       <div className="flex flex-col gap-2 items-start">
         <Label htmlFor="email">Email</Label>
         <Input
-          {...register("email", {
-            required: "Email is required",
-            pattern: {
-              value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-              message: "Invalid email address",
-            },
-          })}
+          {...register("email")}
           type="email"
           id="email"
           disabled={loginMutation.isPending}
@@ -44,13 +38,7 @@ export default function LoginForm() {
         <Label htmlFor="password">Password</Label>
         <div className="relative w-full">
           <Input
-            {...register("password", {
-              required: "Password is required",
-              minLength: {
-                value: 6,
-                message: "Password must be at least 6 characters",
-              },
-            })}
+            {...register("password")}
             type={showPassword ? "text" : "password"}
             id="password"
             disabled={loginMutation.isPending}
