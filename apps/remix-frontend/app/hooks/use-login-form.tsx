@@ -1,8 +1,17 @@
 // React
 import { useState } from "react";
 
+// Third-party imports
+import { useForm } from "react-hook-form";
+
 // First-party imports
 import { useAuth } from "./use-auth";
+
+// Types
+type LoginFormData = {
+  email: string;
+  password: string;
+};
 
 export default function useLoginForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -10,25 +19,32 @@ export default function useLoginForm() {
   const { loginMutation, loginError, isAuthenticated, isAuthQueryPending } =
     useAuth();
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormData>({
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
 
-    const formData = new FormData(event.currentTarget);
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
-
+  const onSubmit = (data: LoginFormData) => {
     loginMutation.mutate({
-      email,
-      password,
+      email: data.email,
+      password: data.password,
     });
   };
 
   return {
+    register,
+    handleSubmit: handleSubmit(onSubmit),
+    errors,
     loginMutation,
     loginError,
     isAuthenticated,
     isAuthQueryPending,
-    handleSubmit,
     showPassword,
     setShowPassword,
   };

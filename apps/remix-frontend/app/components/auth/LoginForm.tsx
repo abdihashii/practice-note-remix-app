@@ -9,9 +9,11 @@ import useLoginForm from "~/hooks/use-login-form";
 
 export default function LoginForm() {
   const {
+    register,
+    handleSubmit,
+    errors,
     loginMutation,
     loginError,
-    handleSubmit,
     showPassword,
     setShowPassword,
   } = useLoginForm();
@@ -21,22 +23,37 @@ export default function LoginForm() {
       <div className="flex flex-col gap-2 items-start">
         <Label htmlFor="email">Email</Label>
         <Input
+          {...register("email", {
+            required: "Email is required",
+            pattern: {
+              value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+              message: "Invalid email address",
+            },
+          })}
           type="email"
           id="email"
-          name="email"
           disabled={loginMutation.isPending}
-          required
         />
+        {errors.email && (
+          <p className="text-red-500 text-sm" role="alert">
+            {errors.email.message}
+          </p>
+        )}
       </div>
       <div className="flex flex-col gap-2 items-start">
         <Label htmlFor="password">Password</Label>
         <div className="relative w-full">
           <Input
+            {...register("password", {
+              required: "Password is required",
+              minLength: {
+                value: 6,
+                message: "Password must be at least 6 characters",
+              },
+            })}
             type={showPassword ? "text" : "password"}
             id="password"
-            name="password"
             disabled={loginMutation.isPending}
-            required
           />
           <span
             onClick={() => setShowPassword(!showPassword)}
@@ -49,6 +66,11 @@ export default function LoginForm() {
             )}
           </span>
         </div>
+        {errors.password && (
+          <p className="text-red-500 text-sm" role="alert">
+            {errors.password.message}
+          </p>
+        )}
       </div>
       <Button type="submit" disabled={loginMutation.isPending}>
         {loginMutation.isPending ? "Logging in..." : "Login"}
