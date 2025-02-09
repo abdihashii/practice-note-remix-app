@@ -8,11 +8,7 @@ import {
 // First-party imports
 import { apiClient } from "~/lib/api-client";
 import { APIError } from "~/lib/api-error";
-import {
-  clearAuthTokens,
-  getRefreshToken,
-  storeAccessTokenInMemory,
-} from "~/lib/auth-utils";
+import { clearAuthTokens, storeAccessTokenInMemory } from "~/lib/auth-utils";
 
 /**
  * Login user with email and password
@@ -43,15 +39,13 @@ export const login = async (
 
 /**
  * Logout user and invalidate tokens
+ * The refresh token cookie will be sent automatically with the request
  */
 export const logout = async (): Promise<void> => {
-  const refreshToken = getRefreshToken();
-  if (!refreshToken) return;
-
   try {
     await apiClient("/auth/logout", {
       method: "POST",
-      body: JSON.stringify({ refreshToken }),
+      requireAuth: false,
     });
   } finally {
     // Clear tokens even if server request fails
@@ -60,32 +54,34 @@ export const logout = async (): Promise<void> => {
 };
 
 /**
- * Refresh the access token using the refresh token
+ * Refresh the access token using the refresh token cookie
  * Returns the new access token if successful, null if failed
  */
 export const refreshTokens = async (): Promise<TokenResponse | null> => {
-  const refreshToken = getRefreshToken();
-  if (!refreshToken) return null;
+  try {
+    const data = await apiClient<TokenResponse>("/auth/refresh", {
+      method: "POST",
+      requireAuth: false,
+      handleError: (error) => {
+        if (
+          error.is(
+            SecurityErrorType.TOKEN_EXPIRED,
+            SecurityErrorType.INVALID_TOKEN
+          )
+        ) {
+          clearAuthTokens();
+          return null;
+        }
+      },
+    });
 
-  const data = await apiClient<TokenResponse>("/auth/refresh", {
-    method: "POST",
-    requireAuth: false,
-    handleError: (error) => {
-      if (
-        error.is(
-          SecurityErrorType.TOKEN_EXPIRED,
-          SecurityErrorType.INVALID_TOKEN
-        )
-      ) {
-        clearAuthTokens();
-        return null;
-      }
-    },
-  });
-
-  if (data) {
-    // Store new access token in memory
-    storeAccessTokenInMemory(data);
+    if (data) {
+      // Store new access token in memory
+      storeAccessTokenInMemory(data);
+    }
+    return data;
+  } catch (error) {
+    console.error("Failed to refresh tokens:", error);
+    return null;
   }
-  return data;
 };
