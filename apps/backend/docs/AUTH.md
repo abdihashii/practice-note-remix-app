@@ -93,7 +93,7 @@ Invalidates both access and refresh tokens:
 
 ```typescript
 POST /api/v1/auth/logout
-Authorization: Bearer eyJhbGc...
+Authorization: Bearer eyJhbGc... (optional)
 
 // Response
 {
@@ -101,23 +101,31 @@ Authorization: Bearer eyJhbGc...
 }
 ```
 
+Note: The refresh token is automatically sent and cleared via HTTP-only cookie.
+
 ### Token Lifecycle
 
 1. **Access Token**
 
    - Short-lived (15 minutes)
    - Used for API requests
+   - Stored in memory on client-side (fallback when React Query is not available)
    - Sent in Authorization header
 
 2. **Refresh Token**
    - Longer-lived (7 days)
    - Used only for getting new access tokens
+   - Stored in HTTP-only cookie
+   - Automatically sent with requests
    - One-time use (rotated on refresh)
    - Invalidated on logout
 
 ### Security Measures
 
-- Passwords are hashed using bcrypt
+- Access tokens stored in memory only (fallback when React Query is not available)
+- Refresh tokens in HTTP-only cookies only
+- CSRF protection enabled
+- Passwords are hashed using Argon2
 - Refresh tokens are single-use
 - Token invalidation on logout
 - Rate limiting on auth endpoints (planned)
