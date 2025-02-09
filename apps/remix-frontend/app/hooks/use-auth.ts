@@ -1,7 +1,9 @@
+// React
+import { useNavigate } from "react-router";
+
 // Third-party imports
 import type { AuthResponse } from "@notes-app/types";
 import { useMutation } from "@tanstack/react-query";
-import { useNavigate } from "react-router";
 
 // First-party imports
 import { login, logout } from "~/api/auth";
@@ -10,7 +12,7 @@ import type { APIError } from "~/lib/api-error";
 
 export const useAuth = () => {
   const navigate = useNavigate();
-  const { setAuth, clearAuth, user } = useAuthStore();
+  const { setAuth, clearAuth, user, accessToken, isLoading } = useAuthStore();
 
   const loginMutation = useMutation<
     AuthResponse,
@@ -46,7 +48,8 @@ export const useAuth = () => {
 
   return {
     user,
-    isAuthenticated: !!user,
+    isAuthenticated: !!user && !!accessToken,
+    isLoading,
     loginMutation,
     logoutMutation,
     // Expose the user-friendly error message
