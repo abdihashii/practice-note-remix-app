@@ -1,50 +1,25 @@
 // Third-party imports
-import type { AuthResponse } from "@notes-app/types";
+import type { AuthResponse, TokenResponse } from "@notes-app/types";
 
 // First-party imports
 import { refreshTokens } from "~/api/auth";
-import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY } from "~/lib/constants";
+import { REFRESH_TOKEN_KEY } from "~/lib/constants";
+
+// In-memory storage for access token (fallback when React Query is not available)
+let memoryAccessToken: string | null = null;
 
 /**
- * Store auth tokens in HTTP-only cookies
+ * Store access token in memory for fallback when React Query is not available
  */
-export function storeAuthTokens(
-  tokens: Pick<AuthResponse, "accessToken" | "refreshToken">
-) {
-  // Set access token cookie (15 minutes)
-  document.cookie = `${ACCESS_TOKEN_KEY}=${tokens.accessToken}; path=/; max-age=900; SameSite=Strict; HttpOnly`;
-
-  // Set refresh token cookie (7 days)
-  document.cookie = `${REFRESH_TOKEN_KEY}=${tokens.refreshToken}; path=/; max-age=604800; SameSite=Strict; HttpOnly`;
+export function storeAccessTokenInMemory(tokens: AuthResponse | TokenResponse) {
+  memoryAccessToken = tokens.accessToken;
 }
 
 /**
- * Get access token from cookie
- * Works in both client and server environments
+ * Get access token from memory
  */
-export function getAccessToken(request?: Request): string | null {
-  if (typeof document !== "undefined") {
-    // Client-side
-    const match = document.cookie.match(
-      new RegExp(`${ACCESS_TOKEN_KEY}=([^;]+)`)
-    );
-    return match ? match[1] : null;
-  }
-
-  // Server-side
-  if (request) {
-    const cookieHeader = request.headers.get("Cookie");
-    if (cookieHeader) {
-      const cookies = cookieHeader.split("; ").reduce((acc, cookie) => {
-        const [key, value] = cookie.split("=");
-        acc[key] = value;
-        return acc;
-      }, {} as Record<string, string>);
-      return cookies[ACCESS_TOKEN_KEY] || null;
-    }
-  }
-
-  return null;
+export function getAccessToken(): string | null {
+  return memoryAccessToken;
 }
 
 /**
@@ -77,11 +52,16 @@ export function getRefreshToken(request?: Request): string | null {
 }
 
 /**
- * Clear auth tokens from cookies
+ * Clear auth tokens from memory and cookies
  */
 export function clearAuthTokens() {
-  document.cookie = `${ACCESS_TOKEN_KEY}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
-  document.cookie = `${REFRESH_TOKEN_KEY}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
+  // Clear memory access token
+  memoryAccessToken = null;
+
+  // Clear refresh token cookie
+  if (typeof document !== "undefined") {
+    document.cookie = `${REFRESH_TOKEN_KEY}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
+  }
 }
 
 /**
@@ -92,7 +72,7 @@ export async function isAuthenticated(
   request?: Request,
   tryRefresh = true
 ): Promise<boolean> {
-  const accessToken = getAccessToken(request);
+  const accessToken = getAccessToken();
 
   if (accessToken) return true;
 
