@@ -46,10 +46,10 @@ export default function Login() {
     <main className="flex h-screen w-full items-center justify-center px-4 sm:px-6 lg:px-8">
       <div className="text-center">
         <h1 className="mb-6 text-4xl font-bold sm:text-5xl md:text-6xl">
-          Login to Notes App
+          Log in to Notes App
         </h1>
         <p className="mb-8 text-lg text-muted-foreground sm:text-xl md:text-2xl">
-          Login to your Notes App account
+          Log in to your Notes App account
         </p>
 
         <LoginForm />
