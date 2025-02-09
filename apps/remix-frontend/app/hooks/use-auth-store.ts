@@ -5,7 +5,11 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 // First-party imports
 import { refreshTokens } from "~/api/auth";
 import { apiClient } from "~/lib/api-client";
-import { getAccessToken } from "~/lib/auth-utils";
+import {
+  clearAuthTokens,
+  getAccessToken,
+  storeAccessTokenInMemory,
+} from "~/lib/auth-utils";
 
 const AUTH_QUERY_KEY = ["auth"] as const;
 
@@ -26,9 +30,11 @@ async function initAuth(): Promise<AuthState> {
       const tokens = await refreshTokens();
       if (tokens) {
         accessToken = tokens.accessToken;
+        // Store the new access token in memory
+        storeAccessTokenInMemory(tokens);
       }
     } catch (error) {
-      console.error("Failed to refresh token:", error);
+      console.error("[initAuth] Failed to refresh token:", error);
       return { accessToken: null, user: null };
     }
   }
@@ -36,15 +42,37 @@ async function initAuth(): Promise<AuthState> {
   // If we have an access token, fetch user data
   if (accessToken) {
     try {
+      // Let apiClient handle the auth header
       const user = await apiClient<User>("/auth/me");
       return { accessToken, user };
     } catch (error) {
-      console.error("Failed to fetch user data:", error);
-      // If user fetch fails, clear the token
+      console.error("[initAuth] Failed to fetch user data:", error);
+
+      // If user fetch fails, clear the token and try refresh one more time
+      clearAuthTokens();
+
+      try {
+        const tokens = await refreshTokens();
+        if (tokens) {
+          accessToken = tokens.accessToken;
+          storeAccessTokenInMemory(tokens);
+
+          // Let apiClient handle the auth header
+          const user = await apiClient<User>("/auth/me");
+
+          return { accessToken, user };
+        }
+      } catch (retryError) {
+        console.error(
+          "[initAuth] Failed to refresh token on retry:",
+          retryError
+        );
+      }
       return { accessToken: null, user: null };
     }
   }
 
+  console.log("[initAuth] No access token available after all attempts");
   // If all else fails, return null state
   return { accessToken: null, user: null };
 }
