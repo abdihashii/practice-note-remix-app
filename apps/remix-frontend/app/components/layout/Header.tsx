@@ -1,10 +1,19 @@
 // React
 import { Link } from "react-router";
 
+// Third-party imports
+import { Loader2, LogOut } from "lucide-react";
+import { Button } from "~/components/ui/button";
+
+// First-party imports
+import { useAuth } from "~/hooks/use-auth";
+
 // First party components
 // import DarkModeToggleButton from "@/components/common/DarkModeToggleButton";
 
 const Header = () => {
+  const { logoutMutation, logoutMutationPending } = useAuth();
+
   return (
     <header className="sticky top-0 z-10 border-b border-foreground/10 bg-background/80 backdrop-blur-sm">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -17,6 +26,20 @@ const Header = () => {
           </Link>
 
           {/* <DarkModeToggleButton /> */}
+          <Button
+            className="w-28"
+            onClick={() => logoutMutation.mutate()}
+            disabled={logoutMutationPending}
+          >
+            {logoutMutationPending ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <>
+                <LogOut className="w-4 h-4" />
+                Logout
+              </>
+            )}
+          </Button>
         </div>
       </div>
     </header>
