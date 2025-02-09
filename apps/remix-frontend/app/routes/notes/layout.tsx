@@ -1,6 +1,6 @@
 // React
 import { useEffect, useState } from "react";
-import { Navigate, Outlet, useLocation } from "react-router";
+import { Outlet, useLocation, useNavigate } from "react-router";
 
 // Third-party imports
 import Header from "~/components/layout/Header";
@@ -11,6 +11,7 @@ import { isAuthenticated } from "~/lib/auth-utils";
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const location = useLocation();
+  const navigate = useNavigate();
   const [authChecked, setAuthChecked] = useState(false);
   const [isAuthed, setIsAuthed] = useState(false);
 
@@ -26,17 +27,19 @@ function RequireAuth({ children }: { children: React.ReactNode }) {
       });
   }, []);
 
+  useEffect(() => {
+    console.log("hello");
+    if (!isAuthed) {
+      const params = new URLSearchParams({
+        returnTo: location.pathname,
+      });
+      navigate(`/login?${params.toString()}`, { replace: true });
+    }
+  }, [isAuthed, location.pathname, navigate]);
+
   // Don't render anything while checking auth
   if (!authChecked) {
     return null;
-  }
-
-  if (!isAuthed) {
-    // Redirect to login if not authenticated, with the return URL
-    const params = new URLSearchParams({
-      returnTo: location.pathname,
-    });
-    return <Navigate to={`/login?${params.toString()}`} replace />;
   }
 
   return children;
