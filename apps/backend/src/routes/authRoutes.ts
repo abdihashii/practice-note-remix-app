@@ -19,6 +19,7 @@ import { sign } from 'hono/jwt';
 
 // Local imports
 import { usersTable } from '../db/schema';
+import { verifyJWT } from '../middleware/authMiddleware';
 import {
 	handleAuthError,
 	handleCSRFError,
@@ -80,11 +81,14 @@ async function generateTokens(userId: string) {
 	return { accessToken, refreshToken };
 }
 
+// Public auth routes (no auth required)
+const publicRoutes = new Hono<CustomEnv>();
+
 /**
  * Register a new user
  * POST /auth/register
  */
-authRoutes.post('/register', async (c) => {
+publicRoutes.post('/register', async (c) => {
 	try {
 		const db = c.get('db');
 		const data = await c.req.json<CreateUserDto>();
@@ -204,7 +208,7 @@ authRoutes.post('/register', async (c) => {
  * Login user
  * POST /auth/login
  */
-authRoutes.post('/login', async (c) => {
+publicRoutes.post('/login', async (c) => {
 	try {
 		const db = c.get('db');
 		const { email, password } = await c.req.json<{
@@ -308,7 +312,7 @@ authRoutes.post('/login', async (c) => {
  * Refresh access token
  * POST /auth/refresh
  */
-authRoutes.post('/refresh', async (c) => {
+publicRoutes.post('/refresh', async (c) => {
 	try {
 		const db = c.get('db');
 		// Get refresh token from cookie
@@ -324,20 +328,34 @@ authRoutes.post('/refresh', async (c) => {
 			where: eq(usersTable.refreshToken, refreshToken),
 		});
 
-		if (!user || !user.refreshTokenExpiresAt) {
+		if (!user) {
+			console.log('[/refresh] No user found with refresh token');
 			return handleAuthError(c, 'Invalid refresh token');
+		}
+
+		if (!user.refreshTokenExpiresAt) {
+			console.log('[/refresh] Refresh token expiry not set');
+			return handleAuthError(c, 'Invalid refresh token state');
 		}
 
 		// Check if refresh token is expired
 		if (user.refreshTokenExpiresAt < new Date()) {
+			console.log('[/refresh] Token expired:', user.refreshTokenExpiresAt);
 			return handleAuthError(c, 'Refresh token expired', {
 				expiredAt: user.refreshTokenExpiresAt.toISOString(),
 			});
 		}
 
+		// Check if user is active
+		if (!user.isActive) {
+			console.log('[/refresh] User account is not active');
+			return handleAuthError(c, 'User account is not active');
+		}
+
 		// Generate new tokens
 		const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
 			await generateTokens(user.id);
+		console.log('[/refresh] Generated new tokens');
 
 		// Update user with new refresh token (rotation)
 		await db
@@ -348,6 +366,7 @@ authRoutes.post('/refresh', async (c) => {
 				lastActivityAt: new Date(),
 			})
 			.where(eq(usersTable.id, user.id));
+		console.log('[/refresh] Updated user with new refresh token');
 
 		// Set new refresh token cookie
 		setCookie(c, 'refreshToken', newRefreshToken, {
@@ -361,6 +380,7 @@ authRoutes.post('/refresh', async (c) => {
 				prefix: 'host', // This will prefix the cookie with __Host-
 			}),
 		});
+		console.log('[/refresh] Set new refresh token cookie');
 
 		const tokenResponse: TokenResponse = {
 			accessToken: newAccessToken,
@@ -368,6 +388,7 @@ authRoutes.post('/refresh', async (c) => {
 
 		return c.json(tokenResponse);
 	} catch (error) {
+		console.error('[/refresh] Error:', error);
 		if (error instanceof HTTPException && error.status === 403) {
 			return handleCSRFError(c, 'Invalid or missing CSRF token');
 		}
@@ -381,7 +402,7 @@ authRoutes.post('/refresh', async (c) => {
  * Logout user
  * POST /auth/logout
  */
-authRoutes.post('/logout', async (c) => {
+publicRoutes.post('/logout', async (c) => {
 	try {
 		const db = c.get('db');
 		// Get refresh token from cookie
@@ -425,21 +446,29 @@ authRoutes.post('/logout', async (c) => {
 	}
 });
 
+// Protected auth routes (auth required)
+const protectedRoutes = new Hono<CustomEnv>();
+// Apply auth middleware to all protected auth routes
+protectedRoutes.use('*', verifyJWT);
+
 /**
- * Get current user data
+ * Get the current user's data
  * GET /auth/me
  */
-authRoutes.get('/me', async (c) => {
+protectedRoutes.get('/me', async (c) => {
 	try {
 		const db = c.get('db');
 		const userId = c.get('userId'); // Set by auth middleware
+		console.log('[/me] Attempting to fetch user with ID:', userId);
 
 		// Find user
 		const user = await db.query.usersTable.findFirst({
 			where: eq(usersTable.id, userId),
 		});
+		console.log('[/me] User found:', user ? 'yes' : 'no');
 
 		if (!user) {
+			console.log('[/me] User not found in database');
 			return handleAuthError(c, 'User not found');
 		}
 
@@ -475,10 +504,16 @@ authRoutes.get('/me', async (c) => {
 			loginCount: user.loginCount ?? 0,
 		};
 
+		console.log('[/me] Successfully returning user data for:', safeUser.email);
 		return c.json(safeUser);
 	} catch (error) {
+		console.error('[/me] Error fetching user data:', error);
 		return handleAuthError(c, 'Failed to fetch user data', {
 			error: error instanceof Error ? error.message : String(error),
 		});
 	}
 });
+
+// Mount both route groups
+authRoutes.route('', publicRoutes);
+authRoutes.route('', protectedRoutes);
