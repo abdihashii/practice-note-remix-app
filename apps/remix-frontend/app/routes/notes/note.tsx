@@ -115,7 +115,7 @@ export default function NotePage({ params }: Route.ComponentProps) {
       </p>
 
       <NoteEditor
-        initialContent={data.content}
+        initialContent={data.content ?? ""}
         noteId={data.id}
         onSave={handleSave}
       />
