@@ -3,11 +3,9 @@ import { useState } from "react";
 import { Link } from "react-router";
 
 // Third-party imports
-import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2Icon, PenLineIcon, SaveIcon } from "lucide-react";
 
 // First-party imports
-import { getNoteById } from "~/api/notes";
 import type { Route } from "./+types";
 import { FavoriteButton } from "~/components/notes/FavoriteButton";
 import { Input } from "~/components/ui/input";
@@ -15,19 +13,18 @@ import { Button } from "~/components/ui/button";
 import { format } from "date-fns";
 import NoteEditor from "~/components/notes-editor/NoteEditor";
 import useNoteEditor from "~/hooks/use-note-editor";
+import { useNote } from "~/hooks/use-note";
 
 export default function NotePage({ params }: Route.ComponentProps) {
   const [isEditingTitle, setIsEditingTitle] = useState(false);
 
-  const queryClient = useQueryClient();
-  const { data, isPending, error } = useQuery({
-    queryKey: ["note", params.id],
-    queryFn: () => getNoteById(params.id!),
+  const { note, isPending, error, invalidateNote } = useNote({
+    noteId: params.id!,
     enabled: !!params.id,
   });
   const { handleUpdateNote } = useNoteEditor({
-    initialContent: data?.content || "",
-    noteId: data?.id,
+    initialContent: note?.content || "",
+    noteId: note?.id,
   });
 
   const onEditTitleClick = () => {
@@ -42,18 +39,12 @@ export default function NotePage({ params }: Route.ComponentProps) {
       const title = formData.get("title") as string;
 
       await handleUpdateNote(title);
-
-      await handleSave();
+      await invalidateNote();
     } catch (error) {
       console.error(error);
     } finally {
       setIsEditingTitle(false);
     }
-  };
-
-  const handleSave = async () => {
-    // Invalidate all queries
-    await queryClient.resetQueries();
   };
 
   if (isPending) {
@@ -64,7 +55,7 @@ export default function NotePage({ params }: Route.ComponentProps) {
     return <div>Error: {error.message}</div>;
   }
 
-  if (!data) {
+  if (!note) {
     return (
       <div>
         <p>Note not found</p>
@@ -77,8 +68,8 @@ export default function NotePage({ params }: Route.ComponentProps) {
     <div className="flex flex-col gap-4">
       <div className="w-fit">
         <FavoriteButton
-          noteId={data.id}
-          isFavorite={data.favorite}
+          noteId={note.id}
+          isFavorite={note.favorite}
           variant="outline"
         />
       </div>
@@ -88,7 +79,7 @@ export default function NotePage({ params }: Route.ComponentProps) {
             onSubmit={handleSaveTitle}
             className="flex flex-1 items-center gap-2"
           >
-            <Input type="text" name="title" defaultValue={data.title} />
+            <Input type="text" name="title" defaultValue={note.title} />
             <Button
               type="submit"
               variant="outline"
@@ -100,7 +91,7 @@ export default function NotePage({ params }: Route.ComponentProps) {
           </form>
         ) : (
           <>
-            <h1 className="text-4xl font-bold">{data.title}</h1>
+            <h1 className="text-4xl font-bold">{note.title}</h1>
             <PenLineIcon
               className="hidden h-4 w-4 cursor-pointer group-hover:block"
               onClick={onEditTitleClick}
@@ -111,13 +102,13 @@ export default function NotePage({ params }: Route.ComponentProps) {
 
       <p className="text-sm text-muted-foreground">
         <span className="font-medium">Last updated at:</span>{" "}
-        {format(new Date(data.updatedAt), "MMM d, yyyy 'at' h:mm a")}
+        {format(new Date(note.updatedAt), "MMM d, yyyy 'at' h:mm a")}
       </p>
 
       <NoteEditor
-        initialContent={data.content ?? ""}
-        noteId={data.id}
-        onSave={handleSave}
+        initialContent={note.content ?? ""}
+        noteId={note.id}
+        onSave={invalidateNote}
       />
     </div>
   );
