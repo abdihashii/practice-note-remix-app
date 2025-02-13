@@ -38,9 +38,6 @@ function RequireAuth({ children }: { children: React.ReactNode }) {
 }
 
 export default function NotesLayout() {
-  console.log("NotesLayout");
-  console.log(process.env.NODE_ENV);
-
   return (
     <RequireAuth>
       <div className="flex min-h-screen flex-col">
