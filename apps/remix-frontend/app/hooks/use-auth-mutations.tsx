@@ -7,7 +7,7 @@ import { useMutation } from "@tanstack/react-query";
 
 // First-party imports
 import { login, logout } from "~/api/auth";
-import type { APIError } from "~/lib/api-error";
+import { APIError } from "~/lib/api-error";
 import { useAuthStore } from "~/providers/AuthProvider";
 
 export const useAuthMutations = () => {
@@ -20,7 +20,37 @@ export const useAuthMutations = () => {
     { email: string; password: string }
   >({
     mutationKey: ["login"],
-    mutationFn: (data) => login(data.email, data.password),
+    mutationFn: async (data) => {
+      try {
+        return await login(data.email, data.password);
+      } catch (error) {
+        // If it's already an APIError, rethrow it
+        if (error instanceof APIError) throw error;
+
+        // Convert unknown errors to APIError with appropriate message
+        if (error instanceof Error) {
+          if (
+            error.message.includes("Failed to fetch") ||
+            error.message.includes("Network")
+          ) {
+            throw new APIError({
+              message:
+                "Unable to connect to the server. Please check your internet connection.",
+              status: 0,
+              technicalDetails: error.message,
+            });
+          }
+        }
+
+        // For any other unknown error
+        throw new APIError({
+          message: "An unexpected error occurred. Please try again.",
+          status: 500,
+          technicalDetails:
+            error instanceof Error ? error.message : "Unknown error",
+        });
+      }
+    },
     onSuccess: (data) => {
       // Update auth store with new tokens and user
       setAuth(data.accessToken, data.user);
@@ -35,13 +65,28 @@ export const useAuthMutations = () => {
       console.error("Authentication error:", error.getTechnicalDetails());
       // Error message is already user-friendly from APIError
     },
+    // Add retry logic only for network errors
+    retry: (failureCount, error) => {
+      if (error.status === 0 && failureCount < 3) {
+        return true;
+      }
+      return false;
+    },
   });
 
   const logoutMutation = useMutation({
     mutationKey: ["logout"],
-    mutationFn: logout,
-    onSuccess: () => {
+    mutationFn: async () => {
+      try {
+        await logout();
+      } catch (error) {
+        // Ignore errors during logout - we want to clear auth state anyway
+        console.error("Logout error:", error);
+      }
+      // Always clear auth state, even if the API call fails
       clearAuth();
+    },
+    onSuccess: () => {
       navigate("/login", { replace: true });
     },
   });
