@@ -7,8 +7,8 @@ import { useMutation } from "@tanstack/react-query";
 
 // First-party imports
 import { login, logout } from "~/api/auth";
-import { useAuthStore } from "~/hooks/use-auth-store";
 import type { APIError } from "~/lib/api-error";
+import { useAuthStore } from "~/providers/AuthProvider";
 
 export const useAuth = () => {
   const navigate = useNavigate();
