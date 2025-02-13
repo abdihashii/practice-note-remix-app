@@ -33,6 +33,7 @@ async function initAuth(): Promise<
   let accessToken = getAccessToken();
 
   // If no access token, try to refresh using the httpOnly cookie
+  // The cookie will be sent automatically with the request
   if (!accessToken) {
     try {
       const tokens = await refreshTokens();
@@ -54,6 +55,8 @@ async function initAuth(): Promise<
     } catch (error) {
       console.error("[initAuth] Failed to fetch user data:", error);
 
+      // If user fetch fails, clear the token from memory and try refresh
+      // one more time
       clearAuthTokensFallback();
 
       try {
@@ -61,7 +64,10 @@ async function initAuth(): Promise<
         if (tokens) {
           accessToken = tokens.accessToken;
           storeAccessTokenInMemory(tokens);
+
+          // Let apiClient handle the auth header
           const user = await apiClient<User>("/auth/me");
+
           return { accessToken, user, isAuthenticated: true };
         }
       } catch (retryError) {
@@ -74,6 +80,7 @@ async function initAuth(): Promise<
     }
   }
 
+  // If all else fails, return null state
   console.log("[initAuth] No access token available after all attempts");
   return { accessToken: null, user: null, isAuthenticated: false };
 }
@@ -84,8 +91,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const { data: auth, isPending } = useQuery({
     queryKey: AUTH_QUERY_KEY,
     queryFn: initAuth,
+    // Don't refetch on window focus since we manage token refresh separately
     refetchOnWindowFocus: false,
     retry: 1,
+    // Ensure this query runs before others
     staleTime: Infinity,
   });
 
