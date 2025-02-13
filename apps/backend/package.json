@@ -6,9 +6,8 @@
 		"dev": "bun run src/local.ts",
 		"build": "bun build ./src/server.ts --outdir ./dist --target node",
 		"start": "bun ./dist/server.js",
-		"clean": "rm -rf .wrangler node_modules dist build",
+		"clean": "rm -rf node_modules dist build",
 		"test": "vitest",
-		"cf-typegen": "wrangler types",
 		"db:generate": "drizzle-kit generate",
 		"db:migrate": "drizzle-kit migrate",
 		"db:push": "drizzle-kit push",
@@ -21,8 +20,7 @@
 		"dotenv": "^16.4.7",
 		"drizzle-kit": "^0.30.1",
 		"typescript": "^5.5.2",
-		"vitest": "2.1.8",
-		"wrangler": "^3.99.0"
+		"vitest": "2.1.8"
 	},
 	"dependencies": {
 		"@notes-app/types": "workspace:*",
