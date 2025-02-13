@@ -6,13 +6,13 @@ import { Loader2, LogOut } from "lucide-react";
 import { Button } from "~/components/ui/button";
 
 // First-party imports
-import { useAuth } from "~/hooks/use-auth";
+import { useAuthMutations } from "~/hooks/use-auth-mutations";
 
 // First party components
 // import DarkModeToggleButton from "@/components/common/DarkModeToggleButton";
 
 const Header = () => {
-  const { logoutMutation, logoutMutationPending } = useAuth();
+  const { logoutMutation, logoutMutationPending } = useAuthMutations();
 
   return (
     <header className="sticky top-0 z-10 border-b border-foreground/10 bg-background/80 backdrop-blur-sm">

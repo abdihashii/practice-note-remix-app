@@ -8,12 +8,12 @@ import Header from "~/components/layout/Header";
 import { Toaster } from "~/components/ui/toaster";
 
 // First-party imports
-import { useAuth } from "~/hooks/use-auth";
+import { useAuthMutations } from "~/hooks/use-auth-mutations";
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const location = useLocation();
   const navigate = useNavigate();
-  const { isAuthenticated, isAuthQueryPending } = useAuth();
+  const { isAuthenticated, isAuthQueryPending } = useAuthMutations();
 
   useEffect(() => {
     if (!isAuthQueryPending && !isAuthenticated) {

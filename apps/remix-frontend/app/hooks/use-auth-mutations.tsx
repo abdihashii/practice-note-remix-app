@@ -10,7 +10,7 @@ import { login, logout } from "~/api/auth";
 import type { APIError } from "~/lib/api-error";
 import { useAuthStore } from "~/providers/AuthProvider";
 
-export const useAuth = () => {
+export const useAuthMutations = () => {
   const navigate = useNavigate();
   const {
     setAuth,

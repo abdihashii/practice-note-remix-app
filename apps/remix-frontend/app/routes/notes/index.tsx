@@ -20,7 +20,7 @@ import { searchNotes } from "~/api/search";
 import AddNoteButton from "~/components/common/AddNoteButton";
 import SearchBar from "~/components/common/SearchBar";
 import NoteCard from "~/components/notes/NoteCard";
-import { useAuth } from "~/hooks/use-auth";
+import { useAuthMutations } from "~/hooks/use-auth-mutations";
 import { cn } from "~/lib/utils";
 import { NotesLoadingSkeleton } from "./NotesLoadingSkeleton";
 
@@ -31,7 +31,7 @@ export default function NotesPage() {
   const searchQuery = searchParams.get("q") ?? "";
   const currentPage = Number(searchParams.get("page") ?? "1");
 
-  const { loginData } = useAuth();
+  const { loginMutation } = useAuthMutations();
 
   const { data, isPending, error } = useQuery({
     queryKey: ["notes", searchQuery, currentPage],
@@ -46,7 +46,7 @@ export default function NotesPage() {
             page: currentPage,
             limit: ITEMS_PER_PAGE,
           }),
-    enabled: !!loginData?.accessToken,
+    enabled: !!loginMutation.data?.accessToken,
   });
 
   const renderPagination = () => {

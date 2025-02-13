@@ -8,7 +8,7 @@ import { Loader2 } from "lucide-react";
 
 // First-party imports
 import LoginForm from "~/components/auth/LoginForm";
-import { useAuth } from "~/hooks/use-auth";
+import { useAuthMutations } from "~/hooks/use-auth-mutations";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -22,7 +22,7 @@ export function meta({}: Route.MetaArgs) {
 
 export default function Login() {
   const navigate = useNavigate();
-  const { isAuthenticated, isAuthQueryPending } = useAuth();
+  const { isAuthenticated, isAuthQueryPending } = useAuthMutations();
 
   // Redirect to notes if authenticated
   useEffect(() => {
