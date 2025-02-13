@@ -21,6 +21,18 @@ interface UseNotesOptions {
   enabled?: boolean;
 }
 
+/**
+ * Hook for fetching and managing notes data with search and pagination support.
+ *
+ * Features:
+ * - Fetches paginated notes data
+ * - Supports searching notes with a query string
+ * - Handles loading and error states automatically
+ * - Configurable items per page
+ *
+ * @param options Configuration options for the hook
+ * @returns Query result containing notes data, loading state, and error state
+ */
 export function useNotes({
   searchQuery,
   currentPage,
