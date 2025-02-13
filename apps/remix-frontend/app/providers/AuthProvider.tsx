@@ -90,13 +90,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   });
 
   const setAuth = (accessToken: string, user: User) => {
-    queryClient.setQueryData(AUTH_QUERY_KEY, { accessToken, user });
-    queryClient.setQueryData(["user"], user);
+    // Only update the auth state in one place to prevent sync issues
+    queryClient.setQueryData(AUTH_QUERY_KEY, {
+      accessToken,
+      user,
+      isAuthenticated: true,
+    });
   };
 
   const clearAuth = () => {
-    queryClient.setQueryData(AUTH_QUERY_KEY, { accessToken: null, user: null });
-    queryClient.setQueryData(["user"], null);
+    // Only update the auth state in one place to prevent sync issues
+    queryClient.setQueryData(AUTH_QUERY_KEY, {
+      accessToken: null,
+      user: null,
+      isAuthenticated: false,
+    });
   };
 
   const value: AuthState = {
