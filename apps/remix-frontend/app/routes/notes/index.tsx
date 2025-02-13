@@ -30,8 +30,8 @@ export default function NotesPage() {
   const [searchParams] = useSearchParams();
   const searchQuery = searchParams.get("q") ?? "";
   const currentPage = Number(searchParams.get("page") ?? "1");
-  const { user } = useAuthStore();
 
+  const { user } = useAuthStore();
   const { data, isPending, error } = useQuery({
     queryKey: ["notes", searchQuery, currentPage],
     queryFn: () =>
