@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 
 // Third-party imports
 import type { AuthResponse } from "@notes-app/types";
+import { SecurityErrorType } from "@notes-app/types";
 import { useMutation } from "@tanstack/react-query";
 
 // First-party imports
@@ -27,27 +28,37 @@ export const useAuthMutations = () => {
         // If it's already an APIError, rethrow it
         if (error instanceof APIError) throw error;
 
-        // Convert unknown errors to APIError with appropriate message
+        // Convert unknown errors to APIError
         if (error instanceof Error) {
           if (
             error.message.includes("Failed to fetch") ||
             error.message.includes("Network")
           ) {
             throw new APIError({
-              message:
-                "Unable to connect to the server. Please check your internet connection.",
-              status: 0,
-              technicalDetails: error.message,
+              error: {
+                type: SecurityErrorType.SERVER_ERROR,
+                message:
+                  "Unable to connect to the server. Please check your internet connection.",
+                code: 0,
+                timestamp: new Date().toISOString(),
+                details: { originalError: error.message },
+              },
             });
           }
         }
 
         // For any other unknown error
         throw new APIError({
-          message: "An unexpected error occurred. Please try again.",
-          status: 500,
-          technicalDetails:
-            error instanceof Error ? error.message : "Unknown error",
+          error: {
+            type: SecurityErrorType.SERVER_ERROR,
+            message: "An unexpected error occurred. Please try again.",
+            code: 500,
+            timestamp: new Date().toISOString(),
+            details: {
+              originalError:
+                error instanceof Error ? error.message : "Unknown error",
+            },
+          },
         });
       }
     },
@@ -63,14 +74,10 @@ export const useAuthMutations = () => {
     onError: (error) => {
       // Log technical details for debugging
       console.error("Authentication error:", error.getTechnicalDetails());
-      // Error message is already user-friendly from APIError
     },
     // Add retry logic only for network errors
     retry: (failureCount, error) => {
-      if (error.status === 0 && failureCount < 3) {
-        return true;
-      }
-      return false;
+      return error.code === 0 && failureCount < 3;
     },
   });
 
