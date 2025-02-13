@@ -9,6 +9,7 @@ import {
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { AuthProvider } from "~/providers/AuthProvider";
 import type { Route } from "./+types/root";
 
 import stylesheet from "./app.css?url";
@@ -40,7 +41,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         <QueryClientProvider client={queryClient}>
-          {children}
+          <AuthProvider>{children}</AuthProvider>
           <ReactQueryDevtools
             initialIsOpen={false}
             buttonPosition="bottom-left"
