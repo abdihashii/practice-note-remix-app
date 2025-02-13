@@ -57,9 +57,6 @@ importers:
       vitest:
         specifier: 2.1.8
         version: 2.1.8(@types/node@20.17.16)(sass@1.83.4)
-      wrangler:
-        specifier: ^3.99.0
-        version: 3.105.1(@cloudflare/workers-types@4.20250124.3)
 
   apps/remix-frontend:
     dependencies:
@@ -5887,6 +5884,7 @@ snapshots:
       - bufferutil
       - supports-color
       - utf-8-validate
+    optional: true
 
   minimatch@9.0.5:
     dependencies:
@@ -6710,6 +6708,7 @@ snapshots:
       ohash: 1.1.4
       pathe: 1.1.2
       ufo: 1.5.4
+    optional: true
 
   universalify@2.0.1: {}
 
@@ -6879,6 +6878,7 @@ snapshots:
       '@cloudflare/workerd-linux-64': 1.20250124.0
       '@cloudflare/workerd-linux-arm64': 1.20250124.0
       '@cloudflare/workerd-windows-64': 1.20250124.0
+    optional: true
 
   wrangler@3.100.0(@cloudflare/workers-types@4.20250124.3):
     dependencies:
@@ -6925,6 +6925,7 @@ snapshots:
       - bufferutil
       - supports-color
       - utf-8-validate
+    optional: true
 
   wrap-ansi@7.0.0:
     dependencies:
