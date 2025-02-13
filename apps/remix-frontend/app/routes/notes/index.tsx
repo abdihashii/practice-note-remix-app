@@ -30,7 +30,6 @@ export default function NotesPage() {
   const currentPage = Number(searchParams.get("page") ?? "1");
 
   const { user } = useAuthStore();
-
   const { data, isPending, error } = useNotes({
     searchQuery,
     currentPage,
@@ -38,6 +37,21 @@ export default function NotesPage() {
     enabled: !!user,
   });
 
+  /**
+   * Renders a pagination component for navigating through notes pages.
+   *
+   * Features:
+   * - Displays up to 5 page numbers at a time
+   * - Shows first and last page numbers always
+   * - Uses ellipsis (...) for hidden page numbers
+   * - Includes Previous/Next navigation buttons
+   * - Maintains search query parameters in pagination links
+   * - Disables Previous button on first page
+   * - Disables Next button on last page
+   *
+   * @returns {JSX.Element | null} Returns a Pagination component when there's data,
+   *                               or null when there's no pagination data available
+   */
   const renderPagination = () => {
     if (!data?.pagination) return null;
 
