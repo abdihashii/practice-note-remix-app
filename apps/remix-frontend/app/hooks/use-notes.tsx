@@ -3,7 +3,7 @@ import type { Note } from "@notes-app/types";
 import { useQuery } from "@tanstack/react-query";
 
 // First-party imports
-import { getNotes } from "~/api/notes";
+import { getNotes } from "~/api/notes-apis";
 import { searchNotes } from "~/api/search";
 
 interface NotesData {

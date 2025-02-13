@@ -16,7 +16,7 @@ import StarterKit from "@tiptap/starter-kit";
 import { useToast } from "~/hooks/use-toast";
 
 // First-party imports
-import { createNote, updateNote } from "~/api/notes";
+import { createNote, updateNote } from "~/api/notes-apis";
 import CodeBlock from "~/components/notes-editor/CodeBlock";
 import { lowlight } from "~/lib/lowlight-utils";
 

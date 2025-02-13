@@ -2,7 +2,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 // First-party imports
-import { getNoteById } from "~/api/notes";
+import { getNoteById } from "~/api/notes-apis";
 
 interface UseNoteOptions {
   noteId: string;

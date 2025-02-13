@@ -1,7 +1,7 @@
 // Third-party imports
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { StarIcon } from "lucide-react";
-import { toggleNoteFavorite } from "~/api/notes";
+import { toggleNoteFavorite } from "~/api/notes-apis";
 import { Button } from "~/components/ui/button";
 import { useToast } from "~/hooks/use-toast";
 import { cn } from "~/lib/utils";
