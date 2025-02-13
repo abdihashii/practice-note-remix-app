@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 
 // First-party imports
 import { getNotes } from "~/api/notes-apis";
-import { searchNotes } from "~/api/search";
+import { searchNotes } from "~/api/search-apis";
 
 interface NotesData {
   searchResults: Note[];
