@@ -2,15 +2,15 @@
 import { useState } from "react";
 
 // Third-party imports
-import { Card, CardHeader, CardTitle } from "~/components/ui/card";
-import { cn } from "~/lib/utils";
 import type { Note } from "@notes-app/types";
 import { format, isAfter, parseISO } from "date-fns";
+import { Card, CardHeader, CardTitle } from "~/components/ui/card";
+import { cn } from "~/lib/utils";
 
 // First-party imports
 import { EditNoteDialogForm } from "~/components/notes/EditNoteDialogForm";
 import { FavoriteButton } from "~/components/notes/FavoriteButton";
-import { useNote } from "~/hooks/use-note";
+import { useNoteMutations } from "~/hooks/use-note-mutations";
 
 interface NoteCardProps {
   note: Note;
@@ -19,7 +19,7 @@ interface NoteCardProps {
 const NoteCard = ({ note }: NoteCardProps) => {
   const [openEditNoteDialog, setOpenEditNoteDialog] = useState(false);
 
-  const { updateMutation, handleEdit } = useNote();
+  const { updateMutation, handleEdit } = useNoteMutations();
 
   return (
     <>
