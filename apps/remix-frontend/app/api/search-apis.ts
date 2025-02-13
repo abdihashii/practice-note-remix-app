@@ -1,5 +1,10 @@
 // Third-party imports
-import type { Note, PaginatedResponse, SearchParams } from "@notes-app/types";
+import type {
+  Note,
+  PaginatedResponse,
+  SearchParams,
+  TransformedPaginatedResponse,
+} from "@notes-app/types";
 import { SecurityErrorType } from "@notes-app/types";
 
 // Local imports
@@ -12,7 +17,7 @@ export const searchNotes = async ({
   query,
   page = 1,
   limit = 10,
-}: SearchParams) => {
+}: SearchParams): Promise<TransformedPaginatedResponse<Note>> => {
   const params = new URLSearchParams({
     q: query,
     page: page.toString(),

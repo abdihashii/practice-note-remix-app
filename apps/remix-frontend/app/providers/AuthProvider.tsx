@@ -6,7 +6,7 @@ import { type User } from "@notes-app/types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 // First-party imports
-import { refreshTokens } from "~/api/auth";
+import { refreshTokens } from "~/api/auth-apis";
 import { apiClient } from "~/lib/api-client";
 import {
   clearAuthTokensFallback,

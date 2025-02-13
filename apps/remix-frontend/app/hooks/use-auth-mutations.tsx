@@ -7,7 +7,7 @@ import { SecurityErrorType } from "@notes-app/types";
 import { useMutation } from "@tanstack/react-query";
 
 // First-party imports
-import { login, logout } from "~/api/auth";
+import { login, logout } from "~/api/auth-apis";
 import { APIError } from "~/lib/api-error";
 import { useAuthStore } from "~/providers/AuthProvider";
 

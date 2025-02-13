@@ -3,9 +3,9 @@ import type { UpdateNoteDto } from "@notes-app/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 // First-party imports
-import { deleteNote, updateNote } from "~/api/notes";
+import { deleteNote, updateNote } from "~/api/notes-apis";
 
-export const useNote = () => {
+export const useNoteMutations = () => {
   const queryClient = useQueryClient();
 
   const deleteMutation = useMutation({

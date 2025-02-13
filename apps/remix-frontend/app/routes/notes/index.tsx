@@ -2,7 +2,7 @@
 import { Link, useSearchParams } from "react-router";
 
 // Third-party imports
-import { useQuery } from "@tanstack/react-query";
+import type { Note } from "@notes-app/types";
 import {
   Pagination,
   PaginationContent,
@@ -14,12 +14,10 @@ import {
 } from "~/components/ui/pagination";
 
 // First-party imports
-import type { Note } from "@notes-app/types";
-import { getNotes } from "~/api/notes";
-import { searchNotes } from "~/api/search";
 import AddNoteButton from "~/components/common/AddNoteButton";
 import SearchBar from "~/components/common/SearchBar";
 import NoteCard from "~/components/notes/NoteCard";
+import { useNotes } from "~/hooks/use-notes";
 import { cn } from "~/lib/utils";
 import { useAuthStore } from "~/providers/AuthProvider";
 import { NotesLoadingSkeleton } from "./NotesLoadingSkeleton";
@@ -32,22 +30,28 @@ export default function NotesPage() {
   const currentPage = Number(searchParams.get("page") ?? "1");
 
   const { user } = useAuthStore();
-  const { data, isPending, error } = useQuery({
-    queryKey: ["notes", searchQuery, currentPage],
-    queryFn: () =>
-      searchQuery
-        ? searchNotes({
-            query: searchQuery,
-            page: currentPage,
-            limit: ITEMS_PER_PAGE,
-          })
-        : getNotes({
-            page: currentPage,
-            limit: ITEMS_PER_PAGE,
-          }),
+  const { data, isPending, error } = useNotes({
+    searchQuery,
+    currentPage,
+    itemsPerPage: ITEMS_PER_PAGE,
     enabled: !!user,
   });
 
+  /**
+   * Renders a pagination component for navigating through notes pages.
+   *
+   * Features:
+   * - Displays up to 5 page numbers at a time
+   * - Shows first and last page numbers always
+   * - Uses ellipsis (...) for hidden page numbers
+   * - Includes Previous/Next navigation buttons
+   * - Maintains search query parameters in pagination links
+   * - Disables Previous button on first page
+   * - Disables Next button on last page
+   *
+   * @returns {JSX.Element | null} Returns a Pagination component when there's data,
+   *                               or null when there's no pagination data available
+   */
   const renderPagination = () => {
     if (!data?.pagination) return null;
 

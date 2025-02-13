@@ -2,7 +2,7 @@
 import type { AuthResponse, TokenResponse } from "@notes-app/types";
 
 // First-party imports
-import { refreshTokens } from "~/api/auth";
+import { refreshTokens } from "~/api/auth-apis";
 import { REFRESH_TOKEN_KEY } from "~/lib/constants";
 
 // In-memory storage for access token (fallback when React Query is not available)
