@@ -106,24 +106,7 @@ Deploy the Next.js frontend to your preferred hosting platform.
 
 ### Backend
 
-1. Authenticate with Cloudflare:
-
-```bash
-npx wrangler login
-```
-
-2. Set up production environment variables:
-
-```bash
-npx wrangler secret put DATABASE_URL
-npx wrangler secret put FRONTEND_URL
-```
-
-3. Deploy to Cloudflare Workers:
-
-```bash
-bun run --cwd apps/backend worker:deploy
-```
+TODO: Add deployment instructions
 
 ### Environment Variables
 

@@ -47,24 +47,7 @@ JWT_SECRET="your_jwt_secret"
 
 ### Deployment
 
-1. Ensure you have Cloudflare Wrangler CLI authenticated:
-
-```bash
-npx wrangler login
-```
-
-2. Configure your production environment variables:
-
-```bash
-npx wrangler secret put DATABASE_URL
-npx wrangler secret put FRONTEND_URL
-```
-
-3. Deploy to Cloudflare Workers:
-
-```bash
-bun run worker:deploy
-```
+TODO: Add deployment instructions
 
 ## Environment Variables
 
