@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 // First-party imports
+import { useAuthStore } from "~/providers/AuthProvider";
 import { useAuthMutations } from "./use-auth-mutations";
 
 // Schema
@@ -26,9 +27,8 @@ type LoginFormData = z.infer<typeof loginSchema>;
 
 export default function useLoginForm() {
   const [showPassword, setShowPassword] = useState(false);
-
-  const { loginMutation, loginError, isAuthenticated, isAuthQueryPending } =
-    useAuthMutations();
+  const { isAuthenticated, isPending: isAuthQueryPending } = useAuthStore();
+  const { loginMutation, loginError } = useAuthMutations();
 
   const {
     register,

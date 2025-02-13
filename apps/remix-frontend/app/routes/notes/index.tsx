@@ -20,8 +20,8 @@ import { searchNotes } from "~/api/search";
 import AddNoteButton from "~/components/common/AddNoteButton";
 import SearchBar from "~/components/common/SearchBar";
 import NoteCard from "~/components/notes/NoteCard";
-import { useAuthMutations } from "~/hooks/use-auth-mutations";
 import { cn } from "~/lib/utils";
+import { useAuthStore } from "~/providers/AuthProvider";
 import { NotesLoadingSkeleton } from "./NotesLoadingSkeleton";
 
 const ITEMS_PER_PAGE = 10;
@@ -30,8 +30,7 @@ export default function NotesPage() {
   const [searchParams] = useSearchParams();
   const searchQuery = searchParams.get("q") ?? "";
   const currentPage = Number(searchParams.get("page") ?? "1");
-
-  const { loginMutation } = useAuthMutations();
+  const { user } = useAuthStore();
 
   const { data, isPending, error } = useQuery({
     queryKey: ["notes", searchQuery, currentPage],
@@ -46,7 +45,7 @@ export default function NotesPage() {
             page: currentPage,
             limit: ITEMS_PER_PAGE,
           }),
-    enabled: !!loginMutation.data?.accessToken,
+    enabled: !!user,
   });
 
   const renderPagination = () => {

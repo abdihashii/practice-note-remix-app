@@ -19,6 +19,7 @@ type AuthState = {
   accessToken: string | null;
   user: User | null;
   isPending: boolean;
+  isAuthenticated: boolean;
   setAuth: (accessToken: string, user: User) => void;
   clearAuth: () => void;
 };
@@ -41,7 +42,7 @@ async function initAuth(): Promise<
       }
     } catch (error) {
       console.error("[initAuth] Failed to refresh token:", error);
-      return { accessToken: null, user: null };
+      return { accessToken: null, user: null, isAuthenticated: false };
     }
   }
 
@@ -49,7 +50,7 @@ async function initAuth(): Promise<
   if (accessToken) {
     try {
       const user = await apiClient<User>("/auth/me");
-      return { accessToken, user };
+      return { accessToken, user, isAuthenticated: true };
     } catch (error) {
       console.error("[initAuth] Failed to fetch user data:", error);
 
@@ -61,7 +62,7 @@ async function initAuth(): Promise<
           accessToken = tokens.accessToken;
           storeAccessTokenInMemory(tokens);
           const user = await apiClient<User>("/auth/me");
-          return { accessToken, user };
+          return { accessToken, user, isAuthenticated: true };
         }
       } catch (retryError) {
         console.error(
@@ -69,12 +70,12 @@ async function initAuth(): Promise<
           retryError
         );
       }
-      return { accessToken: null, user: null };
+      return { accessToken: null, user: null, isAuthenticated: false };
     }
   }
 
   console.log("[initAuth] No access token available after all attempts");
-  return { accessToken: null, user: null };
+  return { accessToken: null, user: null, isAuthenticated: false };
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -102,6 +103,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     accessToken: auth?.accessToken ?? null,
     user: auth?.user ?? null,
     isPending,
+    isAuthenticated: !!auth?.user && !!auth?.accessToken,
     setAuth,
     clearAuth,
   };

@@ -12,13 +12,7 @@ import { useAuthStore } from "~/providers/AuthProvider";
 
 export const useAuthMutations = () => {
   const navigate = useNavigate();
-  const {
-    setAuth,
-    clearAuth,
-    user,
-    accessToken,
-    isPending: isAuthQueryPending,
-  } = useAuthStore();
+  const { setAuth, clearAuth } = useAuthStore();
 
   const loginMutation = useMutation<
     AuthResponse,
@@ -53,9 +47,6 @@ export const useAuthMutations = () => {
   });
 
   return {
-    user,
-    isAuthenticated: !!user && !!accessToken,
-    isAuthQueryPending,
     loginMutation,
     // Expose the user-friendly error message
     loginError: loginMutation.error?.getUserMessage(),
