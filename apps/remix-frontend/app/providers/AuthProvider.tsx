@@ -50,6 +50,7 @@ async function initAuth(): Promise<
   // If we have an access token, fetch user data
   if (accessToken) {
     try {
+      // Let apiClient handle the auth header
       const user = await apiClient<User>("/auth/me");
       return { accessToken, user, isAuthenticated: true };
     } catch (error) {
