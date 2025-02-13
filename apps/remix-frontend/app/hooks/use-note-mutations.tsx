@@ -5,7 +5,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 // First-party imports
 import { deleteNote, updateNote } from "~/api/notes";
 
-export const useNote = () => {
+export const useNoteMutations = () => {
   const queryClient = useQueryClient();
 
   const deleteMutation = useMutation({
