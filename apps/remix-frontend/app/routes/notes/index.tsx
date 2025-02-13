@@ -2,6 +2,7 @@
 import { Link, useSearchParams } from "react-router";
 
 // Third-party imports
+import type { Note } from "@notes-app/types";
 import {
   Pagination,
   PaginationContent,
@@ -13,7 +14,6 @@ import {
 } from "~/components/ui/pagination";
 
 // First-party imports
-import type { Note } from "@notes-app/types";
 import AddNoteButton from "~/components/common/AddNoteButton";
 import SearchBar from "~/components/common/SearchBar";
 import NoteCard from "~/components/notes/NoteCard";
