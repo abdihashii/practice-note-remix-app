@@ -26,9 +26,12 @@ importers:
       argon2:
         specifier: ^0.41.1
         version: 0.41.1
+      bun:
+        specifier: ^1.2.2
+        version: 1.2.2
       drizzle-orm:
         specifier: ^0.38.3
-        version: 0.38.4(@cloudflare/workers-types@4.20250124.3)(@types/pg@8.11.11)(@types/react@19.0.8)(pg@8.13.1)(react@19.0.0)
+        version: 0.38.4(@cloudflare/workers-types@4.20250124.3)(@types/pg@8.11.11)(@types/react@19.0.8)(bun-types@1.2.2)(pg@8.13.1)(react@19.0.0)
       hono:
         specifier: ^4.6.14
         version: 4.6.19
@@ -42,12 +45,12 @@ importers:
       '@cloudflare/workers-types':
         specifier: ^4.20241224.0
         version: 4.20250124.3
-      '@hono/node-server':
-        specifier: ^1.13.8
-        version: 1.13.8(hono@4.6.19)
       '@types/pg':
         specifier: ^8.11.10
         version: 8.11.11
+      bun-types:
+        specifier: ^1.2.2
+        version: 1.2.2
       dotenv:
         specifier: ^16.4.7
         version: 16.4.7
@@ -1007,12 +1010,6 @@ packages:
   '@floating-ui/utils@0.2.9':
     resolution: {integrity: sha512-MDWhGtE+eHw5JW7lq4qhc5yRLS11ERl1c7Z6Xd0a58DozHES6EnNNwUWbMiG4J9Cgj053Bhk8zvlhFYKVhULwg==}
 
-  '@hono/node-server@1.13.8':
-    resolution: {integrity: sha512-fsn8ucecsAXUoVxrUil0m13kOEq4mkX4/4QozCqmY+HpGfKl74OYSn8JcMA8GnG0ClfdRI4/ZSeG7zhFaVg+wg==}
-    engines: {node: '>=18.14.1'}
-    peerDependencies:
-      hono: ^4
-
   '@hookform/resolvers@3.10.0':
     resolution: {integrity: sha512-79Dv+3mDF7i+2ajj7SkypSKHhl1cbln1OGavqrsF7p6mbUv11xpqpacPsGDCTRvCSjEEIez2ef1NveSVL3b0Ag==}
     peerDependencies:
@@ -1069,6 +1066,61 @@ packages:
   '@npmcli/promise-spawn@6.0.2':
     resolution: {integrity: sha512-gGq0NJkIGSwdbUt4yhdF8ZrmkGKVz9vAdVzpOfnom+V8PLSmSOVhZwbNvZZS1EYcJN5hzzKBxmmVVAInM6HQLg==}
     engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0}
+
+  '@oven/bun-darwin-aarch64@1.2.2':
+    resolution: {integrity: sha512-hCDvi6GGJvsKpfGcU9xdrIhshDtzkYcGiB5wnj0jq/QM3U85qmIe8QUs7tyse9T77aZNjFIXO0GirL+oZ7C+IQ==}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@oven/bun-darwin-x64-baseline@1.2.2':
+    resolution: {integrity: sha512-Q4gC6fB/6BwGc6QltAAlhugCdRRIraxbNYuA0cyuwUlFmMzQIqgO+iSCIaS2PLEwVEwVx8WF++YpU+dVGyNAvg==}
+    cpu: [x64]
+    os: [darwin]
+
+  '@oven/bun-darwin-x64@1.2.2':
+    resolution: {integrity: sha512-W1MkLpfLMH4+aRoLNksLiODySVUlnKF5dTEmS2VlHxl4Mle+V/40/WSalpZVRPcztJMquwQy2VXox62WUmERXQ==}
+    cpu: [x64]
+    os: [darwin]
+
+  '@oven/bun-linux-aarch64-musl@1.2.2':
+    resolution: {integrity: sha512-73srKJaPf3fKUuST4Xd+CO52qCKVMtXUICkTddZ+6itnNNrBDBw4AoayrlNImg7swL8wIZonGGYZHpsvyjmlcg==}
+    cpu: [aarch64]
+    os: [linux]
+
+  '@oven/bun-linux-aarch64@1.2.2':
+    resolution: {integrity: sha512-VW83fgwFAJyu76xMF2t6W1+VxcLaKJUMH+/k61PdwAulpR6M+aqf8vPQDpIx2vrs4BqR8DQ4eEspyb2/DpcuyQ==}
+    cpu: [arm64]
+    os: [linux]
+
+  '@oven/bun-linux-x64-baseline@1.2.2':
+    resolution: {integrity: sha512-YvIilLbII9+sjwnZVumwItoUKSUHJHo9xYw5hcf6aeqDztK1ebGzNIJpE0RgjIT+GYqy504Yz5cK77CGpyVyJw==}
+    cpu: [x64]
+    os: [linux]
+
+  '@oven/bun-linux-x64-musl-baseline@1.2.2':
+    resolution: {integrity: sha512-K2o2vSHSnGn+ayXUuFJ+7O5L5Mc+uOIydMc5WI9bMhvmEtRqlohrwQR56HPzeFZVPWvmHdxb34VIceEKXmig6Q==}
+    cpu: [x64]
+    os: [linux]
+
+  '@oven/bun-linux-x64-musl@1.2.2':
+    resolution: {integrity: sha512-6uyUXVNH5jUsvhyzD0uiQNe8VPujuGTsHHDTW1LvRR6Lgr6AVaYjdk45ypbDSauRQsABxDKFQdfQqemkM97sYw==}
+    cpu: [x64]
+    os: [linux]
+
+  '@oven/bun-linux-x64@1.2.2':
+    resolution: {integrity: sha512-qoEkSdWGvTcX2/Iv3nUcwIcOk72L9Pg6X4ONUXV7luuOHsXktoQK5vuQeCC5FTxCEPjfoKy1GFAFomoU4qZDGQ==}
+    cpu: [x64]
+    os: [linux]
+
+  '@oven/bun-windows-x64-baseline@1.2.2':
+    resolution: {integrity: sha512-bYopMWSCjjjCKjANv7xxAXQoabVUxLZxTw0iC1bGYD9VZGo48nGaJXPn7DsPfeCXGyl+CY3Cy4QIEn+3gNRS2A==}
+    cpu: [x64]
+    os: [win32]
+
+  '@oven/bun-windows-x64@1.2.2':
+    resolution: {integrity: sha512-ZjxyIcS7kQFoGxyNBMZ9mqCxCkg7ZVG9P+/GTzMpUceFF/q88lUwsFsC7YwAe0ZubqcQLRSfdyjbKbC/HuqnFw==}
+    cpu: [x64]
+    os: [win32]
 
   '@parcel/watcher-android-arm64@2.5.1':
     resolution: {integrity: sha512-KF8+j9nNbUN8vzOFDpRMsaKBHZ/mcjEjMToVMJOhTozkDonQFFrRcfdLWn6yWKCmJKmdVxSgHiYvTCef4/qcBA==}
@@ -1806,6 +1858,9 @@ packages:
   '@types/use-sync-external-store@0.0.6':
     resolution: {integrity: sha512-zFDAD+tlpf2r4asuHEj0XH6pY6i0g5NeAHPn+15wk3BV6JA69eERFXC1gyGThDkVa1zCyKr5jox1+2LbV/AMLg==}
 
+  '@types/ws@8.5.14':
+    resolution: {integrity: sha512-bd/YFLW+URhBzMXurx7lWByOu+xzU9+kb3RboOteXYDfW+tr+JZa99OyNmPINEGB/ahzKrEuc8rcv4gnpJmxTw==}
+
   '@vitest/expect@2.1.8':
     resolution: {integrity: sha512-8ytZ/fFHq2g4PJVAtDX57mayemKgDR6X3Oa2Foro+EygiOJHUXhCqBAAKQYYajZpFoIfvBCF1j6R6IYRSIUFuw==}
 
@@ -1943,6 +1998,15 @@ packages:
 
   buffer-from@1.1.2:
     resolution: {integrity: sha512-E+XQCRwSbaaiChtv6k6Dwgc+bx+Bs6vuKJHHl5kox/BaKbhiXzqQOwK4cO22yElGp2OCmjwVhT3HmxgyPGnJfQ==}
+
+  bun-types@1.2.2:
+    resolution: {integrity: sha512-RCbMH5elr9gjgDGDhkTTugA21XtJAy/9jkKe/G3WR2q17VPGhcquf9Sir6uay9iW+7P/BV0CAHA1XlHXMAVKHg==}
+
+  bun@1.2.2:
+    resolution: {integrity: sha512-RUc8uVVTw8WoASUzXaEQJR1s7mnwoHm3P871qBUIqSaoOpuwcU+bSVX151/xoqDwnyv38SjOX7yQ3oO0IeT73g==}
+    cpu: [arm64, x64, aarch64]
+    os: [darwin, linux, win32]
+    hasBin: true
 
   bytes@3.1.2:
     resolution: {integrity: sha512-/Nf7TyzTx6S3yRJObOAV7956r8cr2+Oj8AC5dt8wSP3BQAoeX58NoHyCU8P8zGkNXStjTSi6fzO6F0pBdcYbEg==}
@@ -4248,10 +4312,6 @@ snapshots:
 
   '@floating-ui/utils@0.2.9': {}
 
-  '@hono/node-server@1.13.8(hono@4.6.19)':
-    dependencies:
-      hono: 4.6.19
-
   '@hookform/resolvers@3.10.0(react-hook-form@7.54.2(react@19.0.0))':
     dependencies:
       react-hook-form: 7.54.2(react@19.0.0)
@@ -4329,6 +4389,39 @@ snapshots:
   '@npmcli/promise-spawn@6.0.2':
     dependencies:
       which: 3.0.1
+
+  '@oven/bun-darwin-aarch64@1.2.2':
+    optional: true
+
+  '@oven/bun-darwin-x64-baseline@1.2.2':
+    optional: true
+
+  '@oven/bun-darwin-x64@1.2.2':
+    optional: true
+
+  '@oven/bun-linux-aarch64-musl@1.2.2':
+    optional: true
+
+  '@oven/bun-linux-aarch64@1.2.2':
+    optional: true
+
+  '@oven/bun-linux-x64-baseline@1.2.2':
+    optional: true
+
+  '@oven/bun-linux-x64-musl-baseline@1.2.2':
+    optional: true
+
+  '@oven/bun-linux-x64-musl@1.2.2':
+    optional: true
+
+  '@oven/bun-linux-x64@1.2.2':
+    optional: true
+
+  '@oven/bun-windows-x64-baseline@1.2.2':
+    optional: true
+
+  '@oven/bun-windows-x64@1.2.2':
+    optional: true
 
   '@parcel/watcher-android-arm64@2.5.1':
     optional: true
@@ -5035,6 +5128,10 @@ snapshots:
 
   '@types/use-sync-external-store@0.0.6': {}
 
+  '@types/ws@8.5.14':
+    dependencies:
+      '@types/node': 20.17.16
+
   '@vitest/expect@2.1.8':
     dependencies:
       '@vitest/spy': 2.1.8
@@ -5193,6 +5290,25 @@ snapshots:
       update-browserslist-db: 1.1.2(browserslist@4.24.4)
 
   buffer-from@1.1.2: {}
+
+  bun-types@1.2.2:
+    dependencies:
+      '@types/node': 20.17.16
+      '@types/ws': 8.5.14
+
+  bun@1.2.2:
+    optionalDependencies:
+      '@oven/bun-darwin-aarch64': 1.2.2
+      '@oven/bun-darwin-x64': 1.2.2
+      '@oven/bun-darwin-x64-baseline': 1.2.2
+      '@oven/bun-linux-aarch64': 1.2.2
+      '@oven/bun-linux-aarch64-musl': 1.2.2
+      '@oven/bun-linux-x64': 1.2.2
+      '@oven/bun-linux-x64-baseline': 1.2.2
+      '@oven/bun-linux-x64-musl': 1.2.2
+      '@oven/bun-linux-x64-musl-baseline': 1.2.2
+      '@oven/bun-windows-x64': 1.2.2
+      '@oven/bun-windows-x64-baseline': 1.2.2
 
   bytes@3.1.2: {}
 
@@ -5363,11 +5479,12 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  drizzle-orm@0.38.4(@cloudflare/workers-types@4.20250124.3)(@types/pg@8.11.11)(@types/react@19.0.8)(pg@8.13.1)(react@19.0.0):
+  drizzle-orm@0.38.4(@cloudflare/workers-types@4.20250124.3)(@types/pg@8.11.11)(@types/react@19.0.8)(bun-types@1.2.2)(pg@8.13.1)(react@19.0.0):
     optionalDependencies:
       '@cloudflare/workers-types': 4.20250124.3
       '@types/pg': 8.11.11
       '@types/react': 19.0.8
+      bun-types: 1.2.2
       pg: 8.13.1
       react: 19.0.0
 
