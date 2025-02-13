@@ -4,6 +4,7 @@ import type {
   Note,
   PaginatedResponse,
   PaginationParams,
+  TransformedPaginatedResponse,
   UpdateNoteDto,
 } from "@notes-app/types";
 import { SecurityErrorType } from "@notes-app/types";
@@ -17,7 +18,7 @@ import { apiClient } from "~/lib/api-client";
 export const getNotes = async ({
   page = 1,
   limit = 10,
-}: PaginationParams = {}) => {
+}: PaginationParams = {}): Promise<TransformedPaginatedResponse<Note>> => {
   const params = new URLSearchParams({
     page: page.toString(),
     limit: limit.toString(),
