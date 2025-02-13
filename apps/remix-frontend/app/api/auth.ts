@@ -91,7 +91,7 @@ export const refreshTokens = async (): Promise<TokenResponse | null> => {
     storeAccessTokenInMemory(data);
     return data;
   } catch (error) {
-    console.error("[refreshTokens] Failed to refresh tokens:", error);
+    console.warn("[refreshTokens] Failed to refresh tokens:", error);
     return null;
   }
 };
