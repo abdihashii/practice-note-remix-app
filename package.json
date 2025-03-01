@@ -4,13 +4,16 @@
   "private": true,
   "scripts": {
     "clean": "pnpm -r run clean",
-    "dev": "pnpm run build:types && pnpm -parallel run dev",
+    "predev": "pnpm run db:start",
+    "dev": "pnpm run predev && pnpm run build:types && pnpm -parallel run dev",
     "build": "pnpm run build:types && pnpm -r run build",
     "build:types": "pnpm --filter @notes-app/types build",
     "typecheck": "pnpm -r run typecheck",
     "db:generate": "pnpm --filter @notes-app/backend db:generate",
     "db:migrate": "pnpm --filter @notes-app/backend db:migrate",
     "db:push": "pnpm --filter @notes-app/backend db:push",
+    "db:start": "docker compose -f apps/backend/db.docker-compose.yml up -d",
+    "db:stop": "docker compose -f apps/backend/db.docker-compose.yml down",
     "test": "pnpm -r run test",
     "install:clean": "rm -rf node_modules **/node_modules pnpm-lock.yaml && pnpm install"
   },
